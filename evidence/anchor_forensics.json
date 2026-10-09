@@ -1,0 +1,77 @@
+{
+  "grid": {
+    "shape": [
+      3730,
+      3292
+    ],
+    "footprint_px": 5167373,
+    "catalogue_px": 60988,
+    "sum_kernel_credit": 211157.84092758718
+  },
+  "anchors": {
+    "h33-2-b2 (0.2778)": {
+      "n_dots": 37654,
+      "mean_value": 1.0,
+      "max_value": 1.0,
+      "min_value": 1.0,
+      "n_distinct_values": 1,
+      "dots_on_catalogue_px": 0,
+      "catalogue_truth_covered_within_3px_frac": 0.1724929494326753,
+      "TP_w_vs_visible_catalogue": 277.93795319758345,
+      "mean_credit_per_dot": 0.007381365942465168,
+      "catalogue_proxy_DTI": 0.0049348727157372966,
+      "organizer_confirmed_DTI": 0.2778,
+      "nn_px_mean": 15.021093038196017,
+      "nn_px_p10": 4.123105625617661,
+      "nn_px_p90": 29.832867780352597,
+      "implied_G_if_private_credit_equals_proxy": -8162.879260270052,
+      "inflation_factor_vs_proxy": 56.29324523692303
+    },
+    "poisson300m-offcat (0.2600)": {
+      "n_dots": 44090,
+      "mean_value": 1.0,
+      "max_value": 1.0,
+      "min_value": 1.0,
+      "n_distinct_values": 1,
+      "dots_on_catalogue_px": 0,
+      "catalogue_truth_covered_within_3px_frac": 0.48237358168820094,
+      "TP_w_vs_visible_catalogue": 3954.7811237275546,
+      "mean_credit_per_dot": 0.08969791616528815,
+      "catalogue_proxy_DTI": 0.06864938314078424,
+      "organizer_confirmed_DTI": 0.26,
+      "nn_px_mean": 15.149451594671815,
+      "nn_px_p10": 4.123105625617661,
+      "nn_px_p90": 29.5296461204668,
+      "implied_G_if_private_credit_equals_proxy": 7990.8707871517045,
+      "inflation_factor_vs_proxy": 3.7873610527103976
+    },
+    "efd28-repro (unconfirmed)": {
+      "n_dots": 44090,
+      "mean_value": 1.0,
+      "max_value": 1.0,
+      "min_value": 1.0,
+      "n_distinct_values": 1,
+      "dots_on_catalogue_px": 0,
+      "catalogue_truth_covered_within_3px_frac": 0.48237358168820094,
+      "TP_w_vs_visible_catalogue": 3954.7811237275546,
+      "mean_credit_per_dot": 0.08969791616528815,
+      "catalogue_proxy_DTI": 0.06864938314078424,
+      "organizer_confirmed_DTI": null,
+      "nn_px_mean": 15.26768943931401,
+      "nn_px_p10": 4.0,
+      "nn_px_p90": 29.154759474226502
+    }
+  },
+  "random_controls": {
+    "37654": {
+      "TP_w": 951.8738275019604,
+      "catalogue_proxy_DTI": 0.01690080870972139,
+      "mean_credit_per_dot": 0.02527948763748766
+    },
+    "44090": {
+      "TP_w": 1139.4980252818893,
+      "catalogue_proxy_DTI": 0.01978006723467219,
+      "mean_credit_per_dot": 0.02584481799233135
+    }
+  }
+}
