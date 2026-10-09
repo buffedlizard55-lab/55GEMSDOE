@@ -215,23 +215,23 @@ def greedy_cover(
     stop_gain: float | None = None,
     init_cap: int = 1_500_000,
 ) -> tuple[np.ndarray, list[float]]:
-    """Greedy maximum-expected-credit placement (Church-Revelle MCLP, greedy form).
+    """Greedy expected-coverage placement heuristic; **not** an official-DTI optimizer.
 
-    The metric decomposes exactly as ``DTI = TP_w / (0.2 N + 0.8 |G|)`` because
-    ``TP_w + FN_w = |G|`` identically (verified in tests/test_dti.py).  So the
-    placement problem is: choose ``N`` pixels that maximise the expected captured
-    credit ``sum_g m_g`` while spending as few dots as possible.  Captured credit
-    is a monotone submodular function of the chosen set, so the greedy rule --
-    repeatedly take the pixel with the largest remaining credit, then deplete the
-    credit it just captured -- is within ``(1 - 1/e)`` of optimal.
+    The official metric is
+    ``DTI = TP_w / (TP_w + alpha*FP_w + beta*FN_w + eps)``.  Although
+    ``TP_w + FN_w = |G|``, ``TP_w + FP_w`` is not generally prediction mass:
+    each truth pixel takes a separate maximum while FP is summed over predictions.
+    Therefore this routine does not reduce the full DTI to a denominator depending
+    only on dot count and truth count.
 
-    ``prior[x]`` is the expected kernel credit available at ``x``.  Depletion:
-    placing a dot at ``p`` multiplies the remaining credit at ``p + o`` by
-    ``(1 - k(|o|))``.  With a *flat* prior this reproduces a near-optimal
-    triangular tiling at the metric's own 300 m kernel scale; with an informative
-    prior it concentrates dots where credit is expected.
+    ``prior[x]`` is a heuristic expected-credit surface.  The routine repeatedly
+    selects high remaining prior and depletes nearby credit to discourage redundant
+    dots.  This approximates a maximum-coverage objective, but it does not include
+    the official FP term and its depletion approximation has no stated optimality
+    guarantee for DTI.  It is an exploratory placement baseline only; compare any
+    emitted map with the exact shared ``dti55.dti`` evaluator under spatial holdout.
 
-    Returns the boolean dot map and the list of per-step marginal gains.
+    Returns the boolean dot map and the list of heuristic per-step gains.
     """
     import heapq
 

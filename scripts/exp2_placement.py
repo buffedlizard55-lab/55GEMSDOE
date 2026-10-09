@@ -12,6 +12,7 @@ import json, sys, time
 from pathlib import Path
 import numpy as np
 from scipy import ndimage
+from scipy.stats import t as student_t
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -29,6 +30,12 @@ z.close()
 cat = labels == 1
 folds = holdout55.make_folds(labels, footprint, grid=(2, 2), buffer_px=3)
 
+def t_ci95(values):
+    values = np.asarray(values, dtype=np.float64)
+    mean = float(values.mean())
+    half = float(student_t.ppf(0.975, len(values) - 1) * values.std(ddof=1) / np.sqrt(len(values)))
+    return [mean - half, mean + half]
+
 def run(prior_fn, mode, n=N_DOTS):
     union = np.zeros(labels.shape, dtype=bool); per = []
     for f in folds:
@@ -43,8 +50,17 @@ def run(prior_fn, mode, n=N_DOTS):
         union |= d
         per.append(dti55.dti(d.astype(np.float32), f.truth, mask=f.withheld).dti)
     r = dti55.dti(union.astype(np.float32), cat)
-    return {"pooled": r.as_dict(), "folds": [round(x, 4) for x in per],
-            "wbar": round(r.tp_w / max(r.n_pred_pos, 1), 5)}
+    return {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "src/gems55/dti55.py",
+        "withheld_positive_count": int(cat.sum()),
+        "pooled": r.as_dict(),
+        "per_fold_dti": per,
+        "ci95": t_ci95(per),
+        "ci95_method": f"Student-t 95% interval across {len(per)} fold DTI values (df={len(per)-1}); pooled-components DTI is the point estimate.",
+        "folds": [round(x, 4) for x in per],
+        "wbar": round(r.tp_w / max(r.n_pred_pos, 1), 5),
+    }
 
 def cat_annulus(f):
     d = ndimage.distance_transform_edt(~f.visible)
@@ -52,7 +68,16 @@ def cat_annulus(f):
     return np.where(f.visible, 0.0, w)
 
 flat = lambda f: np.ones(labels.shape, dtype=np.float32)
-res = {"n_dots_target": N_DOTS, "tag": TAG, "arms": {}}
+res = {
+    "n_dots_target": N_DOTS,
+    "tag": TAG,
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py",
+    "withheld_positive_count": int(cat.sum()),
+    "metric_parameters": {"alpha": 0.2, "beta": 0.8, "kernel_radius_m": 300},
+    "protocol": "Four whole-quadrant hide-and-recover folds with 3 px buffer; visible faults excluded per fold.",
+    "arms": {},
+}
 ARMS = [
     ("flat_random",        flat, "random"),
     ("flat_greedy",        flat, "greedy"),

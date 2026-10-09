@@ -185,6 +185,10 @@
     "0.3774@N=44090": {
       "min_abs_G_for_any_placement": 4767.2,
       "required_TP_w_per_dot_at_that_G": 0.0408
-    }
-  }
+    },
+    "identity": "RETRACTED: TP_w + FN_w = |G| is valid, but it does not imply TP_w + FP_w = N and does not yield the displayed simplified DTI denominator.",
+    "upper_bound": "RETRACTED: this bound depends on the invalid TP_w + FP_w = N substitution; do not cite or use.",
+    "historical_invalid_shortcut": "DTI = TP_w/(0.2N + 0.8|G|); retained only to identify the prior method error."
+  },
+  "_review_status": "RETRACTED_METHOD_ERROR"
 }

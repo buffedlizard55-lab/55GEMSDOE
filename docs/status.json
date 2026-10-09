@@ -6,8 +6,8 @@
   "download_allowed": true,
   "submit_allowed": false,
   "submit_recommended": false,
-  "why_download_is_allowed": "The all-finite audit artifact passes the local format validator after being re-read from disk: one float32 band, EPSG:32611, template shape/transform, no NaN, all values in [0,1], and 40,000 positive pixels inside the footprint. This is permission to download for audit, not permission to spend a competition slot.",
-  "why_submission_is_blocked": "The strict lane uniqueness gate stops the artifact: its continuous surface has max absolute Spearman 0.0223 across 56 registry rasters, but final-dot overlap is 0.736 or higher for two prior rasters and 1.000 for the spacing-5 lattice. The protocol says duplicate/stop when overlap exceeds 0.70. The all-finite encoding also has no organizer receipt; no score is claimed.",
+  "why_download_is_allowed": "Audit download only. Current static byte-level checks re-read the TIFF and confirm a single float32 band, EPSG:32611, recorded shape/transform, all finite values in [0,1], 40,000 positive cells, and matching SHA-256. A prior full template/labels validator result is recorded as 12/12 PASS, but cannot be rerun in this checkout because the official template and labels are absent. This is not submit clearance.",
+  "why_submission_is_blocked": "The committed strict uniqueness result is DUPLICATE-STOP: prior final-dot overlap exceeded 0.70 for multiple registry rasters. Registry rasters are absent here, so no current uniqueness recheck was possible. The prior same-evaluator HOLDOUT-DTI candidate failed to beat the one-scale comparator. Do not spend a competition slot.",
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
     "evaluator_version": "src/gems55/dti55.py; exact published DTI formula, alpha=0.2, beta=0.8, R=300 m",
@@ -31,5 +31,41 @@
   },
   "organizer_confirmed_score": null,
   "sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
-  "reason": "Audit download is permitted; strict uniqueness and promotion gates are independently enforced."
+  "reason": "Audit download is permitted; strict uniqueness and promotion gates are independently enforced.",
+  "current_checkout_revalidation": {
+    "status": "STATIC_TIF_CHECKS_PASS_FULL_GATES_BLOCKED",
+    "checked_at_utc": "2026-10-09T18:57:44Z",
+    "static_tif_check": "PASS",
+    "static_tif_checks": [
+      "candidate exists",
+      "SHA-256 matches docs/run-card.json",
+      "single float32 band",
+      "EPSG:32611",
+      "3730 rows x 3292 columns",
+      "expected 100 m affine transform",
+      "all cells finite",
+      "range is [0,1]",
+      "exactly 40,000 positive cells"
+    ],
+    "raster_sha256_observed": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
+    "full_template_match": "NOT_RUN_MISSING_TEMPLATE",
+    "catalogue_pixel_check": "NOT_RUN_MISSING_LABELS",
+    "holdout_rerun": "BLOCKED_MISSING_FEATURE_CACHE_AND_LABELS",
+    "registry_uniqueness_rerun": "BLOCKED_MISSING_REGISTRY_RASTERS",
+    "missing_paths": [
+      "data/sample_submission.tif",
+      "data/labels.tif",
+      "data/training_features.tif",
+      "data/cache/lane_h56_ms300_900.npz",
+      "registry/rasters/",
+      "data/gems-geodawn-numerical-features.tif"
+    ],
+    "reason": "Static checks re-read the committed TIFF bytes. They do not establish template geometry equality, outside-footprint behavior, catalogue-pixel exclusion, holdout score, or uniqueness."
+  },
+  "leaderboard_snapshot": {
+    "evidence_class": "PUBLIC-LEADERBOARD-SNAPSHOT_NOT_SUBMISSION_PAGE_RECEIPT",
+    "file": "evidence/leaderboard_snapshot_20261009.json",
+    "captured_at_utc": "2026-10-09T18:48:54Z",
+    "artifact_mapping_verified": false
+  }
 }

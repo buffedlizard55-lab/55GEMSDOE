@@ -1,3 +1,7 @@
+import subprocess
+import sys
+from pathlib import Path
+
 import numpy as np
 import rasterio
 from rasterio.transform import from_origin
@@ -36,3 +40,18 @@ def test_validator_rejects_nan_inside(tmp_path):
         arr = np.full((30, 40), 0.5, np.float32); arr[3, 3] = np.nan
         d.write(arr, 1)
     assert not submission.validate(path, fp, _meta())["no_nan_inside_footprint"]
+
+
+def test_cli_missing_official_inputs_fails_closed_with_actionable_message(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    candidate = root / "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif"
+    result = subprocess.run(
+        [sys.executable, str(root / "scripts/validate_submission.py"), str(candidate),
+         "--template", str(tmp_path / "missing-template.tif"),
+         "--labels", str(tmp_path / "missing-labels.tif")],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 2
+    assert "BLOCKED: full submission validation needs" in result.stderr
+    assert "MISSING" in result.stderr
+    assert "Traceback" not in result.stderr

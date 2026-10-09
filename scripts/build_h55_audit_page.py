@@ -20,22 +20,12 @@ def main() -> None:
     card = json.loads((DOCS / "run-card-h55-160k.json").read_text())
     st = json.loads((DOCS / "status-h55-160k.json").read_text())
     ex10 = json.loads((EVID / "exp10_mass_sweep_v1.json").read_text())
-    ex9 = json.loads((EVID / "exp9_distance_band_v1_n40000.json").read_text())
     hd, uq, vo, sub = card["holdout_dti"], card["uniqueness"], card["validator_output"], card["submission"]
+    q4 = ex10["protocols"]["Q4_primary"]["160000"]
+    b15 = ex10["protocols"]["B15_secondary"]["160000"]
 
-    q4 = ex10["protocols"]["Q4_primary"]
-    b15 = ex10["protocols"]["B15_secondary"]
-    rows = []
-    for n in ["20000", "40000", "80000", "160000"]:
-        t, r = q4[n]["tensor_full"]["fold_pooled_dti"], q4[n]["random"]["fold_pooled_dti"]
-        p = q4[n]["tensor_minus_random_signflip_p_two_sided"]
-        t15, r15 = b15[n]["tensor_full"]["fold_pooled_dti"], b15[n]["random"]["fold_pooled_dti"]
-        p15 = b15[n]["tensor_minus_random_signflip_p_two_sided"]
-        rows.append(f"<tr><td class='num'>{int(n):,}</td><td class='num'>{t:.4f}</td><td class='num'>{r:.4f}</td>"
-                    f"<td class='num'>{t - r:+.4f}</td><td class='num'>{p:.3f}</td>"
-                    f"<td class='num'>{t15:.4f}</td><td class='num'>{r15:.4f}</td><td class='num'>{p15:.3f}</td></tr>")
-    sweep = "\n".join(rows)
-    b15_40 = ex9["bands"]["15"]["arms"]
+    def show_ci(arm: dict) -> str:
+        return f"[{arm['ci95'][0]:.4f}, {arm['ci95'][1]:.4f}]"
 
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -49,11 +39,10 @@ th{{background:#1c2129}} td.num{{text-align:right;font-variant-numeric:tabular-n
 .banner b{{color:#ffb4ae;font-size:18px}} .small{{font-size:13px;color:#9aa7b4}}
 </style></head><body><main>
 <div class="banner"><b>DO NOT SUBMIT — AUDIT DOWNLOAD ONLY</b><br>
-This file is a labelled negative result. Format-valid, but the literal duplicate-stop uniqueness rule is tripped and the
-holdout is negative. It is <b>not cleared to submit</b> and must <b>not spend a DrivenData slot</b>.</div>
+This historical file is an audit artifact only. Its recorded result is negative and the literal duplicate-stop uniqueness rule is tripped. The current checkout lacks competition inputs, cache, and registry rasters, so no full validator, holdout, or uniqueness gate was rerun. It is <b>not cleared to submit</b> and must <b>not spend a DrivenData slot</b>.</div>
 
 <h1>h55 tensor-dimensionality lane — final pass (2026-10-09)</h1>
-<p class="small">Experiments used: 3 of 3 (exp8 run 2, exp9, exp10). Labels: HOLDOUT-DTI only. No organiser score exists for this file.
+<p class="small">Historical experiment budget: 3 of 3 (exp8 run 2, exp9, exp10). All candidate performance numbers below are labelled HOLDOUT-DTI; this is not an organiser score. This review ran no holdout experiment.
 Shared site: <a href="index.html">executive summary</a> · <a href="hypotheses.html">hypotheses</a> · <a href="irregularities.html">irregularities</a>.</p>
 
 <h2>Audit download</h2>
@@ -64,7 +53,7 @@ Shared site: <a href="index.html">executive summary</a> · <a href="hypotheses.h
 <tr><td>NaN-outside twin (comparison)</td><td><a href="downloads/audit-h55-160k/{html.escape(Path(card['nan_twin']['file']).name)}">{html.escape(Path(card['nan_twin']['file']).name)}</a></td></tr>
 <tr><td>SHA-256 (.tif)</td><td class="small"><code>{html.escape(card['raster_sha256'])}</code></td></tr>
 <tr><td>Dots / encoding</td><td>{sub['n_dots']:,} binary dots, float32, EPSG:32611, 100 m, zeros outside footprint</td></tr>
-<tr><td>Format validator</td><td>{vo['checks_passed']}/{vo['checks_passed'] + vo['checks_failed']} checks PASS (re-read from bytes); NaN twin {vo['nan_twin_checks_passed']}/{vo['nan_twin_checks_passed']}; dots on mapped catalogue px: {vo['dots_on_mapped_catalogue_px']}</td></tr>
+<tr><td>Prior recorded format validator</td><td>{vo['checks_passed']}/{vo['checks_passed'] + vo['checks_failed']} checks PASS at generation (re-read from bytes); NaN twin {vo['nan_twin_checks_passed']}/{vo['nan_twin_checks_passed']}; dots on mapped catalogue px: {vo['dots_on_mapped_catalogue_px']}. Not rerun in this checkout (template and labels absent).</td></tr>
 <tr><td>Portal note (if ever used)</td><td><code>{html.escape(sub['note'])}</code> ({sub['note_characters']}/140 chars)</td></tr>
 <tr><td>Machine-readable</td><td><a href="run-card-h55-160k.json">run-card-h55-160k.json</a> · <a href="status-h55-160k.json">status-h55-160k.json</a></td></tr>
 </table>
@@ -77,25 +66,20 @@ Shared site: <a href="index.html">executive summary</a> · <a href="hypotheses.h
 <tr><td>Unique?</td><td><b>BLOCKED under the literal rule, not a copy.</b> Max |Spearman| {uq['max_abs_spearman_dense']} and max Jaccard {uq['max_jaccard']} against {uq['n_registry']} registry rasters. Raw 3-px overlap {uq['max_frac_within_3px_raw']} against <code>{html.escape(uq['raw_max_reference'])}</code>, where a random control gets {uq['raw_max_reference_random_control_frac_within_3px']} (excess {uq['excess_over_random_control_for_that_reference']:+.4f}). Owner decision needed (IR-55-030).</td></tr>
 </table>
 
-<h2>Holdout result (HOLDOUT-DTI)</h2>
-<p>Evaluator <code>{html.escape(hd['evaluator_version'])}</code>. Protocol: {html.escape(hd['protocol'])}.
-Withheld positives: <b>{hd['withheld_positive_count']:,}</b>.</p>
+<h2>Historical holdout results</h2>
+<p>Every DTI below is labelled <b>HOLDOUT-DTI</b>; evaluator <code>{html.escape(hd['evaluator_version'])}</code>, withheld positives <b>{hd['withheld_positive_count']:,}</b>. The point estimate is pooled-components DTI. Q4 is the preregistered primary (four folds); B15 is a ten-fold distance-banded secondary. CIs are Student-t intervals over per-fold DTI values; the original fold values were rounded to six decimals, so the review-added intervals are approximate. No organizer score is present.</p>
 <table>
-<tr><th>Arm (Q4 primary, N = 160,000)</th><th>HOLDOUT-DTI</th><th>95% CI (fold-level, df = 3)</th></tr>
-<tr><td>tensor_full</td><td class="num"><b>{hd['value']:.4f}</b></td><td class="num">[{hd['ci95'][0]:.4f}, {hd['ci95'][1]:.4f}]</td></tr>
-<tr><td>uniform random control</td><td class="num">{hd['uniform_random_control']:.4f}</td><td class="num">—</td></tr>
+<tr><th>Protocol / arm</th><th>Evidence class</th><th>DTI estimate</th><th>95% CI</th><th>Evaluator / positives</th></tr>
+<tr><td>Q4 primary, N = 160,000, tensor_full</td><td><b>HOLDOUT-DTI</b></td><td class="num">{hd['value']:.5f}</td><td class="num">[{hd['ci95'][0]:.5f}, {hd['ci95'][1]:.5f}]</td><td><code>{html.escape(hd['evaluator_version'])}</code>; {hd['withheld_positive_count']:,}</td></tr>
+<tr><td>Q4 primary, N = 160,000, random control</td><td><b>HOLDOUT-DTI</b></td><td class="num">{q4['random']['fold_pooled_dti']:.5f}</td><td class="num">{show_ci(q4['random'])}</td><td><code>{html.escape(hd['evaluator_version'])}</code>; {q4['random']['n_withheld_truth']:,}</td></tr>
+<tr><td>B15 secondary, N = 160,000, tensor_full</td><td><b>HOLDOUT-DTI</b></td><td class="num">{b15['tensor_full']['fold_pooled_dti']:.5f}</td><td class="num">{show_ci(b15['tensor_full'])}</td><td><code>{html.escape(hd['evaluator_version'])}</code>; {b15['tensor_full']['n_withheld_truth']:,}</td></tr>
+<tr><td>B15 secondary, N = 160,000, random control</td><td><b>HOLDOUT-DTI</b></td><td class="num">{b15['random']['fold_pooled_dti']:.5f}</td><td class="num">{show_ci(b15['random'])}</td><td><code>{html.escape(hd['evaluator_version'])}</code>; {b15['random']['n_withheld_truth']:,}</td></tr>
 </table>
-<p class="small">The CI method is a fold-level t-interval over 4 quadrant folds. It is indicative only.</p>
+<p class="small">Additional historical sweep scores and their fold-derived 95% CIs are in <a href="../evidence/exp10_mass_sweep_v1.json">exp10 evidence</a>; banded 40k results are in <a href="../evidence/exp9_distance_band_v1_n40000.json">exp9 evidence</a>. Metadata notes the CI method and no-rerun status.</p>
 
-<h2>Dot-mass sweep (exp10, pre-registered)</h2>
-<table>
-<tr><th>N dots</th><th>Q4 tensor</th><th>Q4 random</th><th>Q4 diff</th><th>Q4 p (sign-flip)</th><th>B15 tensor</th><th>B15 random</th><th>B15 p</th></tr>
-{sweep}
-</table>
-<p>Rule: N* = argmax of tensor on Q4 = 160,000, which is the upper edge of the grid. Label: <b>NEGATIVE</b>
-(Q4 fails at N*; B15 passes at N* but does not rescue the primary). Random beats tensor on Q4 at 40k, 80k and 160k.</p>
-<p class="small">Secondary B = 15 px at N = 40k (exp9, fold-pooled): random {b15_40['random']['fold_pooled_dti']:.4f}, tensor_full {b15_40['tensor_full']['fold_pooled_dti']:.4f},
-H-A-500 {b15_40['H-A-500']['fold_pooled_dti']:.4f}, H-A-1500 {b15_40['H-A-1500']['fold_pooled_dti']:.4f}. Leakage canary: max single-feature AUC ≤ 0.90 for lane features (IR-55-031).</p>
+<h2>Pre-registered mass sweep (exp10)</h2>
+<p>The selected dot budget was the maximum of the tensor arm under the Q4 primary protocol. The promotion verdict remains <b>NEGATIVE</b>: the primary did not beat its random control, while the B15 secondary comparison was positive and cannot rescue the primary. The full historical sweep is linked above with each arm's fold vectors and fold-derived 95% CI; this page intentionally does not repeat scores lacking the same report context.</p>
+<p class="small">The per-feature leakage canary is separately recorded in the run card as a diagnostic, not a DTI score. No holdout experiment was rerun during this review.</p>
 
 <h2>Why it is labelled negative and not a file to submit</h2>
 <ul>
@@ -105,7 +89,7 @@ H-A-500 {b15_40['H-A-500']['fold_pooled_dti']:.4f}, H-A-1500 {b15_40['H-A-1500']
 </ul>
 
 <h2>Out-of-lane hypotheses H-B to H-F (proposals only; not implemented)</h2>
-<p>Break-even bar for any new dot: α·DTI/(1+α·DTI) at the random control = <b>{0.2 * hd['uniform_random_control'] / (1 + 0.2 * hd['uniform_random_control']):.4f}</b> per dot. Gains are priors, not HOLDOUT-DTI. AGENTS.md needs lane approval before any of these is built.</p>
+<p><b>Retraction:</b> the historical per-dot break-even shortcut was based on the invalid identity TP_w + FP_w = N; it is withdrawn under IR-55-034 and is not a decision rule. Expected gains below are priors only, not HOLDOUT-DTI. AGENTS.md requires lane approval before any out-of-lane proposal is built.</p>
 <table>
 <tr><th>Rank</th><th>Hypothesis</th><th>Layers (band no.)</th><th>Expected DTI gain (prior)</th><th>Cost</th><th>Status</th></tr>
 <tr><td>1</td><td><b>H-F</b> 1 m lidar DEM scarps</td><td>1 m DEM (USGS 3DEP; not in stack)</td><td>High (unquantified)</td><td>High</td><td>Blocked: 3DEP unreachable from the sandbox</td></tr>
@@ -125,7 +109,7 @@ H-A-500 {b15_40['H-A-500']['fold_pooled_dti']:.4f}, H-A-1500 {b15_40['H-A-1500']
 <tr><td>IR-55-028</td><td><b>High</b></td><td>Striping axis unreconciled: ScienceBase says E–W; the lane masks rows (E–W); the diagnostic says N–S but its own numbers don't support that.</td><td>Open. Needs the flight-line shapefile (not reachable from the sandbox). Do not cite the lane striping mask until resolved.</td></tr>
 <tr><td>IR-55-029</td><td>Medium</td><td>Two striping counts from two detectors: 86,947 px (row z-score) and 1,105,919 px (21%, coherence mask).</td><td>Both reported; not a miscount.</td></tr>
 <tr><td>IR-55-030</td><td>Medium (blocks submit)</td><td>Literal 70% duplicate-stop tripped: raw 3-px overlap 0.8401 against a dense spacing-5 lattice; random control 0.8389 (excess +0.0012). Not a copy.</td><td>Owner decision required. No submit clearance.</td></tr>
-<tr><td>IR-55-031</td><td>Medium</td><td>Secondary protocol (B = 15 px) is significantly positive at 40k and 160k; the primary Q4 is negative.</td><td>Reported as is; the pre-registered rule gives NEGATIVE.</td></tr>
+<tr><td>IR-55-031</td><td>Medium</td><td>Secondary B15 protocol disagrees with the negative primary Q4 decision.</td><td>All historical DTI arms now have fold-derived CIs in the run card/evidence JSON; no experiment was rerun.</td></tr>
 <tr><td>IR-55-032</td><td>Medium</td><td>The holdout arm (withheld-domain emission, striping excluded, per-fold seeds) is not the shipped emitter (full footprint, striping ×0.25, seed 55).</td><td>Disclosed. Would need a different protocol to close.</td></tr>
 <tr><td>IR-55-033</td><td>Low–Medium</td><td>Zeros vs NaN outside the footprint: rules allow null or nan; the zeros choice rests on the portal range check, which is not verified.</td><td>Confirm on the portal before relying on either encoding. NaN twin is for comparison.</td></tr>
 </table>

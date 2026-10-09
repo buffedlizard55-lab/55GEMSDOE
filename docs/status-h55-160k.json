@@ -1,7 +1,7 @@
 {
   "project": "55GEMSDOE",
   "reviewed_utc": "2026-10-09",
-  "overall_status": "format_valid_uniqueness_blocked_negative_audit_only",
+  "overall_status": "historical_format_validation_uniqueness_blocked_negative_audit_only",
   "label": "DO NOT SUBMIT",
   "submission_tif": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
   "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
@@ -10,21 +10,80 @@
   "submit_allowed": false,
   "submit_recommended": false,
   "uniqueness_status": "BLOCKED: literal 70% duplicate-stop rule tripped (raw 0.8401 vs a spacing-5 lattice; random control 0.8389; not a copy). Submit blocked until the owner decides.",
-  "why_download_is_allowed": "Audit download only. The file passes 12/12 format checks re-read from the written bytes (single-band float32, EPSG:32611, 3730x3292, template transform incl. 100 m pixel size, every value in [0,1], zero NaN, no dot on a mapped catalogue pixel). It is not a copy of any of the 56 registry rasters (max Spearman 0.014, max Jaccard 0.031). Format validity is not submit clearance.",
-  "why_submission_is_not_recommended": "On the leakage-free Q4 holdout, tensor_full at N=160000 scores 0.1019 vs 0.1627 for uniform random (HOLDOUT-DTI, 60,988 withheld positives). On Q4 it loses at N=40k, 80k and 160k and is not distinguishable at 20k. Do not spend a weekly slot on it. The uniqueness gate is also flagged (see uniqueness_status).",
+  "why_download_is_allowed": "Audit download only. A prior run recorded format validation, but this review did not re-read this h55 TIFF or compare it to the absent official template/labels. The TIFF is not a cleared submission; format validity never overrides the negative holdout and strict uniqueness stop.",
+  "why_submission_is_not_recommended": "The historical pre-registered primary Q4 holdout verdict was negative versus its matched random control; the secondary B15 result does not rescue it. See the linked historical run card and evidence for per-score HOLDOUT-DTI labels, evaluator, withheld-positive count, and CIs. Do not spend a weekly slot.",
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
-    "evaluator": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-    "tensor_lane": 0.1019,
-    "uniform_random_control": 0.1627,
-    "ci95_folds": [
-      0.0877,
-      0.1185
-    ],
+    "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
     "withheld_positive_count": 60988,
-    "n_dots": 160000
+    "primary_q4": {
+      "protocol": "Q4 contiguous-quadrant hide-and-recover, four folds, N=160000",
+      "tensor_full": {
+        "value": 0.1019,
+        "ci95": [
+          0.0877,
+          0.1185
+        ],
+        "ci95_method": "Student-t 95% interval across 4 Q4 per-fold DTI values (df=3); pooled-components DTI is the point estimate; indicative."
+      },
+      "uniform_random_control": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
+        "withheld_positive_count": 60988,
+        "protocol": "Q4 primary, N=160000, four buffered quadrant folds",
+        "value": 0.16268402704607413,
+        "ci95": [
+          0.095892,
+          0.251167
+        ],
+        "ci95_method": "Student-t 95% interval over 4 recorded per-fold DTI values (df=3); fold values stored rounded to 6 decimals, interval approximate."
+      }
+    },
+    "secondary_b15": {
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
+      "withheld_positive_count": 60988,
+      "protocol": "Distance-banded whole-segment holdout, B=15 px, N=160000, ten folds; secondary only.",
+      "tensor_full": {
+        "value": 0.023839710601390767,
+        "ci95": [
+          0.022891,
+          0.024782
+        ],
+        "ci95_method": "Student-t 95% interval over 10 recorded per-fold DTI values (df=9); fold values stored rounded to 6 decimals, interval approximate."
+      },
+      "random": {
+        "value": 0.021196785103013028,
+        "ci95": [
+          0.019939,
+          0.022449
+        ],
+        "ci95_method": "Student-t 95% interval over 10 recorded per-fold DTI values (df=9); fold values stored rounded to 6 decimals, interval approximate."
+      },
+      "signflip_p_two_sided": 0.00390625,
+      "interpretation": "Positive secondary comparison; it does not change the pre-registered negative primary Q4 verdict."
+    },
+    "interpretation": "Historical local hide-and-recover evidence only; not an organizer score or prediction.",
+    "full_card": "docs/run-card-h55-160k.json"
   },
   "organizer_confirmed_score": null,
   "organizer_score_status": "none exists for this file",
-  "reason": "A validated raster is published because the owner's standing requirement is an obvious downloadable submission. Its scientific verdict is negative and the site says so next to the button."
+  "reason": "The historical h55 TIFF remains linked for audit under an explicit DO NOT SUBMIT label. Current template, labels, cached features, and registry rasters are absent, so no fresh validator, holdout, or uniqueness claim is made. Its recorded verdict is negative and no slot was used.",
+  "current_checkout_revalidation": {
+    "status": "NOT_RERUN_BLOCKED_BY_MISSING_INPUTS",
+    "checked_at_utc": "2026-10-09T18:57:44Z",
+    "static_tif_checks": "NOT_RUN_FOR_H55",
+    "full_validator": "BLOCKED_MISSING_SAMPLE_TEMPLATE_AND_LABELS",
+    "holdout": "NOT_RERUN_NO_FEATURE_CACHE",
+    "uniqueness": "NOT_RERUN_NO_REGISTRY_RASTERS",
+    "missing_paths": [
+      "data/sample_submission.tif",
+      "data/labels.tif",
+      "data/training_features.tif",
+      "data/gems-geodawn-numerical-features.tif",
+      "data/cache/",
+      "registry/rasters/"
+    ],
+    "note": "The h55 page summarizes historical evidence only; no fresh check is claimed."
+  }
 }

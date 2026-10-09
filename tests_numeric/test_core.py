@@ -97,10 +97,30 @@ def test_dti_kernel_offsets_are_the_3px_triangular_kernel():
     assert min(edge) == pytest.approx(0.0, abs=1e-12)
 
 
-def test_breakeven_credit_is_monotone():
+def test_isolated_pixel_breakeven_credit_is_monotone_and_derived():
+    # With alpha + beta = 1, the independent-one-pixel approximation is alpha * DTI.
     assert dti55.breakeven_credit(0.0) == 0.0
     assert dti55.breakeven_credit(0.3) < dti55.breakeven_credit(0.5)
-    assert dti55.breakeven_credit(0.3) == pytest.approx(0.0566, abs=1e-3)
+    assert dti55.breakeven_credit(0.3) == pytest.approx(0.06, abs=1e-12)
+    # For alpha + beta != 1, exercise the full documented denominator.
+    assert dti55.breakeven_credit(0.3, alpha=0.2, beta=0.6) == pytest.approx(0.2 * 0.3 / 0.94)
+    with pytest.raises(ValueError):
+        dti55.breakeven_credit(float("nan"))
+
+
+def test_tp_plus_fp_is_not_prediction_mass_for_adjacent_truth_pixels():
+    """Official TP is maxed per truth pixel; FP is defined per prediction pixel."""
+    truth = np.zeros((15, 15), dtype=bool)
+    truth[7, 7:9] = True
+    pred = np.zeros((15, 15), dtype=np.float32)
+    pred[7, 7] = 1.0
+    result = dti55.dti(pred, truth)
+    assert result.tp_w == pytest.approx(1.0 + 2.0 / 3.0)
+    assert result.fp_w == pytest.approx(0.0)
+    assert result.tp_w + result.fp_w > pred.sum()
+    # This refutes the shortcut TP+FP=N, which would produce a different DTI.
+    shortcut = result.tp_w / (0.2 * float(pred.sum()) + 0.8 * int(truth.sum()))
+    assert result.dti != pytest.approx(shortcut)
 
 
 # --------------------------------------------------------------------------- #

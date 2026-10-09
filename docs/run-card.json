@@ -154,8 +154,54 @@
     "weekly_slot_used": false
   },
   "review_passes": [
-    "implementation",
-    "bug/assumption audit",
-    "requirement/source/strict-uniqueness audit"
-  ]
+    "Pass 1 \u2014 implementation/tests: audited the exact DTI helper and fail-closed validator; rebuilt the site pages; current static TIFF hash/bytes checks passed; pytest tests_numeric: 30 passed, 2 skipped; pytest tests: 8 passed.",
+    "Pass 2 \u2014 algebra/evidence: retracted the invalid TP_w + FP_w = N shortcut; corrected the isolated-pixel helper and greedy-placement wording; added regression tests and fold-CI metadata to historical holdouts; H33-to-public-row mapping remains unverified.",
+    "Pass 3 \u2014 requirements/provenance/gates: checked official links and dated leaderboard snapshot, submission-page receipt distinction, visible no-submit warnings, and strict 0.90/70% protocol. No new holdout or uniqueness scan was possible because required inputs/cache/registry are absent; H56 remains negative and DO NOT SUBMIT."
+  ],
+  "public_leaderboard_snapshot": {
+    "evidence_class": "PUBLIC-LEADERBOARD-SNAPSHOT_NOT_SUBMISSION_PAGE_RECEIPT",
+    "snapshot_file": "evidence/leaderboard_snapshot_20261009.json",
+    "captured_at_utc": "2026-10-09T18:48:54Z",
+    "observed_ranks": {
+      "rank_1": 0.3774,
+      "rank_7": 0.3195,
+      "rank_16": 0.2778
+    },
+    "h33_artifact_mapping_verified": false,
+    "not_recorded_as_organizer_confirmed_score": true
+  },
+  "review_corrections": [
+    {
+      "id": "IR-55-034",
+      "status": "retracted_method_error",
+      "note": "Historical anchor-proxy DTI and target-score algebra assumed TP_w + FP_w = N. This is not an identity of the official metric. See docs/leaderboard-analysis.md."
+    }
+  ],
+  "current_checkout_revalidation": {
+    "status": "STATIC_TIF_CHECKS_PASS_FULL_GATES_BLOCKED",
+    "checked_at_utc": "2026-10-09T18:57:44Z",
+    "static_tif_check": "PASS",
+    "static_tif_checks": [
+      "candidate exists",
+      "SHA-256 matches docs/run-card.json",
+      "single float32 band",
+      "EPSG:32611",
+      "3730 rows x 3292 columns",
+      "expected 100 m affine transform",
+      "all cells finite",
+      "range is [0,1]",
+      "exactly 40,000 positive cells"
+    ],
+    "raster_sha256_observed": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
+    "full_template_label_holdout_registry_recheck": "BLOCKED_NOT_RERUN",
+    "missing_paths": [
+      "data/sample_submission.tif",
+      "data/labels.tif",
+      "data/gems-geodawn-numerical-features.tif",
+      "data/cache/lane_h56_ms300_900.npz",
+      "registry/rasters/",
+      "data/training_features.tif"
+    ],
+    "reason": "Template and labels are needed for footprint/catalogue checks; feature cache for the canonical holdout; registry rasters for pre/post uniqueness checks. No new holdout or uniqueness scan was performed."
+  }
 }

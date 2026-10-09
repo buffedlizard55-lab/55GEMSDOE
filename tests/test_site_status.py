@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 import unittest
 from html.parser import HTMLParser
 from pathlib import Path
@@ -38,6 +40,12 @@ class SiteStatusTests(unittest.TestCase):
         card = json.loads((DOCS / "run-card.json").read_text())
 
         self.assertEqual(status["overall_status"], "format_valid_uniqueness_blocked_negative")
+        current = status["current_checkout_revalidation"]
+        self.assertEqual(current["status"], "STATIC_TIF_CHECKS_PASS_FULL_GATES_BLOCKED")
+        self.assertEqual(current["static_tif_check"], "PASS")
+        self.assertIn("full_template_match", current)
+        self.assertEqual(current["holdout_rerun"], "BLOCKED_MISSING_FEATURE_CACHE_AND_LABELS")
+        self.assertEqual(current["registry_uniqueness_rerun"], "BLOCKED_MISSING_REGISTRY_RASTERS")
         self.assertEqual(card["verdict"], "negative")
         self.assertFalse(card["submission"]["weekly_slot_used"])
         self.assertFalse(card["submission"]["submit_allowed"])
@@ -110,18 +118,67 @@ class SiteStatusTests(unittest.TestCase):
                 self.assertTrue(target.exists(), f"{page.relative_to(ROOT)} -> {href}")
 
     def test_run_card_labels_holdout_evaluation(self) -> None:
-        # Updated 2026-10-09: the holdout HAS run (negative). Every number must carry its label, evaluator,
-        # withheld-positive count and CI, and must not be presented as an organiser score.
+        # H56 is committed prior-run evidence, not rerun in this checkout. Every
+        # reported DTI arm shares the exact evaluator/positive-count metadata and CI.
         card = json.loads((DOCS / "run-card.json").read_text())
         holdout = card["holdout_dti"]
         self.assertEqual(holdout["evidence_class"], "HOLDOUT-DTI")
         self.assertEqual(holdout["status"], "RUN")
         self.assertTrue(holdout["evaluator_version"])
         self.assertIsInstance(holdout["withheld_positive_count"], int)
-        self.assertEqual(len(holdout["ci95"]), 2)
-        self.assertLessEqual(holdout["ci95"][0], holdout["value"])
-        self.assertLessEqual(holdout["value"], holdout["ci95"][1])
-        self.assertNotIn("organizer_confirmed_score", card)
+        arms = [holdout, holdout["matched_random_control"], holdout["current_best_comparator"]]
+        arms.extend(holdout["other_arms"].values())
+        for arm in arms:
+            self.assertIn("value", arm)
+            self.assertEqual(len(arm["ci95"]), 2)
+            self.assertLessEqual(arm["ci95"][0], arm["value"])
+            self.assertLessEqual(arm["value"], arm["ci95"][1])
+        self.assertEqual(card["current_checkout_revalidation"]["status"],
+                         "STATIC_TIF_CHECKS_PASS_FULL_GATES_BLOCKED")
+        self.assertFalse(card["submission"]["submit_allowed"])
+        self.assertFalse(card["organizer_confirmed_scores"])
+        snapshot = card["public_leaderboard_snapshot"]
+        self.assertEqual(snapshot["evidence_class"], "PUBLIC-LEADERBOARD-SNAPSHOT_NOT_SUBMISSION_PAGE_RECEIPT")
+        self.assertFalse(snapshot["h33_artifact_mapping_verified"])
+
+    def test_h55_archived_dti_scores_and_sweep_ci_metadata(self) -> None:
+        card = json.loads((DOCS / "run-card-h55-160k.json").read_text())
+        h = card["holdout_dti"]
+        self.assertEqual(h["evidence_class"], "HOLDOUT-DTI")
+        self.assertTrue(h["evaluator_version"])
+        self.assertEqual(h["withheld_positive_count"], 60988)
+        arms = [h, h["uniform_random_control"], h["B15_secondary"]["tensor_full"],
+                h["B15_secondary"]["random"]]
+        for arm in arms:
+            self.assertIn("value", arm)
+            self.assertEqual(len(arm["ci95"]), 2)
+
+        for name in ("exp9_distance_band_v1_n40000.json", "exp10_mass_sweep_v1.json"):
+            evidence = json.loads((ROOT / "evidence" / name).read_text())
+            meta = evidence["review_metadata"]
+            self.assertEqual(meta["evidence_class"], "HOLDOUT-DTI")
+            self.assertTrue(meta["evaluator_version"])
+            self.assertEqual(meta["withheld_positive_count"], 60988)
+            def check_fold_scores(x):
+                if isinstance(x, dict):
+                    if "per_fold_dti" in x:
+                        self.assertEqual(len(x["ci95"]), 2)
+                        self.assertIn("ci95_method", x)
+                    for value in x.values():
+                        check_fold_scores(value)
+                elif isinstance(x, list):
+                    for value in x:
+                        check_fold_scores(value)
+            check_fold_scores(evidence)
+
+    def test_retired_h55_card_generator_fails_closed(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/make_final_card.py")],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("is retired", result.stderr)
+        self.assertIn("must not overwrite", result.stderr)
 
 
 if __name__ == "__main__":

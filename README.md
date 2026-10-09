@@ -2,8 +2,10 @@
 
 DrivenData competition **306**, *The Geologic Enhanced Mapping System (GEMS)
 Prize Challenge*, GeoDAWN region, northwestern Great Basin. Read this file first
-at the start of every session. The current evidence is in `docs/run-card.json` and
-`docs/status.json`; numbers in this README are labelled by evidence class.
+at the start of every session, then read `docs/run-card.json`, `docs/status.json`,
+`docs/hypotheses.md`, and `docs/irregularities.md`. The dated public leaderboard observation is in
+`evidence/leaderboard_snapshot_20261009.json`; numbers in this README are labelled
+by evidence class.
 
 ## Current decision: audit artifact generated, submission blocked
 
@@ -20,29 +22,59 @@ H55 raster**:
 
 | Question | Decision | Measured reason |
 |---|---|---|
-| Can the all-finite TIF be downloaded for audit? | **YES** | Independent re-read passed 12/12 local format checks: one float32 band, EPSG:32611, 3730×3292, the template transform, finite values in [0,1], and 40,000 in-footprint positives. |
+| Can the all-finite TIF be downloaded for audit? | **YES — AUDIT ONLY** | This checkout's byte-level read confirms one float32 band, EPSG:32611, shape 3730×3292, transform `(100, 0, 243350, 0, -100, 4508550)`, all finite values in [0,1], and 40,000 positive cells. The committed run card records the prior full 12/12 template-based validator result; it cannot be reproduced in this checkout because `data/sample_submission.tif` and `data/labels.tif` are absent. |
+| Is the H56 candidate scientifically cleared? | **NO** | Prior HOLDOUT-DTI evidence was negative versus the one-scale comparator; prior strict dot uniqueness was `DUPLICATE-STOP`. Competition features/cache and registry rasters are absent here, so none of those checks was rerun. |
 | Is it cleared to upload to DrivenData? | **NO — DO NOT SUBMIT** | The strict parallel-run uniqueness gate is `DUPLICATE-STOP`: final dots overlap one prior raster by 1.000 and another by 0.736 within 3 px, above the 0.70 stop threshold. No weekly slot was used. |
-| Did the organizer confirm a score? | **NO** | There is no submission-page receipt in this checkout. User- and sibling-repository-reported leaderboard values remain claims, not organizer-confirmed scores. |
+| Did the organizer confirm a score for this raster? | **NO** | There is no submission-page receipt. The official public leaderboard snapshot is recorded separately, but its rows do not map to a raster filename or hash. |
 | Did the candidate beat the current same-evaluator holdout best? | **NO** | **HOLDOUT-DTI** full multiscale tensor lane = 0.01728, 95% CI [0.01613, 0.01847], versus one-scale `ridge_x_agree` comparator = 0.01852, 95% CI [0.01782, 0.01940]. Both use 60,988 withheld positives and the corrected segment evaluator. |
 
-The file is therefore a **unique-by-bytes, format-valid audit artifact**, not a
-cleared competition submission. The web site repeats this distinction at the top
+The file is therefore a **hash-identified audit artifact**, not a cleared
+competition submission. The web site repeats this distinction at the top
 of [`docs/index.html`](docs/index.html). A chance-adjusted overlap is reported for
 research, but it never overrides the literal >70% stop rule.
 
-## Tensor-lane final pass (h55 audit file, 2026-10-09) — DO NOT SUBMIT
+## Official public leaderboard snapshot — not a file receipt
 
-This session used its 3-experiment budget. The pre-registered rule selected N\* = 160,000 dots. The result is **NEGATIVE** (HOLDOUT-DTI).
+The official public leaderboard rendered during this review (captured 2026-10-09
+18:48:54 UTC). Its displayed best-public rows show **0.3774 at rank 1**,
+**0.3195 at rank 7**, and **0.2778 at rank 16**. The leaderboard identifies
+participants, not GeoTIFF filenames or hashes, so it cannot verify that the H33
+raster named in the user brief produced the 0.2778 row. The GEMSDOE32 H33 page
+itself labels that candidate `UNSCORED` and calls 0.2747 a projection. Do not
+attribute a public row to that raster without a matching submission-page receipt.
+See [dated snapshot](evidence/leaderboard_snapshot_20261009.json) and
+[H33 analysis](docs/leaderboard-analysis.md). This public-page observation is not
+an `ORGANIZER-CONFIRMED` submission receipt; the run-card receipt list remains
+empty.
 
-* **Primary Q4:** tensor_full 0.1019 (fold-level 95% CI 0.0877–0.1185, 60,988 withheld positives) vs uniform random 0.1627. Random wins at 40k, 80k and 160k.
-* **Secondary B = 15 px:** tensor beats random at 40k and 160k (p = 0.008, p = 0.004). The rule needs both protocols to pass, so the label stays NEGATIVE.
-* **Audit file:** `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 `ffd2a892…`). Format 12/12. **Uniqueness is blocked** under the literal 70% duplicate-stop rule (raw 0.8401 against a spacing-5 lattice, chance-level; not a copy). **Do not submit.** Download for audit only.
-* **Page:** `docs/h55-160k-audit.html`. **Run card:** `docs/run-card-h55-160k.json`, `docs/status-h55-160k.json`. The canonical `docs/run-card.json` and `docs/status.json` describe the h56 file and are not overwritten.
-* **Hypotheses:** H-B to H-F (out of lane, proposals only) are in `docs/hypotheses.md` and on the audit page.
-* **Irregularities:** IR-55-025 to IR-55-033 (striping axis unreconciled, two striping detectors, literal uniqueness stop, holdout arm vs shipped emitter, zeros/NaN encoding).
-* **Template fixes (each applied once):** validator pixel size (IR-55-025), feature-raster name in `io55`, `prepare_data`, `run_tensor_lane` and `build_docs` (IR-55-026), sidecar selection (IR-55-027).
+## Retraction: anchor proxy-DTI analysis
 
-Reproduce the audit file: `scripts/submission_writer.py --tag v1 --n-dots 160000`, then `scripts/validate_submission.py`, `scripts/verify_unique.py`, `scripts/make_final_card.py`, `scripts/build_site.py`, `scripts/build_h55_audit_page.py` (in that order).
+A line-by-line audit found that the old anchor-forensics scripts assumed
+`TP_w + FP_w = N`. The official metric only implies `TP_w + FN_w = |G|`; TP and
+FP are separately defined, so the old proxy-DTI values, hidden-label-size algebra,
+and conclusions based on them are **retracted**. Those historical JSON files
+remain with a retraction marker; scripts 5–7 now fail closed. The same invalid
+denominator also appeared in a `greedy_cover` docstring and the old exp10 sweep
+rationale; both now state that greedy expected-credit placement is only a heuristic,
+not an exact DTI optimizer. Exact DTI must be measured by the canonical evaluator
+inside a proper segment holdout. See `docs/irregularities.md` IR-55-034. No holdout
+experiment or submission slot was used to make this correction.
+
+## Historical tensor-lane final pass (h55) — DO NOT SUBMIT
+
+The h55 audit used its three-experiment budget and reached a **negative**
+pre-registered decision; its secondary protocol disagreed with its primary. No
+submission slot was used. The exact measured results must be read from
+[`docs/run-card-h55-160k.json`](docs/run-card-h55-160k.json), where each score is
+paired with the evaluator, withheld-positive count, CI, and protocol. That audit
+is historical, not a fresh result from this review. Its TIFF is for audit only and
+is blocked by the strict registry rule.
+
+- **Artifact:** `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (SHA-256 begins `ffd2a892`).
+- **Page:** `docs/h55-160k-audit.html`.
+- **Historical caveats:** striping axis, two striping detectors, holdout-emitter mismatch, and zeros-versus-NaN remain logged in `docs/irregularities.md`.
+- **Budget:** prior run used its three-experiment cap; this review ran no new holdout experiment.
+
 
 ---
 
@@ -183,25 +215,28 @@ linked from the [executive summary](docs/index.html).
 
 ## Limitations and next session
 
-1. The organizer leaderboard page returned only a client-side “Loading…” response
-   to this review tool. The values in the user brief (0.2778, 0.3195, 0.3774 and
-   others) are therefore **USER-SUPPLIED**, not organizer-confirmed here.
-2. The local payload hashes are pinned to a sibling GitHub bridge manifest, not
-   independently authenticated against the DrivenData download because that tab
-   requires login. Do not redistribute the payloads.
-3. The official USGS release documents four acquisition blocks and flight paths,
-   but the exact block polygons are not part of the 19-band competition stack in
-   this checkout. The current FFT is therefore not evidence of true per-block
-   processing; candidate H4 remains blocked until those polygons are downloaded
-   and aligned.
-4. The direct RTP tensor is a documented proxy for the requested pseudogravity
-   extension, not a proof that the unknown magnetization-direction transform has
-   been applied. Candidate H5 remains unimplemented.
-5. The strict overlap gate is currently dominated by dense prior rasters (the
-   spacing-5 lattice is within 3 px of every candidate dot). This is an irregularity
-   in the supplied protocol, not a reason to silently change the verdict. The next
-   session should ask which registry artifacts count as scored entries, then rerun
-   the literal gate with an organizer-verified registry.
+1. The dated official leaderboard snapshot is a public-page observation, not a
+   submission-page receipt and not a file mapping. It shows 0.3774 at rank 1,
+   0.3195 at rank 7, and 0.2778 at rank 16; H33-to-row attribution is unresolved.
+2. The official competition feature stack, labels, sample template, cached tensor
+   surface, and registry rasters are **absent from this checkout**. The TIF can be
+   inspected by bytes, but exact template/label checks, holdout reruns, and strict
+   registry rescans are blocked. Do not claim this review regenerated a new
+   scientifically supported candidate.
+3. Historical payload hashes were pinned to a sibling GitHub bridge manifest, not
+   independently authenticated against the DrivenData download because that data
+   tab is login-gated here. Do not redistribute those payloads.
+4. The official USGS release documents four acquisition blocks and flight paths,
+   but exact block polygons are not aligned to the competition grid in this
+   checkout. Current FFT results do not demonstrate true per-block processing.
+5. The direct RTP tensor is a documented proxy for the requested pseudogravity
+   extension, not proof that a magnetization-direction transform has been applied.
+6. The strict overlap gate is dominated by dense prior rasters (the spacing-5
+   lattice is within 3 px of every candidate dot). This is a protocol irregularity,
+   not permission to silently relax its literal stop rule.
+7. The historical anchor proxy-DTI analysis was mathematically invalid and is
+   retracted under IR-55-034. Corrected analysis requires authorized data and a
+   valid holdout; no extra experiment was run in this review.
 
 ## Project values
 

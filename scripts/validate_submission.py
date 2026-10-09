@@ -30,10 +30,10 @@ def ck(name: str, ok: bool, detail: str = "") -> bool:
     return bool(ok)
 
 
-def validate(path: Path, *, outside: str) -> bool:
+def validate(path: Path, *, outside: str, template_path: Path, labels_path: Path) -> bool:
     print(f"\n== validating {path.name} (outside='{outside}') ==")
     CHECKS.clear()
-    grid, tmpl = io55.read_template()
+    grid, _ = io55.read_template(template_path)
     with rasterio.open(path) as src:
         a = src.read(1)
         nband, dt = src.count, src.dtypes[0]
@@ -63,7 +63,7 @@ def validate(path: Path, *, outside: str) -> bool:
        f"nan_inside={int(np.isnan(a[grid.footprint]).sum())}")
     pos = int((a > 0).sum())
     ck("positive predictions exist", pos > 0, f"n_positive={pos}")
-    lab = io55.read_labels()
+    lab = io55.read_labels(labels_path)
     ck("no positive on a mapped catalogue pixel", int(((a > 0) & (lab == 1)).sum()) == 0,
        f"on_catalogue={int(((a > 0) & (lab == 1)).sum())}")
     return all(ok for _, ok, _ in CHECKS)
@@ -72,7 +72,20 @@ def validate(path: Path, *, outside: str) -> bool:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("tif", nargs="+")
+    ap.add_argument("--template", type=Path, default=io55.TEMPLATE_TIF,
+                    help="official sample_submission.tif used for exact grid/footprint checks")
+    ap.add_argument("--labels", type=Path, default=io55.LABELS_TIF,
+                    help="official labels.tif used to check that no dot lies on a mapped catalogue pixel")
     args = ap.parse_args()
+
+    missing = [p for p in (args.template, args.labels) if not p.exists()]
+    if missing:
+        print("BLOCKED: full submission validation needs the official template and labels:", file=sys.stderr)
+        for p in missing:
+            print(f"  MISSING {p}", file=sys.stderr)
+        print("Place authorized competition files under data/ (see data/README.md), then rerun.", file=sys.stderr)
+        raise SystemExit(2)
+
     allok = True
     for t in args.tif:
         p = Path(t)
@@ -81,7 +94,7 @@ def main() -> None:
             allok = False
             continue
         outside = "nan" if "nan" in p.name else "zeros"
-        allok &= validate(p, outside=outside)
+        allok &= validate(p, outside=outside, template_path=args.template, labels_path=args.labels)
     print("\nRESULT:", "ALL CHECKS PASSED" if allok else "FAILURES PRESENT")
     sys.exit(0 if allok else 1)
 

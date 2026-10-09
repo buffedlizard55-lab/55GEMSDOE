@@ -20,10 +20,10 @@ Implementation notes
   on the *offset*, that is a weighted max-filter:
   ``M = max_{o: |o| <= R} k(|o|) * shift(p, o)``, evaluated over the 29 offsets
   with ``dx^2 + dy^2 <= 9``.  This is exact, not an approximation.
-* ``tests/test_dti.py`` checks the weighted max-filter against a brute-force
-  per-truth-pixel loop, and checks the final ratio against the worked example in
-  the official problem description (TP_w = 3.00, FP_w = 1.89, FN_w = 2.00 ->
-  DTI = 0.60).
+* ``tests_numeric/test_core.py`` checks the weighted max-filter against a
+  brute-force per-truth-pixel loop, exercises the invalid ``TP_w + FP_w = N``
+  shortcut, and checks the ratio against the official worked example
+  (TP_w = 3.00, FP_w = 1.89, FN_w = 2.00 -> DTI = 0.60).
 """
 
 from __future__ import annotations
@@ -202,11 +202,30 @@ def brute_force_dti(
     )
 
 
-def breakeven_credit(dti_now: float, alpha: float = ALPHA) -> float:
-    """Marginal rule: the expected kernel credit a new unit dot must exceed.
+def breakeven_credit(
+    dti_now: float,
+    alpha: float = ALPHA,
+    beta: float = BETA,
+) -> float:
+    """Isolated-pixel marginal threshold, not a general DTI placement rule.
 
-    Adding one unit dot with expected credit ``w`` (so FP cost ``1 - w``) raises
-    DTI iff ``w > alpha * DTI / (1 + alpha * DTI)``.  Derived from
-    ``(TP+w)/(TP+w+a(FP+1-w)+b FN) > TP/(TP+a FP+b FN)`` with ``TP = DTI * D``.
+    Under the simplifying assumption that one new unit prediction changes exactly
+    one truth pixel by ``w`` (so TP increases by ``w``, FN decreases by ``w``, and
+    FP increases by ``1-w``), the score improves when
+
+        w > alpha * DTI / (1 - DTI * (1 - alpha - beta)).
+
+    For the competition's ``alpha + beta == 1`` this reduces to
+    ``w > alpha * DTI``.  The official metric's max-over-predictions TP term can
+    make one dot affect several nearby truth pixels, and existing predictions can
+    prevent any TP increase, so this scalar threshold must not be used as a
+    promotion criterion.  Use ``dti`` on the complete raster for exact comparison.
     """
-    return alpha * dti_now / (1.0 + alpha * dti_now)
+    if not np.isfinite(dti_now) or not 0.0 <= dti_now <= 1.0:
+        raise ValueError("dti_now must be finite and in [0, 1]")
+    if not np.isfinite(alpha) or not np.isfinite(beta) or alpha < 0.0 or beta < 0.0:
+        raise ValueError("alpha and beta must be finite and non-negative")
+    denom = 1.0 - dti_now * (1.0 - alpha - beta)
+    if denom <= 0.0:
+        return float("inf")
+    return float(alpha * dti_now / denom)

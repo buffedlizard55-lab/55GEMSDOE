@@ -1,4 +1,4 @@
-# Candidate hypotheses before experiment H56
+# Tensor-lane hypotheses and H56 result record
 
 **Preregistration time:** 2026-10-09 UTC. **Lane:** tensor dimensionality only.
 These are proposals, not scores and not leaderboard projections. The ordering is a
@@ -67,18 +67,19 @@ allowed to enter a submission slot on a projection.
 5. Write a TIF only after the format validator, uniqueness checks, and holdout
    evidence are recorded. A format-valid TIF is not an organizer-confirmed score.
 
-## Prior-run status
+## Historical one-scale status
 
-The previous one-scale tensor run used a quadrant-style evaluator and is **not the
-current baseline** for this experiment. It is retained as historical evidence, not
-combined with the segment holdout below. The evaluator design correction is logged
-in `docs/irregularities.md` and the new results will replace stale status claims.
+An earlier one-scale tensor run used a quadrant-style evaluator and is **not a
+current comparator**. It remains historical evidence and is not combined with the
+whole-segment/lattice holdout recorded in `docs/run-card.json`. The evaluator
+design correction and the now-completed H56 comparison are logged in
+`docs/irregularities.md`; H56 did not beat the current one-scale holdout best.
 
 ## Out-of-lane hypotheses H-B to H-F (2026-10-09, tensor-lane final pass)
 
 These are **proposals only**. None has been implemented or evaluated. AGENTS.md keeps this checkout to the tensor-dimensionality lane, so each one needs lane approval before any work. Gain labels are priors, not measurements, and are not HOLDOUT-DTI.
 
-Break-even bar for any new dot: expected kernel credit above α·DTI/(1+α·DTI). At the random control DTI 0.0757 (HOLDOUT-DTI, 60,988 withheld positives) that is **≈ 0.0149 per dot**. H-A (visible-prior gate) was tested earlier in this session and failed, so it is not repeated here.
+**Retraction:** an earlier anchor note derived a per-dot break-even credit and hidden-label-size bound by assuming `TP_w + FP_w = N`. That is not an identity of the official metric, so the old threshold and values are withdrawn. The same simplification was removed from the legacy greedy-placement and exp10 rationales; the greedy emitter is an exploratory coverage heuristic, not an exact DTI optimizer. See IR-55-034. Do not use those calculations for promotion. H-A (visible-prior gate) was tested earlier and failed, so it is not repeated here.
 
 | Rank | Hypothesis | Layers (band no., `docs/data_dictionary.md`) | Physical reasoning | Expected DTI gain (prior) | Implementation cost | Status |
 |---|---|---|---|---|---|---|
@@ -90,17 +91,8 @@ Break-even bar for any new dot: expected kernel credit above α·DTI/(1+α·DTI)
 
 Ordering: rank 1 has the largest physical upside but is blocked, so its cost is high and its gain is untested. Ranks 2–4 use bands already in the stack, so their costs are lower, but their redundancy with the tensor lane limits their gain. Rank 5 is cheap but carries leakage risk.
 
-## Tensor-lane final pass — HOLDOUT-DTI (2026-10-09, h55 audit file)
+## Tensor-lane final pass (h55 historical audit)
 
-Evaluator `src/gems55/dti55.py` (exact official DTI). Protocols: Q4 quadrant hide-and-recover (PRIMARY) and B = 15 px distance-banded whole-segment folds (SECONDARY). Withheld positives 60,988. Audit page: `docs/h55-160k-audit.html`.
+The prior h55 experiments are retained in `evidence/exp8_visible_prior_gate_v1_n40000.json`, `evidence/exp9_distance_band_v1_n40000.json`, and `evidence/exp10_mass_sweep_v1.json`. Their primary run card is `docs/run-card-h55-160k.json`; every score there must be read with its evaluator, withheld-positive count, CI, and protocol. The overall result was negative under its preregistered rule, the strict uniqueness gate blocked the artifact, and no submission slot was used. The audit file is **DO NOT SUBMIT**.
 
-| Experiment | What it tested | Result |
-|---|---|---|
-| exp8 run 2 | H-A visible-prior gate | Q4 fails (H-A-500 0.0521 vs random 0.0742); promote = false |
-| exp9 | H-A at distance bands 3, 15, 30 px | H-A fails at every band ≥ 1.5 km (B15: H-A-500 0.0001, worse than random in all 10 folds) |
-| exp10 | Dot-mass sweep, N ∈ {20k, 40k, 80k, 160k} | Q4 tensor_full 0.0459 / 0.0666 / 0.0889 / 0.1019 vs random 0.0422 / 0.0742 / 0.1202 / 0.1627 |
-
-- **Pre-registered N\* = 160,000** (argmax of tensor_full on Q4; upper edge of the grid, so the largest N tested). Label **NEGATIVE**. Q4 loses to random at 40k, 80k and 160k. At 20k it is +0.0030 (p = 0.25, not significant).
-- Secondary B = 15 px: tensor beats random at 40k (+0.0015, p = 0.008) and 160k (+0.0026, p = 0.004), not at 80k (p = 0.20). The sign depends on the protocol (IR-55-031). The primary governs under the rule.
-- Audit file: `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 ffd2a892…). Validator 12/12. Uniqueness BLOCKED under the literal 70% rule (IR-55-030). **DO NOT SUBMIT.** Download for audit only.
-- Budget: 3 of 3 experiments used.
+The previous experiment cap was exhausted. The current checkout also has no competition payloads, cached surface, or registry rasters, so no new candidate was run in this review. Do not interpret the retracted anchor-forensics figures as holdout results or use them to alter the experiment ranking.

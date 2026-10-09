@@ -1,0 +1,43 @@
+{
+  "schema": "55gemsdoe.public-leaderboard-snapshot.v1",
+  "captured_at_utc": "2026-10-09T18:48:54Z",
+  "evidence_class": "PUBLIC-LEADERBOARD-SNAPSHOT; not a submission-page receipt and not used as a project score",
+  "source_url": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+  "capture_note": "The public organizer leaderboard rendered a ranked table during this review. The table identifies participant best-public scores, not the filename or SHA-256 of the submission that achieved each score.",
+  "artifact_mapping_verified": false,
+  "rows": [
+    {"rank": 1, "participant": "xiaofanhu", "best_public_score": 0.3774, "submission_count": 14},
+    {"rank": 2, "participant": "alexoktaba", "best_public_score": 0.3361, "submission_count": 26},
+    {"rank": 3, "participant": "nchuzhoy", "best_public_score": 0.3262, "submission_count": 6},
+    {"rank": 4, "participant": "joeyfezster", "best_public_score": 0.3260, "submission_count": 25},
+    {"rank": 5, "participant": "kinghorton42", "best_public_score": 0.3222, "submission_count": 9},
+    {"rank": 6, "participant": "Batik Shirt Brothers", "best_public_score": 0.3221, "submission_count": 24},
+    {"rank": 7, "participant": "DARD", "best_public_score": 0.3195, "submission_count": 17},
+    {"rank": 8, "participant": "ohyeah", "best_public_score": 0.2960, "submission_count": 4},
+    {"rank": 9, "participant": "JerryDataWorks", "best_public_score": 0.2948, "submission_count": 17},
+    {"rank": 10, "participant": "mzoorob", "best_public_score": 0.2902, "submission_count": 28},
+    {"rank": 11, "participant": "notmyfault", "best_public_score": 0.2901, "submission_count": 18},
+    {"rank": 12, "participant": "ndavis7", "best_public_score": 0.2888, "submission_count": 10},
+    {"rank": 13, "participant": "GrigorSargsyan", "best_public_score": 0.2876, "submission_count": 15},
+    {"rank": 14, "participant": "HardcoreTechGod", "best_public_score": 0.2854, "submission_count": 6},
+    {"rank": 15, "participant": "op01", "best_public_score": 0.2797, "submission_count": 8},
+    {"rank": 16, "participant": "extradr19", "best_public_score": 0.2778, "submission_count": 13},
+    {"rank": 17, "participant": "arnofault", "best_public_score": 0.2764, "submission_count": 2},
+    {"rank": 18, "participant": "faultsofthy", "best_public_score": 0.2764, "submission_count": 3},
+    {"rank": 19, "participant": "wonderfulbig12", "best_public_score": 0.2761, "submission_count": 4},
+    {"rank": 20, "participant": "No Fault of Our Own", "best_public_score": 0.2761, "submission_count": 25},
+    {"rank": 21, "participant": "newway", "best_public_score": 0.2752, "submission_count": 6},
+    {"rank": 22, "participant": "wbg1", "best_public_score": 0.2750, "submission_count": 15},
+    {"rank": 23, "participant": "raboush2", "best_public_score": 0.2747, "submission_count": 10},
+    {"rank": 24, "participant": "li002666", "best_public_score": 0.2726, "submission_count": 4},
+    {"rank": 25, "participant": "smashi34", "best_public_score": 0.2710, "submission_count": 13},
+    {"rank": 26, "participant": "smrtdoog5", "best_public_score": 0.2708, "submission_count": 13}
+  ],
+  "interpretation": {
+    "leader_observed": {"rank": 1, "score": 0.3774},
+    "0_3195_observed": {"rank": 7, "participant": "DARD"},
+    "0_2778_observed": {"rank": 16, "participant": "extradr19"},
+    "relationship_to_h33_raster": "Unknown: public leaderboard rows do not reveal prediction filenames or hashes, and the GEMSDOE32 page's retrieved manifest marks the named h33 candidate receipt as null / UNSCORED.",
+    "run_card_organizer_confirmed_scores": []
+  }
+}

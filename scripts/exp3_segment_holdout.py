@@ -10,6 +10,7 @@ import json, sys, time
 from pathlib import Path
 import numpy as np
 from scipy import ndimage
+from scipy.stats import t as student_t
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -25,6 +26,13 @@ score, ridge, dim, agree, plunge = z["score"], z["ridge"], z["dim"], z["agree"],
 striping, labels, footprint = z["striping"], z["labels"], z["footprint"]
 z.close()
 folds = holdout55.make_segment_folds(labels, footprint, n_folds=5, buffer_px=3, split_px=20, seed=0)
+
+def t_ci95(values):
+    values = np.asarray(values, dtype=np.float64)
+    mean = float(values.mean())
+    half = float(student_t.ppf(0.975, len(values) - 1) * values.std(ddof=1) / np.sqrt(len(values)))
+    return [mean - half, mean + half]
+
 print(f"[{time.time()-t0:.1f}s] {len(folds)} segment folds; truth px per fold = "
       f"{[int(f.truth.sum()) for f in folds]}", flush=True)
 
@@ -43,8 +51,17 @@ PRIORS = {
     "ridge_x_catann":  lambda f: (ridge * cat_credit(f)).astype(np.float32),
     "2d_x_catann":     lambda f: ((1.0 - dim) * cat_credit(f)).astype(np.float32),
 }
-res = {"tag": TAG, "n_folds": len(folds),
-       "truth_per_fold": [int(f.truth.sum()) for f in folds], "runs": {}}
+res = {
+    "tag": TAG,
+    "n_folds": len(folds),
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py",
+    "withheld_positive_count": int(np.count_nonzero(labels == 1)),
+    "metric_parameters": {"alpha": 0.2, "beta": 0.8, "kernel_radius_m": 300},
+    "protocol": "Whole-segment folds, 3 px buffer, per-fold visible-fault masking, pooled components.",
+    "truth_per_fold": [int(f.truth.sum()) for f in folds],
+    "runs": {},
+}
 
 for N in DOTS:
     for name, fn in PRIORS.items():
@@ -64,8 +81,17 @@ for N in DOTS:
                 per.append(dti55.dti(d.astype(np.float32), f.truth, mask=f.truth | f.withheld).dti)
             r = dti55.dti(union.astype(np.float32), np.zeros(labels.shape, dtype=bool) | np.logical_or.reduce([f.truth for f in folds]))
             key = f"n{N}_{name}_{mode}"
-            res["runs"][key] = {"pooled": r.as_dict(), "folds": [round(x, 4) for x in per],
-                                "wbar": round(r.tp_w / max(r.n_pred_pos, 1), 5)}
+            res["runs"][key] = {
+                "evidence_class": "HOLDOUT-DTI",
+                "evaluator_version": "src/gems55/dti55.py",
+                "withheld_positive_count": int(r.n_truth),
+                "pooled": r.as_dict(),
+                "per_fold_dti": per,
+                "ci95": t_ci95(per),
+                "ci95_method": f"Student-t 95% interval across {len(per)} fold DTI values (df={len(per)-1}); pooled-components DTI is the point estimate.",
+                "folds": [round(x, 4) for x in per],
+                "wbar": round(r.tp_w / max(r.n_pred_pos, 1), 5),
+            }
             print(f"[{time.time()-t0:7.1f}s] {key:26s} DTI={r.dti:.4f} TP={r.tp_w:8.1f} "
                   f"N={r.n_pred_pos:6d} wbar={r.tp_w/max(r.n_pred_pos,1):.4f}", flush=True)
 

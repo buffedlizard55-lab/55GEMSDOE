@@ -3,14 +3,14 @@
   "hypothesis": "Gradient ridges on RTP-magnetic and isostatic-gravity grids cannot separate a strike-extended fault or contact from a compact intrusion or vent, because both produce ridges. The potential-field gradient tensor can: its dimensionality index is zero for strictly two-dimensional sources and its intermediate eigenvector carries strike. Gating ridges on being near-2-D AND on eigenvector strike agreeing with the ridge's own orientation should therefore preferentially retain unmapped, elongated, less conspicuous traces.",
   "mechanism": "FFT gradient tensor of bands 2 (RTP mag) and 13 (isostatic gravity) after nearest-neighbour NaN fill, along-track micro-levelling and a 400 m - 6 km band-pass; Tzz derived as -(Txx+Tyy) so the tensor is exactly traceless; closed-form 3x3 eigen-decomposition; dimensionality I = 27 e3^2 / (4 (-e2)^3) (I=0 2-D, I=1 3-D, both endpoints unit-tested); strike = azimuth of the intermediate eigenvector; score = corroborated ridge rank x (1-I) x exp(-(dtheta/25deg)^2) x plunge weight x survey-line mask.",
   "non_fault_process_that_could_mimic_it": "Airborne survey-line striping. It is measured here to run north-south, not east-west as the lane brief asserts (IR-55-04). Analytically a field varying only across the flight lines has eigenvalues (|f''|,0,-|f''|) - indistinguishable from a 2-D source striking along the lines - so the tensor cannot reject it and it must be masked geometrically. Secondary mimics: lithologic contacts and dike swarms (genuinely 2-D but not faults) and basin-margin alluvial edges.",
-  "generated_by": "scripts/make_final_card.py",
+  "generated_by": "Historical output from scripts/make_final_card.py; score metadata corrected in this review from stored fold arrays (no experiment rerun).",
   "verdict": "negative",
-  "verdict_reason": "Pre-registered rule (exp10): N* = argmax over N of tensor_full on the Q4 primary protocol = 160000. At N*, tensor_full scores 0.1019 vs uniform random 0.1627 (Q4, 60,988 withheld positives), and beats random in 0/4 folds (p=0.125). The B=15 px secondary is mixed: tensor 0.0238 vs random 0.0212 (p=0.00390625), a significant gain there but not on the primary, so the label rule (both must pass) gives NEGATIVE. No weekly slot.",
+  "verdict_reason": "The pre-registered primary Q4 protocol is negative versus its matched random control at the selected N; its HOLDOUT-DTI estimates, evaluator, withheld-positive count, and CIs are recorded under holdout_dti. The positive B15 secondary does not rescue the primary. No weekly slot.",
   "submission": {
     "file": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
     "name": "h55-tensor2d-strikegate-160000dots-20261009T164334Z",
-    "note": "DO NOT SUBMIT (audit). h55 tensor-dim lane, 160k dots. NEGATIVE holdout (Q4 0.102 vs random 0.163). Literal duplicate-stop tripped.",
-    "note_characters": 131,
+    "note": "DO NOT SUBMIT (audit). h55 tensor-dimensionality lane; negative primary HOLDOUT-DTI. Literal duplicate-stop.",
+    "note_characters": 108,
     "weekly_slot_used": false,
     "n_dots": 160000,
     "crs": "EPSG:32611",
@@ -42,38 +42,55 @@
       0.0877,
       0.1185
     ],
-    "ci95_method": "fold-level t-interval over 4 quadrant folds (df=3); indicative only",
-    "uniform_random_control": 0.1627,
+    "ci95_method": "Student-t 95% interval across 4 Q4 per-fold DTI values (df=3); pooled-components DTI is the point estimate; indicative.",
+    "uniform_random_control": {
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
+      "withheld_positive_count": 60988,
+      "protocol": "Q4 primary, N=160000, four buffered quadrant folds",
+      "value": 0.16268402704607413,
+      "ci95": [
+        0.095892,
+        0.251167
+      ],
+      "ci95_method": "Student-t 95% interval over 4 recorded per-fold DTI values (df=3); fold values stored rounded to 6 decimals, interval approximate."
+    },
     "tensor_minus_random": -0.0705,
     "signflip_p_two_sided_Q4": 0.125,
     "folds_beating_random_Q4": "0/4",
     "B15_secondary": {
-      "tensor_full": 0.0238,
-      "random": 0.0212,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
+      "withheld_positive_count": 60988,
+      "protocol": "Distance-banded whole-segment holdout, B=15 px, N=160000, ten folds; secondary only.",
+      "tensor_full": {
+        "value": 0.023839710601390767,
+        "ci95": [
+          0.022891,
+          0.024782
+        ],
+        "ci95_method": "Student-t 95% interval over 10 recorded per-fold DTI values (df=9); fold values stored rounded to 6 decimals, interval approximate."
+      },
+      "random": {
+        "value": 0.021196785103013028,
+        "ci95": [
+          0.019939,
+          0.022449
+        ],
+        "ci95_method": "Student-t 95% interval over 10 recorded per-fold DTI values (df=9); fold values stored rounded to 6 decimals, interval approximate."
+      },
       "signflip_p_two_sided": 0.00390625,
-      "direction": "tensor > random (significant)",
-      "label_rule_passed": "not applicable: label rule requires the Q4 primary to pass, and it fails"
-    },
-    "exp9_B15_at_N40000": {
-      "random": 0.0077,
-      "tensor_full": 0.0092,
-      "H-A-500": 0.0001,
-      "H-A-1500": 0.0056
-    },
-    "all_N_Q4": {
-      "20000": 0.0459,
-      "40000": 0.0666,
-      "80000": 0.0889,
-      "160000": 0.1019
-    },
-    "all_N_Q4_random": {
-      "20000": 0.0422,
-      "40000": 0.0742,
-      "80000": 0.1202,
-      "160000": 0.1627
+      "interpretation": "Positive secondary comparison; it does not change the pre-registered negative primary Q4 verdict."
     },
     "leakage_canary": "per-fold mean AUC of single lane features <= 0.90 in exp8/exp9 (max 0.555 at B=15, ridge). The visible-distance control reached 0.899 at B=3 (below 0.90) and 0.654 at B=15; it is a control, not a lane feature.",
-    "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)"
+    "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)",
+    "additional_historical_score_details": {
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
+      "withheld_positive_count": 60988,
+      "file": "evidence/exp10_mass_sweep_v1.json",
+      "note": "Per-arm values from the stored mass sweep have fold-based 95% CIs added under review_metadata; no experiment was rerun."
+    }
   },
   "validator_output": {
     "tool": "scripts/validate_submission.py (re-reads written bytes with rasterio)",
@@ -113,5 +130,6 @@
     "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368"
   },
   "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)",
-  "weekly_slot_selection": "separate selector step; not performed (no holdout win)"
+  "weekly_slot_selection": "separate selector step; not performed (no holdout win)",
+  "review_status": "HISTORICAL_AUDIT_ONLY; score CIs augmented from recorded per-fold arrays; no rerun."
 }

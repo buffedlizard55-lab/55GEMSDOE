@@ -73,5 +73,11 @@
       "catalogue_proxy_DTI": 0.01978006723467219,
       "mean_credit_per_dot": 0.02584481799233135
     }
+  },
+  "_review_status": {
+    "state": "RETRACTED_METHOD_ERROR",
+    "reason": "RETRACTED: prior proxy-DTI and target-score calculations assumed TP_w + FP_w = N. The official metric defines TP_w and FP_w separately; that identity is not generally valid. Do not cite numeric DTI, inferred hidden-label size, or conclusions derived from those fields. Re-run only through the canonical whole-segment holdout evaluator.",
+    "retracted_utc": "2026-10-09T18:48:54Z",
+    "replacement": "docs/leaderboard-analysis.md and scripts/evaluate_holdout.py"
   }
 }

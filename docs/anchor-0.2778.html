@@ -1,150 +1,57 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Why h33 “scored” 0.2778 · 55GEMSDOE</title>
-<link rel="stylesheet" href="site.css"></head><body><main>
-<p><a href="index.html">← back to the submission</a></p>
-<h1>Why <code>h33-h33-2-b2-…-e5eb6e7e-zeros</code> “scored” 0.2778</h1>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>H33 and the public leaderboard · 55GEMSDOE</title><style>
+body{max-width:1100px;margin:2rem auto;padding:0 1rem;font:16px/1.6 system-ui,sans-serif;color:#17251d;background:#f7f8f5}
+a{color:#176747}.box{padding:1rem 1.25rem;margin:1rem 0;border-radius:10px;background:#fff;border:1px solid #d8e1d8}.warn{border-left:6px solid #a3342e;background:#fff1ef}.note{border-left:6px solid #936317;background:#fff8e8}table{width:100%;border-collapse:collapse;background:#fff}th,td{text-align:left;padding:.55rem;border-bottom:1px solid #d8e1d8}th{background:#eaf0e9}code,pre{font-family:ui-monospace,monospace}pre{overflow:auto;background:#eef2ed;padding:1rem;border-radius:8px}.tag{font-weight:700}
+</style></head><body>
+<p><a href="index.html">← Project overview</a> · <a href="leaderboard-analysis.html">Leaderboard analysis</a></p>
+<h1>H33, the 0.2778 row, and what the evidence does—and does not—show</h1>
+<div class="box warn"><p class="tag">NO CLEARED NEW SUBMISSION — DO NOT SUBMIT THE AUDIT TIFF</p>
+<p>The current H56 raster remains download-for-audit only. The stored evidence says its holdout result is negative and the strict final-dot uniqueness rule stops it. The current checkout is also missing the official template, feature stack, labels, cached tensor surface, and registry rasters, so the full gates cannot be rerun here.</p></div>
 
-<div class="callout bad"><h2>Short answer: it did not.</h2>
-<p>The number 0.2778 is <b>not an organiser-confirmed score for that file.</b>
-GEMSDOE32's own audit manifest (<code>docs/downloads/submissions_manifest.json</code>,
-generated 2026-10-04T15:27:17Z by <code>scripts/audit_shipped.py</code>) lists it as
-the <code>primary</code> candidate with <code>receipt: null</code>, and its run note
-ends:</p>
-<blockquote>“flank B=2 prune on the 0.2708 base: 37,654 dots, 0 within 200 m of the
-catalogue; live-mirror +0.00487 in 4/4 folds, safety 2.08, <b>projected 0.2747;
-UNSCORED</b>”</blockquote>
-<p>Every one of the 24 entries in that manifest carries <code>receipt: null</code>.
-The only number its author attaches is a <b>projection</b> — 0.2747 — built by adding
-a +0.00487 fold delta to a “0.2708 base”. Under this project's own rule,
-<i>a projection is never written as a score</i>. 0.2778 sits in the same range as that
-projection chain and is most likely it (or a sibling of it) being carried forward as
-though it had been scored. Logged as <b>IR-55-12</b>.</p></div>
+<h2>Dated official public leaderboard snapshot</h2>
+<p>Captured 2026-10-09T18:48:54Z. This is a public leaderboard observation, <b>not</b> a per-submission receipt. It identifies participants' best public scores but not the submitted raster name or hash. Its evidence class is <code>PUBLIC-LEADERBOARD-SNAPSHOT; not a submission-page receipt and not used as a project score</code>.</p>
+<div class="box"><table><thead><tr><th>Rank</th><th>Participant</th><th>Best public score shown</th><th>Submission count shown</th></tr></thead><tbody><tr><td>1</td><td>xiaofanhu</td><td>0.3774</td><td>14</td></tr>
+<tr><td>2</td><td>alexoktaba</td><td>0.3361</td><td>26</td></tr>
+<tr><td>3</td><td>nchuzhoy</td><td>0.3262</td><td>6</td></tr>
+<tr><td>4</td><td>joeyfezster</td><td>0.3260</td><td>25</td></tr>
+<tr><td>5</td><td>kinghorton42</td><td>0.3222</td><td>9</td></tr>
+<tr><td>6</td><td>Batik Shirt Brothers</td><td>0.3221</td><td>24</td></tr>
+<tr><td>7</td><td>DARD</td><td>0.3195</td><td>17</td></tr>
+<tr><td>8</td><td>ohyeah</td><td>0.2960</td><td>4</td></tr>
+<tr><td>9</td><td>JerryDataWorks</td><td>0.2948</td><td>17</td></tr>
+<tr><td>10</td><td>mzoorob</td><td>0.2902</td><td>28</td></tr>
+<tr><td>11</td><td>notmyfault</td><td>0.2901</td><td>18</td></tr>
+<tr><td>12</td><td>ndavis7</td><td>0.2888</td><td>10</td></tr>
+<tr><td>13</td><td>GrigorSargsyan</td><td>0.2876</td><td>15</td></tr>
+<tr><td>14</td><td>HardcoreTechGod</td><td>0.2854</td><td>6</td></tr>
+<tr><td>15</td><td>op01</td><td>0.2797</td><td>8</td></tr>
+<tr><td>16</td><td>extradr19</td><td>0.2778</td><td>13</td></tr>
+<tr><td>17</td><td>arnofault</td><td>0.2764</td><td>2</td></tr>
+<tr><td>18</td><td>faultsofthy</td><td>0.2764</td><td>3</td></tr>
+<tr><td>19</td><td>wonderfulbig12</td><td>0.2761</td><td>4</td></tr>
+<tr><td>20</td><td>No Fault of Our Own</td><td>0.2761</td><td>25</td></tr>
+<tr><td>21</td><td>newway</td><td>0.2752</td><td>6</td></tr>
+<tr><td>22</td><td>wbg1</td><td>0.2750</td><td>15</td></tr>
+<tr><td>23</td><td>raboush2</td><td>0.2747</td><td>10</td></tr>
+<tr><td>24</td><td>li002666</td><td>0.2726</td><td>4</td></tr>
+<tr><td>25</td><td>smashi34</td><td>0.2710</td><td>13</td></tr>
+<tr><td>26</td><td>smrtdoog5</td><td>0.2708</td><td>13</td></tr></tbody></table></div>
+<p>At capture, 0.3774 is rank 1, 0.3195 is rank 7, and 0.2778 is rank 16. This corrects the older 0.3195 “current high” statement. Leaderboard values can change; see the <a href="../evidence/leaderboard_snapshot_20261009.json">machine-readable dated snapshot</a> and the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">live official page</a>.</p>
 
-<h2>What the raster actually is</h2>
-<p>Measured here with <code>src/gems55/dti55.py</code> — the evaluator verified
-against a brute-force transcription of the official formula and against the
-official worked example (3.00 / (3.00 + 0.2·1.89 + 0.8·2.00) = 0.60).</p>
-<table>
-<tr><th>measurement</th><th>h33-2-b2<br>(“0.2778”)</th><th>d28 / 0.2600<br>live anchor</th><th>ours<br>h55</th><th>uniform random<br>same size</th></tr>
-<tr><td>dots</td><td>37,654</td><td>44,090</td><td>40,000</td><td>37,654 / 44,090</td></tr>
-<tr><td>catalogue-proxy DTI</td><td><b>0.0049</b></td><td><b>0.0686</b></td><td>0.0269</td><td>0.0267 / 0.0306</td></tr>
-<tr><td>kernel credit harvested per dot</td><td>0.0074</td><td>0.0897</td><td>0.0382</td><td>0.0399 / 0.0400</td></tr>
-<tr><td>ratio to a random scatter of the same size</td><td><b>0.18×</b></td><td><b>2.24×</b></td><td>0.94×</td><td>1.00×</td></tr>
-<tr><td>dots on mapped-fault pixels</td><td>0</td><td>0</td><td>0</td><td>—</td></tr>
-<tr><td>min distance to a mapped fault</td><td>2.236 px = 224 m</td><td>1.000 px = 100 m</td><td>1.000 px = 100 m</td><td>—</td></tr>
-<tr><td>median distance to a mapped fault</td><td>19.6 px ≈ 1.96 km</td><td>15.0 px ≈ 1.50 km</td><td>23.0 px ≈ 2.30 km</td><td>—</td></tr>
-<tr><td>strongest correlation with any of the 19 official bands</td><td>|ρ| 0.0469</td><td>|ρ| 0.0503</td><td>|ρ| 0.0112</td><td>—</td></tr>
-</table>
+<h2>Can the 0.2778 leaderboard row be attributed to the H33 TIF?</h2>
+<div class="box note"><p><b>No artifact-to-row mapping is verified.</b> The public leaderboard row names participant <code>extradr19</code> and shows 0.2778, but does not expose the file name or hash. The <a href="https://buffedlizard55-lab.github.io/GEMSDOE32/docs/index.html">GEMSDOE32 page</a> describes an H33-2-B2 candidate and labels its note “projected 0.2747; UNSCORED”; it also states that no organizer score exists for artifacts in that repository. The two observations cannot be connected without a submission-page receipt or matching artifact hash.</p></div>
 
-<div class="callout"><h2>The finding that matters</h2>
-<p>The 0.2778-projection raster is <b>0.18× random</b> — it
-harvests <i>less</i> kernel credit than throwing 37,654 dots at the
-footprint uniformly. The raster actually associated with a live <b>0.2600</b> is
-<b>2.24× random</b>. Between them is a factor of
-<b>13.9×</b>, and the two embody opposite
-philosophies.</p>
-<p>h33 enforces “0 within 200 m of the catalogue” — measured here as a minimum
-distance of 2.236 px = 224 m (√5 px, a
-diagonal neighbour, so the 200 m rule genuinely holds) and a median of
-1.96 km. The 0.2600 anchor does the reverse: its dots sit
-<i>immediately adjacent</i> to mapped traces (min 1 px = 100 m,
-median 1.50 km) while never landing on them
-(0 dots on mapped pixels).</p></div>
+<h2>Why a sparse predictor can score well in principle</h2>
+<p>The official <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description</a> defines a distance-weighted Tversky metric with a triangular 300 m kernel, α=0.2 and β=0.8. Nearby predictions can receive partial credit; false positives are weighted less than false negatives; hidden labels are expert-identified faults absent from the existing public catalogue. That makes a low-mass, accurately placed candidate plausible. These metric properties explain a possible mechanism, not the cause of any particular leaderboard row.</p>
+<pre>DTI = TP_w / (TP_w + 0.2 FP_w + 0.8 FN_w)
+TP_w, FP_w, and FN_w are separately defined by the official distance-weighted metric.</pre>
+<p>The missing causal evidence matters: public scores use private expert labels; local catalogue holdouts use known faults as a proxy. A high leaderboard score cannot be explained from the public raster alone, and local catalogue overlap cannot verify hidden-fault discovery.</p>
 
-<h2>Why the 200 m exclusion is the mistake</h2>
-<p>The problem description says the private test set contains <i>newly identified</i>
-faults not in the USGS database. That fully justifies <b>excluding catalogue
-pixels</b>: a dot on a catalogue pixel can never earn credit, because catalogue
-pixels are not in <code>G</code>. All three rasters do this — every one has 0 dots on
-mapped pixels.</p>
-<p>It does <b>not</b> justify a 200 m <i>buffer</i>. A fault trace 300 m from a mapped
-trace is still, by every structural-geology prior, far more likely to be a fault
-than a point 2 km away in the middle of a basin — and at 300 m it is still inside
-the scoring kernel, so it would have paid. Pushing every dot out past 200 m
-discards the one piece of ground truth the problem gives away for free.</p>
-<p>That neither raster is explained by any of the 19 official layers (strongest
-|ρ| 0.0469 and 0.0503 respectively — both
-statistically indistinguishable from noise at this N) says the same thing from the
-other direction: the placement that works is <b>geometric relative to the catalogue</b>,
-not driven by the feature stack.</p>
+<h2>Correction to prior in-repository anchor forensics</h2>
+<p>Historical anchor scripts incorrectly substituted <code>TP_w + FP_w = N</code> after observing the valid identity <code>TP_w + FN_w = |G|</code>. The first identity is not generally true: TP is a maximum taken separately for each truth pixel, while FP is summed separately over predictions. The resulting old catalogue-proxy DTI values, hidden-label-size calculations, and conclusions derived from them are <b>retracted</b>, retained only for audit, and must not guide promotion. See <a href="irregularities.html">IR-55-034</a> and the updated <a href="leaderboard-analysis.md">analysis notes</a>.</p>
 
-<h2>Is it beatable? The algebra says what any score costs</h2>
-<p>Because <code>TP_w + FN_w = |G|</code> identically, <code>DTI = TP_w/(0.2N + 0.8|G|)</code>,
-and no truth pixel can contribute more than 1.0, so <code>TP_w ≤ |G|</code>. That gives a
-model-free floor on how much truth must exist for any score to be attainable:</p>
-<table><tr><th>target DTI</th><th>N = 37,654</th><th>N = 44,090</th></tr>
-<tr><td><b>0.26</b></td><td>|G| ≥ 2,472 px, credit/dot ≥ 0.0171</td><td>|G| ≥ 2,895 px, credit/dot ≥ 0.0171</td></tr>
-<tr><td><b>0.2708</b></td><td>|G| ≥ 2,603 px, credit/dot ≥ 0.0187</td><td>|G| ≥ 3,048 px, credit/dot ≥ 0.0187</td></tr>
-<tr><td><b>0.2747</b></td><td>|G| ≥ 2,651 px, credit/dot ≥ 0.0193</td><td>|G| ≥ 3,105 px, credit/dot ≥ 0.0193</td></tr>
-<tr><td><b>0.2778</b></td><td>|G| ≥ 2,690 px, credit/dot ≥ 0.0198</td><td>|G| ≥ 3,150 px, credit/dot ≥ 0.0198</td></tr>
-<tr><td><b>0.3195</b></td><td>|G| ≥ 3,232 px, credit/dot ≥ 0.0274</td><td>|G| ≥ 3,785 px, credit/dot ≥ 0.0274</td></tr>
-<tr><td><b>0.3774</b></td><td>|G| ≥ 4,071 px, credit/dot ≥ 0.0408</td><td>|G| ≥ 4,767 px, credit/dot ≥ 0.0408</td></tr>
-</table>
-<p>A footprint-uniform scatter delivers <b>0.0400 credit per dot</b>
-against the mapped catalogue at N = 44,090. Reading the table against that number:</p>
-<ul>
-<li><b>0.2600</b> needs 0.0171/dot — <i>less</i> than uniform
-random. This is the coverage plateau; it is essentially free.</li>
-<li><b>0.2778</b> needs 0.0198/dot — still below random. Also free, <i>if</i> the hidden
-set is anywhere near as findable as the mapped one.</li>
-<li><b>0.3195</b> needs 0.0274/dot and <b>0.3774</b> needs
-0.0408/dot — the latter is essentially
-catalogue-level targeting. Those are not coverage results; they require the
-geology to be right.</li>
-</ul>
-
-<div class="callout good"><h2>Conditional estimate of the hidden truth size</h2>
-<p>If the hidden test set is about as findable as the mapped catalogue, the d28
-anchor's measured 0.0897 credit/dot × 44,090 dots = TP_w ≈
-3,955 must satisfy 0.2600 = TP_w/(0.2·44,090 + 0.8|G|),
-giving <b>|G| ≈ 7,991 hidden truth pixels</b>.
-Label: <b>PROJECTION, conditional on that assumption — not a score and not a
-measurement.</b> The model-free statement is only the floor: |G| ≥
-2,895.</p></div>
-
-<h2>What we should do with this</h2>
-<ol>
-<li><b>Do not chase 0.2778.</b> It is a projection, and by the algebra it is
-below the coverage plateau anyway.</li>
-<li><b>The real target is 0.2600</b>, and it is a <i>placement</i> result, not a
-detection result. The measured mechanism is: dots immediately adjacent to mapped
-traces, never on them.</li>
-<li><b>Our raster sits at random.</b> 0.0269 proxy DTI at
-40,000 dots versus 0.0286 for uniform random — and
-2.6× below the 0.2600 anchor. That is an
-independent confirmation of this lane's NEGATIVE verdict from a completely
-different direction than the holdout.</li>
-<li><b>Highest-leverage next experiment, still in-lane:</b> keep the tensor
-strike estimator — it is the one part of this lane that tested positive — but use
-it to decide <i>which way to extend</i> from mapped traces, and place dots
-immediately adjacent to catalogue pixels instead of ≥200 m away. Concretely: for
-each mapped-fault pixel, emit along the tensor strike at 1–3 px offset, off the
-trace. This combines the measured winner (adjacency) with this lane's one
-confirmed asset (strike), and it is falsifiable on the same holdout.</li>
-</ol>
-
-<h2>Evidence classes</h2>
-<table>
-<tr><th>claim</th><th>class</th></tr>
-<tr><td>h33-2-b2 is UNSCORED, projected 0.2747, receipt null</td><td><b>VERBATIM from GEMSDOE32's audit manifest</b>, fetched read-only from api.github.com</td></tr>
-<tr><td>dot counts, proxy DTI, credit/dot, distances, band correlations</td><td><b>MEASURED here</b> — <code>evidence/anchor_verdict.json</code></td></tr>
-<tr><td>0.2600 for the d28 anchor</td><td><b>USER/SIBLING CLAIM</b> — no organiser receipt is available in this environment; the filename <code>…identical-to-live-02600…</code> is GEMSDOE32's own label</td></tr>
-<tr><td>0.2778, 0.3195, 0.3774</td><td><b>USER-SUPPLIED</b> — unreceipted</td></tr>
-<tr><td>|G| ≈ 8,000</td><td><b>PROJECTION</b>, conditional — never a score</td></tr>
-</table>
-
-<h2>Disagreement with GEMSDOE32's audit, disclosed</h2>
-<p>Their <code>audit_shipped.py</code> reports catalogue-proxy DTI
-0.0067 / credit-per-dot 0.01
-for h33 and 0.1618 / 0.2154
-for the d28 anchor. This evaluator reports 0.0049 / 0.0074
-and 0.0686 / 0.0897 — factors of 1.36× and 2.40×
-lower. The truth mask is not the cause: <code>labels.tif</code> contains exactly
-{−1: 7,111,787 nodata; 0: 5,106,385; 1: 60,988} and <code>existing_faults.tif</code> has an
-identical value histogram, so |G| = 60,988 either way. Our evaluator is the one
-checked against a brute-force transcription and the official worked example, so
-where the two disagree we report ours and flag theirs as unverified. The
-<i>ranking</i> is unaffected: by either evaluator the d28 anchor beats h33 by a wide
-margin.</p>
-</main></body></html>
+<h2>What is recorded in the prior-run H56 card</h2>
+<p>The committed card records <b>HOLDOUT-DTI</b> 0.01728, 95% CI [0.01613, 0.01847], evaluator src/gems55/dti55.py, 60,988 withheld positives. It is below the same-evaluator one-scale comparator and does not predict the hidden public leaderboard score. This holdout was not rerun in the present review; no new experiment or submission slot was used. The old H56 TIF is an audit artifact, not a cleared submission.</p>
+<p><a href="results.html">Full holdout results</a> · <a href="submit.html">Download/submit status</a> · <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Official metric and submission format</a></p>
+</body></html>
