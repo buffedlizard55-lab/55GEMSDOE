@@ -22,9 +22,9 @@ EVID = ROOT / "evidence"
 DOCS = ROOT / "docs"
 N_STAR = 160000
 BASE = "h55-tensor2d-strikegate-160000dots-20261009T164334Z"
-TIF = f"docs/downloads/{BASE}-zeros.tif"
-NOTE = ("h55 tensor-dim lane, 160k dots. NEGATIVE on holdout (Q4 0.102 vs random 0.163). "
-        "Format-valid. Do not use a weekly slot.")
+TIF = f"docs/downloads/audit-h55-160k/{BASE}-zeros.tif"  # audit-only folder: not the canonical primary (see AGENTS.md)
+NOTE = ("DO NOT SUBMIT (audit). h55 tensor-dim lane, 160k dots. NEGATIVE holdout "
+        "(Q4 0.102 vs random 0.163). Literal duplicate-stop tripped.")
 EVALUATOR = "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)"
 
 
@@ -185,23 +185,25 @@ def main() -> None:
         "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)",
         "weekly_slot_selection": "separate selector step; not performed (no holdout win)",
     }
-    (DOCS / "run-card.json").write_text(json.dumps(card, indent=2) + "\n")
+    (DOCS / "run-card-h55-160k.json").write_text(json.dumps(card, indent=2) + "\n")  # canonical docs/run-card.json belongs to the h56 session
 
     status = {
         "project": "55GEMSDOE",
         "reviewed_utc": "2026-10-09",
-        "overall_status": "format_cleared_science_negative",
+        "overall_status": "format_valid_uniqueness_blocked_negative_audit_only",
+        "label": "DO NOT SUBMIT",
         "submission_tif": TIF,
         "sha256": digest,
         "download_allowed": True,
-        "submit_allowed": True,
+        "download_scope": "audit only (AGENTS.md: audit TIF links need a prominent DO NOT SUBMIT label)",
+        "submit_allowed": False,
         "submit_recommended": False,
-        "uniqueness_status": "REVIEW (literal 70% rule tripped on a chance-level lattice overlap; not a copy)",
+        "uniqueness_status": "BLOCKED: literal 70% duplicate-stop rule tripped (raw 0.8401 vs a spacing-5 lattice; random control 0.8389; not a copy). Submit blocked until the owner decides.",
         "why_download_is_allowed": (
-            f"The file passes {n_pass}/{n_pass + n_fail} independent format checks re-read from the written bytes "
-            "(single-band float32, EPSG:32611, 3730x3292 (rows x cols), template transform incl. 100 m pixel size, "
-            "every value in [0,1], zero NaN, no dot on a mapped catalogue pixel) and is not a copy of any of the 56 "
-            "registry rasters (max Spearman 0.014, max Jaccard 0.031)."),
+            f"Audit download only. The file passes {n_pass}/{n_pass + n_fail} format checks re-read from the written bytes "
+            "(single-band float32, EPSG:32611, 3730x3292, template transform incl. 100 m pixel size, every value in [0,1], "
+            "zero NaN, no dot on a mapped catalogue pixel). It is not a copy of any of the 56 registry rasters "
+            "(max Spearman 0.014, max Jaccard 0.031). Format validity is not submit clearance."),
         "why_submission_is_not_recommended": (
             f"On the leakage-free Q4 holdout, tensor_full at N={N_STAR} scores {tens['fold_pooled_dti']:.4f} "
             f"vs {rnd['fold_pooled_dti']:.4f} for uniform random (HOLDOUT-DTI, 60,988 withheld positives). "
@@ -221,9 +223,9 @@ def main() -> None:
         "reason": ("A validated raster is published because the owner's standing requirement is an obvious "
                    "downloadable submission. Its scientific verdict is negative and the site says so next to the button."),
     }
-    (DOCS / "status.json").write_text(json.dumps(status, indent=2) + "\n")
+    (DOCS / "status-h55-160k.json").write_text(json.dumps(status, indent=2) + "\n")
     print(f"validator zeros ok={ok} pass={n_pass} fail={n_fail}; nan ok={ok_nan} pass={n_pass_nan}")
-    print(f"wrote docs/run-card.json and docs/status.json; sha={digest}; ci95={ci}")
+    print(f"wrote docs/run-card-h55-160k.json and docs/status-h55-160k.json; sha={digest}; ci95={ci}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,30 @@
+{
+  "project": "55GEMSDOE",
+  "reviewed_utc": "2026-10-09",
+  "overall_status": "format_valid_uniqueness_blocked_negative_audit_only",
+  "label": "DO NOT SUBMIT",
+  "submission_tif": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
+  "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
+  "download_allowed": true,
+  "download_scope": "audit only (AGENTS.md: audit TIF links need a prominent DO NOT SUBMIT label)",
+  "submit_allowed": false,
+  "submit_recommended": false,
+  "uniqueness_status": "BLOCKED: literal 70% duplicate-stop rule tripped (raw 0.8401 vs a spacing-5 lattice; random control 0.8389; not a copy). Submit blocked until the owner decides.",
+  "why_download_is_allowed": "Audit download only. The file passes 12/12 format checks re-read from the written bytes (single-band float32, EPSG:32611, 3730x3292, template transform incl. 100 m pixel size, every value in [0,1], zero NaN, no dot on a mapped catalogue pixel). It is not a copy of any of the 56 registry rasters (max Spearman 0.014, max Jaccard 0.031). Format validity is not submit clearance.",
+  "why_submission_is_not_recommended": "On the leakage-free Q4 holdout, tensor_full at N=160000 scores 0.1019 vs 0.1627 for uniform random (HOLDOUT-DTI, 60,988 withheld positives). On Q4 it loses at N=40k, 80k and 160k and is not distinguishable at 20k. Do not spend a weekly slot on it. The uniqueness gate is also flagged (see uniqueness_status).",
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
+    "tensor_lane": 0.1019,
+    "uniform_random_control": 0.1627,
+    "ci95_folds": [
+      0.0877,
+      0.1185
+    ],
+    "withheld_positive_count": 60988,
+    "n_dots": 160000
+  },
+  "organizer_confirmed_score": null,
+  "organizer_score_status": "none exists for this file",
+  "reason": "A validated raster is published because the owner's standing requirement is an obvious downloadable submission. Its scientific verdict is negative and the site says so next to the button."
+}

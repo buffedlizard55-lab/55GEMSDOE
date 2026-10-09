@@ -3,16 +3,17 @@
 
 Protocol
 --------
-4-fold *contiguous-quadrant* spatial CV ("hide and recover"):
+5-fold *whole-segment* spatial CV ("hide and recover"):
 
-* fold ``i`` hides every catalogue pixel inside quadrant ``i`` and buffers 3 px
-  around them; the other three quadrants' catalogue is "visible".
-* fold ``i`` emits ``n_dots / 4`` unit dots inside its own quadrant only, from a
-  surface that never saw that quadrant's catalogue, and with the visible faults
-  masked pixel-exactly.
-* the four emissions are unioned into one whole-grid prediction and scored once
-  with the official distance-weighted Tversky index against the full catalogue.
-* per-fold DTI is also reported, restricted to the fold's quadrant.
+* the catalogue is split into whole connected traces and 20-pixel lattice
+  segments; a seeded assignment withholds complete segments and buffers them by
+  3 px.  No withheld segment is used as a visible catalogue feature.
+* each fold emits ``n_dots / 5`` unit dots over the full scored footprint, while
+  all visible catalogue pixels are masked pixel-exactly.  The held-out segment
+  truth is the only positive set for that fold.
+* fold TP/FP/FN contributions are pooled before taking one official DTI.  This
+  mirrors the organiser's pooled aggregation and avoids averaging fold ratios.
+* a matched uniform-random arm is evaluated with the identical eligible mask.
 
 Arms at matched mass:
   random        uniform over the eligible set (the null)
@@ -76,7 +77,11 @@ def main() -> None:
 
     grid, _ = io55.read_template()
     assert footprint.shape == grid.shape
-    folds = holdout55.make_folds(labels, footprint, grid=(2, 2), buffer_px=3)
+    folds = holdout55.make_segment_folds(
+        labels, footprint, n_folds=5, buffer_px=3, split_px=20, seed=0
+    )
+    if len(folds) < 2:
+        raise RuntimeError("segment holdout needs at least two non-empty folds")
     cat = labels == 1
 
     base_elig = footprint & ~striping
@@ -91,21 +96,33 @@ def main() -> None:
 
     res: dict = {"config": vars(args), "n_folds": len(folds), "n_truth_total": int(cat.sum())}
     for arm in arms:
-        union = np.zeros(grid.shape, dtype=bool)
+        # Each fold has its own information set.  Do not union the predictions
+        # before scoring: a pixel masked as visible in one fold is not the same
+        # information state as that pixel in another fold.  Pool the exact
+        # TP/FP/FN totals instead, as the organiser does for the leaderboard.
         per_fold = []
-        for f in folds:
-            elig = base_elig & f.withheld & ~f.visible
+        totals = {"tp_w": 0.0, "fp_w": 0.0, "fn_w": 0.0, "n_pred_pos": 0, "n_truth": 0}
+        for fold_i, f in enumerate(folds):
+            # Predictions may occur anywhere in the footprint.  Only visible
+            # catalogue pixels are forbidden; otherwise this is a true
+            # hide-and-recover test rather than a quadrant placement test.
+            elig = base_elig & ~f.visible
             n = args.n_dots // len(folds)
             surf = surfaces[arm]
             dots = holdout55.emit_dots(
-                surf, elig, n, min_sep_px=args.min_sep, seed=1234, random=(arm == "random")
+                surf, elig, n, min_sep_px=args.min_sep,
+                seed=1234 + fold_i, random=(arm == "random")
             )
-            union |= dots
-            per_fold.append(
-                dti55.dti(dots.astype(np.float32), f.truth, mask=f.withheld).as_dict()
-                | {"n_dots": int(dots.sum())}
-            )
-        pooled = dti55.dti(union.astype(np.float32), cat)
+            c = dti55.dti(dots.astype(np.float32), f.truth, mask=footprint)
+            record = c.as_dict() | {"n_dots": int(dots.sum()), "n_truth": int(f.truth.sum())}
+            per_fold.append(record)
+            for key in ("tp_w", "fp_w", "fn_w", "n_pred_pos", "n_truth"):
+                totals[key] += record[key]
+        pooled = dti55.DTIResult(
+            dti=dti55.dti_from_totals(totals["tp_w"], totals["fp_w"], totals["fn_w"]),
+            tp_w=totals["tp_w"], fp_w=totals["fp_w"], fn_w=totals["fn_w"],
+            n_pred_pos=int(totals["n_pred_pos"]), n_truth=int(totals["n_truth"]),
+        )
         fd = np.array([p["dti"] for p in per_fold])
         res[arm] = {
             "pooled": pooled.as_dict(),
@@ -134,30 +151,22 @@ def main() -> None:
         "plunge": plunge,
         "dim_inv_raw": dim_inv,
     }
-    # Catalogue-distance control.  It MUST be recomputed from each fold's own
-    # visible set.  (IR-55-17: the previous version used fold 0's visible set for
-    # every fold, which contains the withheld truth of folds 1-3 and reported
-    # AUC 0.877 -- leakage, not signal.  Corrected AUC is ~0.52.)
-    from scipy import ndimage
-
-    per_fold_dist = {id(f): (-ndimage.distance_transform_edt(~f.visible)).astype(np.float32) for f in folds}
-    aucs_by_feat: dict[str, list[float]] = {name: [] for name in feats}
-    aucs_by_feat["neg_visible_catalogue_distance"] = []
-    for f in folds:
-        pos = f.truth
-        neg = base_elig & f.withheld & ~cat
-        nidx = np.nonzero(neg.ravel())[0]
-        take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
-        negm = np.zeros(grid.shape, dtype=bool)
-        negm.ravel()[take] = True
-        y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
-        for name, arr in feats.items():
+    for name, arr in feats.items():
+        aucs = []
+        for f in folds:
+            # The negative sample is drawn from the same fold's eligible
+            # information state.  No distance-to-visible-fault channel is
+            # invented here; catalogue-derived controls must be recomputed per
+            # fold, not borrowed from fold zero.
+            pos = f.truth
+            neg = base_elig & ~f.visible & ~f.truth
+            nidx = np.nonzero(neg.ravel())[0]
+            take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
+            negm = np.zeros(grid.shape, dtype=bool)
+            negm.ravel()[take] = True
+            y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
             s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
-            aucs_by_feat[name].append(holdout55.auc(s, y))
-        arr = per_fold_dist[id(f)]
-        s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
-        aucs_by_feat["neg_visible_catalogue_distance"].append(holdout55.auc(s, y))
-    for name, aucs in aucs_by_feat.items():
+            aucs.append(holdout55.auc(s, y))
         canary[name] = {"auc_per_fold": [float(a) for a in aucs], "auc_mean": float(np.mean(aucs))}
     res["leakage_canary"] = canary
     res["leakage_flagged_gt_0p90"] = sorted(

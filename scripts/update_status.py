@@ -1,98 +1,104 @@
 #!/usr/bin/env python3
-"""Regenerate docs/status.json and docs/run-card.json from the measured evidence.
+"""Verify and refresh the current fail-closed site status.
 
-Replaces the previous fail-closed constants (which correctly said "no raster
-exists" for a session that produced none) with values derived from the artifacts
-on disk, so the site cannot claim a state the files do not support.
+This script deliberately reads the current H56 evidence, not the retired H55
+quadrant-run files. It will not turn a format-valid audit artifact into a submit
+recommendation when strict uniqueness or the same-evaluator promotion gate fails.
 """
 from __future__ import annotations
-import hashlib, json, subprocess, sys
-from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT/"src"))
-DOCS, EVID, DL = ROOT/"docs", ROOT/"evidence", ROOT/"docs"/"downloads"
 
-def sha(p): 
-    h=hashlib.sha256()
-    with open(p,"rb") as f:
-        for b in iter(lambda: f.read(1<<20), b""): h.update(b)
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DOCS = ROOT / "docs"
+EVID = ROOT / "evidence"
+
+
+def load(path: Path) -> dict:
+    return json.loads(path.read_text())
+
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
     return h.hexdigest()
 
-card = json.loads((EVID/"runcard.json").read_text())
-uniq = json.loads((EVID/"uniqueness.json").read_text())
-e1   = json.loads((EVID/"holdout_v1_n40000.json").read_text())
-tifs = sorted(DL.glob("*-zeros.tif"))
-tif  = tifs[-1]
-h    = sha(tif)
 
-# run the validator for real and require it to pass
-rc = subprocess.run([sys.executable, str(ROOT/"scripts"/"validate_submission.py"), str(tif)],
-                    capture_output=True, text=True)
-validator_ok = rc.returncode == 0
-npass = rc.stdout.count("[PASS]"); nfail = rc.stdout.count("[FAIL]")
-assert validator_ok and nfail == 0, rc.stdout
+def main() -> None:
+    status_path = DOCS / "status.json"
+    card_path = DOCS / "run-card.json"
+    status = load(status_path)
+    card = load(card_path)
+    holdout = load(EVID / "holdout_h56_ms300_900_n40000.json")
+    baseline = load(EVID / "holdout_baseline_segment_n40000.json")
+    unique = load(EVID / "uniqueness_h56_strict.json")
 
-status = {
-  "project": "55GEMSDOE",
-  "reviewed_utc": "2026-10-09",
-  "overall_status": "format_cleared_science_negative",
-  "submission_tif": f"docs/downloads/{tif.name}",
-  "download_allowed": True,
-  "submit_allowed": True,
-  "submit_recommended": False,
-  "why_download_is_allowed": ("The file passes 12/12 independent format checks re-read from the "
-      "written bytes (single-band float32, EPSG:32611, 3292x3730, template transform, every "
-      "value in [0,1], zero NaN, no dot on a mapped catalogue pixel) and is unique against "
-      f"{uniq['n_registry']} prior scored rasters."),
-  "why_submission_is_not_recommended": ("On the leakage-free spatial holdout the lane scores "
-      f"{e1['tensor_full']['pooled']['dti']:.4f} pooled DTI versus "
-      f"{e1['random']['pooled']['dti']:.4f} for a uniform-random control at matched mass, and "
-      "is below it in 4 of 4 folds. It has not beaten the control, so it must not be promoted "
-      "into a weekly slot on this evidence."),
-  "holdout_dti": {
-    "evidence_class": "HOLDOUT-DTI",
-    "evaluator": "src/gems55/dti55.py (exact official DTI; verified vs brute force and the official worked example)",
-    "tensor_lane": e1["tensor_full"]["pooled"]["dti"],
-    "uniform_random_control": e1["random"]["pooled"]["dti"],
-    "fold_mean": e1["tensor_full"]["fold_mean"],
-    "ci95_folds": e1["tensor_full"]["fold_ci95"],
-    "withheld_positive_count": sum(f["n_truth"] for f in e1["tensor_full"]["per_fold"]),
-    "concurrent_session_replication": {"ridge_baseline": 0.0578, "full_tensor_lane": 0.0444,
-                                       "ci95": [0.0383, 0.0502]},
-  },
-  "organizer_confirmed_score": None,
-  "sha256": h,
-  "reason": ("A validated, unique raster is published because the owner's standing requirement "
-      "is an obvious downloadable submission. Its scientific verdict is negative and the site "
-      "says so next to the download button."),
-}
-(DOCS/"status.json").write_text(json.dumps(status, indent=2))
+    rel = Path(card["submission"]["file"])
+    tif = ROOT / rel
+    if not tif.exists():
+        raise SystemExit(f"published candidate is missing: {tif}")
+    digest = sha256(tif)
+    if digest != card["raster_sha256"]:
+        raise SystemExit(f"SHA-256 mismatch: {digest} != {card['raster_sha256']}")
 
-card_doc = json.loads((DOCS/"run-card.json").read_text())
-card_doc["status"] = "format_cleared_science_negative"
-card_doc["raster_sha256"] = h
-card_doc["submission"] = {
-  "name": card["submission_name"], "note": card["submission_note"],
-  "note_characters": len(card["submission_note"]),
-  "download_allowed": True, "weekly_slot_used": False,
-  "file": f"docs/downloads/{tif.name}",
-}
-card_doc["validator_output"] = {
-  "status": "PASS", "tool": "scripts/validate_submission.py",
-  "checks_passed": npass, "checks_failed": nfail,
-  "no_nan_inside_footprint": True, "values_in_0_1_inside_footprint": True,
-  "single_band_float32": True, "crs_matches": True, "shape_matches": True,
-  "transform_matches": True, "outside_footprint_null_or_nan": "zeros (all-finite encoding)",
-}
-card_doc["correlation_overlap_vs_registry"] = {
-  "registry_rasters_scanned": uniq["n_registry"],
-  "max_abs_spearman_dense": uniq["max_spearman_dense"], "threshold_spearman": 0.90,
-  "max_jaccard": uniq["max_jaccard"],
-  "max_frac_within_3px_raw": uniq["max_frac_within_3px"],
-  "max_frac_3px_excess_over_random_control": uniq["max_frac3px_excess_over_random_control"],
-  "max_frac_within_3px_density_matched": uniq["max_frac_within_3px_density_matched"],
-  "threshold_frac_3px": 0.70, "verdict": uniq["verdict"],
-}
-card_doc["verdict"] = "negative"
-(DOCS/"run-card.json").write_text(json.dumps(card_doc, indent=2))
-print("status.json + run-card.json regenerated; validator", npass, "PASS /", nfail, "FAIL")
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "validate_submission.py"), str(tif)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode:
+        print(result.stdout, end="")
+        raise SystemExit("published candidate no longer passes the local validator")
+    checks_passed = result.stdout.count("[PASS]")
+    checks_failed = result.stdout.count("[FAIL]")
+    if checks_failed:
+        raise SystemExit("published candidate has validator failures")
+
+    h56 = holdout["tensor_full"]["pooled"]["dti"]
+    best = baseline["ridge_x_agree"]["pooled"]["dti"]
+    strict_block = unique["strict_verdict"] == "DUPLICATE-STOP"
+    negative = h56 <= best
+    status.update(
+        {
+            "overall_status": "format_valid_uniqueness_blocked_negative" if strict_block and negative else "needs_review",
+            "submission_tif": str(rel),
+            "download_allowed": True,
+            "submit_allowed": not strict_block and not negative,
+            "submit_recommended": not strict_block and not negative,
+            "sha256": digest,
+            "organizer_confirmed_score": None,
+            "holdout_dti": {
+                "evidence_class": "HOLDOUT-DTI",
+                "evaluator_version": "src/gems55/dti55.py; exact published DTI formula, alpha=0.2, beta=0.8, R=300 m",
+                "withheld_positive_count": holdout["tensor_full"]["pooled"]["n_truth"],
+                "multiscale_tensor_full": h56,
+                "multiscale_tensor_full_ci95": holdout["tensor_full"]["fold_ci95"],
+                "matched_random_control": holdout["random"]["pooled"]["dti"],
+                "matched_random_control_ci95": holdout["random"]["fold_ci95"],
+                "current_best_one_scale_arm": best,
+                "current_best_one_scale_arm_name": "ridge_x_agree (ablation/control, not the full tensor candidate)",
+                "current_best_one_scale_arm_ci95": baseline["ridge_x_agree"]["fold_ci95"],
+            },
+            "reason": "Audit download is permitted; strict uniqueness and promotion gates are independently enforced.",
+        }
+    )
+    status_path.write_text(json.dumps(status, indent=2) + "\n")
+
+    card["raster_sha256"] = digest
+    card["status"] = status["overall_status"]
+    card["validator_output"].update(
+        {"status": "PASS", "checks_passed": checks_passed, "checks_failed": checks_failed}
+    )
+    card["submission"]["submit_allowed"] = status["submit_allowed"]
+    card_path.write_text(json.dumps(card, indent=2) + "\n")
+    print(f"verified {rel}: {checks_passed} PASS / {checks_failed} FAIL; status={status['overall_status']}")
+
+
+if __name__ == "__main__":
+    main()

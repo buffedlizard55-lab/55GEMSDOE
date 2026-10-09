@@ -1,117 +1,161 @@
 {
-  "project": "55GEMSDOE",
-  "hypothesis": "Gradient ridges on RTP-magnetic and isostatic-gravity grids cannot separate a strike-extended fault or contact from a compact intrusion or vent, because both produce ridges. The potential-field gradient tensor can: its dimensionality index is zero for strictly two-dimensional sources and its intermediate eigenvector carries strike. Gating ridges on being near-2-D AND on eigenvector strike agreeing with the ridge's own orientation should therefore preferentially retain unmapped, elongated, less conspicuous traces.",
-  "mechanism": "FFT gradient tensor of bands 2 (RTP mag) and 13 (isostatic gravity) after nearest-neighbour NaN fill, along-track micro-levelling and a 400 m - 6 km band-pass; Tzz derived as -(Txx+Tyy) so the tensor is exactly traceless; closed-form 3x3 eigen-decomposition; dimensionality I = 27 e3^2 / (4 (-e2)^3) (I=0 2-D, I=1 3-D, both endpoints unit-tested); strike = azimuth of the intermediate eigenvector; score = corroborated ridge rank x (1-I) x exp(-(dtheta/25deg)^2) x plunge weight x survey-line mask.",
-  "non_fault_process_that_could_mimic_it": "Airborne survey-line striping. It is measured here to run north-south, not east-west as the lane brief asserts (IR-55-04). Analytically a field varying only across the flight lines has eigenvalues (|f''|,0,-|f''|) - indistinguishable from a 2-D source striking along the lines - so the tensor cannot reject it and it must be masked geometrically. Secondary mimics: lithologic contacts and dike swarms (genuinely 2-D but not faults) and basin-margin alluvial edges.",
-  "generated_by": "scripts/make_final_card.py",
-  "verdict": "negative",
-  "verdict_reason": "Pre-registered rule (exp10): N* = argmax over N of tensor_full on the Q4 primary protocol = 160000. At N*, tensor_full scores 0.1019 vs uniform random 0.1627 (Q4, 60,988 withheld positives), and beats random in 0/4 folds (p=0.125). The B=15 px secondary is mixed: tensor 0.0238 vs random 0.0212 (p=0.00390625), a significant gain there but not on the primary, so the label rule (both must pass) gives NEGATIVE. No weekly slot.",
-  "submission": {
-    "file": "docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
-    "name": "h55-tensor2d-strikegate-160000dots-20261009T164334Z",
-    "note": "h55 tensor-dim lane, 160k dots. NEGATIVE on holdout (Q4 0.102 vs random 0.163). Format-valid. Do not use a weekly slot.",
-    "note_characters": 119,
-    "weekly_slot_used": false,
-    "n_dots": 160000,
-    "crs": "EPSG:32611",
-    "shape": [
-      3730,
-      3292
-    ],
-    "cell_m": 100,
-    "values": "0 or 1 (binary dots), float32, single band, zeros outside footprint"
-  },
-  "raster_sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
-  "nan_twin": {
-    "file": "docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-nan.tif",
-    "sha256": "c3185ec459f84c5fd9a9c117f4611c25ec754e1a113c12139baca60e29501d74"
-  },
-  "zip": {
-    "file": "docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip",
-    "sha256": "3c0cc3f4efd858716c9b4c6fe8568f1bc9aa324d54ca7a6fd932831f5a14d9a6"
-  },
+  "schema": "55gemsdoe.run-card.v2",
+  "run_id": "55GEMSDOE-H56-MULTISCALE-TENSOR-2026-10-09",
+  "status": "format_valid_uniqueness_blocked_negative",
+  "hypothesis": "A fault-related RTP-magnetic/isostatic-gravity tensor response should remain near-2-D and strike-concordant at more than one structural wavelength; geometric-mean scale persistence should suppress compact bodies, derivative noise, and line artefacts better than the one-scale lane.",
+  "mechanism": "Bands 2 and 13 are NaN-filled only inside the template footprint, robustly along-track leveled, low-pass filtered at 300 m and 900 m Gaussian sigma, differentiated by FFT, decomposed as symmetric traceless 3x3 tensors, converted to dimensionality/strike/ridge products, and aggregated by geometric persistence. The existing survey-line coherence mask is unioned across scales.",
+  "named_non_fault_mimic": "Lithologic contacts, dikes, intrusive sheets, basin-margin edges, tie-line/leveling residuals, acquisition seams, east-west or north-south flight-line striping, and FFT boundary ringing can all be long or 2-D without being faults.",
   "holdout_dti": {
-    "evidence_class": "HOLDOUT-DTI",
     "status": "RUN",
-    "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-    "protocol": "Q4 contiguous-quadrant hide-and-recover (PRIMARY), per-fold visible-only faults, 3 px buffer; secondary B=15 px distance-banded whole-segment folds (exp9/exp10).",
-    "value": 0.1019,
-    "value_meaning": "tensor_full at N=160000, Q4, fold-pooled DTI",
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py",
+    "parameters": {
+      "alpha": 0.2,
+      "beta": 0.8,
+      "kernel_radius_m": 300,
+      "n_dots": 40000,
+      "min_sep_px": 3.0
+    },
     "withheld_positive_count": 60988,
+    "protocol": "5 whole-segment/lattice folds with a 3 px buffer; visible faults masked pixel-exactly per fold; pooled components; CI is 4,000 resamples of the five fold DTI values.",
+    "value": 0.01727793270506305,
     "ci95": [
-      0.0877,
-      0.1185
+      0.01612827573503906,
+      0.018468645641252373
     ],
-    "ci95_method": "fold-level t-interval over 4 quadrant folds (df=3); indicative only",
-    "uniform_random_control": 0.1627,
-    "tensor_minus_random": -0.0705,
-    "signflip_p_two_sided_Q4": 0.125,
-    "folds_beating_random_Q4": "0/4",
-    "B15_secondary": {
-      "tensor_full": 0.0238,
-      "random": 0.0212,
-      "signflip_p_two_sided": 0.00390625,
-      "direction": "tensor > random (significant)",
-      "label_rule_passed": "not applicable: label rule requires the Q4 primary to pass, and it fails"
+    "matched_random_control": {
+      "value": 0.014404859072739232,
+      "ci95": [
+        0.013732983126265159,
+        0.015374661727613106
+      ]
     },
-    "exp9_B15_at_N40000": {
-      "random": 0.0077,
-      "tensor_full": 0.0092,
-      "H-A-500": 0.0001,
-      "H-A-1500": 0.0056
+    "current_best_comparator": {
+      "name": "one-scale ridge_x_agree ablation",
+      "value": 0.018519270698750034,
+      "ci95": [
+        0.01782350648872739,
+        0.019402442229139772
+      ]
     },
-    "all_N_Q4": {
-      "20000": 0.0459,
-      "40000": 0.0666,
-      "80000": 0.0889,
-      "160000": 0.1019
-    },
-    "all_N_Q4_random": {
-      "20000": 0.0422,
-      "40000": 0.0742,
-      "80000": 0.1202,
-      "160000": 0.1627
-    },
-    "leakage_canary": "per-fold mean AUC of single lane features <= 0.90 in exp8/exp9 (max 0.555 at B=15, ridge). The visible-distance control reached 0.899 at B=3 (below 0.90) and 0.654 at B=15; it is a control, not a lane feature.",
-    "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)"
+    "other_arms": {
+      "one_scale_ridge_only": {
+        "value": 0.017789004080108257,
+        "ci95": [
+          0.016719302180601664,
+          0.01894517919223205
+        ]
+      },
+      "one_scale_tensor_full": {
+        "value": 0.017744384543558565,
+        "ci95": [
+          0.017095580741474416,
+          0.01836769482519536
+        ]
+      },
+      "multiscale_ridge_only_ablation": {
+        "value": 0.01927199149692655,
+        "ci95": [
+          0.018290928984518638,
+          0.020261451422340312
+        ]
+      },
+      "gravity_only_tensor": {
+        "value": 0.016707865973809154,
+        "ci95": [
+          0.015809191340112487,
+          0.01762383112272163
+        ]
+      }
+    }
   },
+  "leakage_canary": {
+    "evidence_class": "HOLDOUT-DTI",
+    "features_tested_alone": [
+      "tensor_full_score",
+      "ridge",
+      "one_minus_dim",
+      "strike_agree",
+      "plunge",
+      "dim_inv_raw"
+    ],
+    "max_auc": 0.5521852271834549,
+    "auc_by_feature": {
+      "tensor_full_score": 0.36017707842304414,
+      "ridge": 0.5521852271834549,
+      "one_minus_dim": 0.5056271489209598,
+      "strike_agree": 0.5299200788434344,
+      "plunge": 0.49122305761905827,
+      "dim_inv_raw": 0.4945415377263408
+    },
+    "leakage_threshold": 0.9,
+    "leakage_flag": false
+  },
+  "strike_diagnostic": {
+    "evidence_class": "HOLDOUT-DTI",
+    "withheld_segments_tested": 273,
+    "withheld_match_rate_within_20deg": 0.2600732600732601,
+    "random_ridge_match_rate_within_20deg": 0.22394571013087736,
+    "mean_abs_difference_deg": -9.945493411303604,
+    "ci95_mean_difference_deg": [
+      -12.496032447307863,
+      -7.205863991529839
+    ],
+    "note": "Auxiliary catalogue-proxy diagnostic, not an organizer score; the random-ridge comparison is not used as a promotion gate because ridge orientation and tensor strike can be geometrically coupled."
+  },
+  "correlation_overlap_vs_registry": {
+    "evidence_class": "HOLDOUT-DTI",
+    "registry_rasters_scanned": 56,
+    "max_abs_surface_spearman": 0.0223,
+    "max_abs_final_binary_spearman": 0.0054,
+    "max_final_dot_overlap_within_3px": 1.0,
+    "duplicate_rows": 2,
+    "threshold_surface_spearman": 0.9,
+    "threshold_final_dot_overlap": 0.7,
+    "strict_verdict": "DUPLICATE-STOP",
+    "control_adjusted_overlap_is_diagnostic_only": true
+  },
+  "raster_sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
   "validator_output": {
-    "tool": "scripts/validate_submission.py (re-reads written bytes with rasterio)",
     "status": "PASS",
-    "zeros_status": "PASS",
+    "tool": "scripts/validate_submission.py; independent rasterio re-read",
     "checks_passed": 12,
     "checks_failed": 0,
-    "nan_twin_status": "PASS",
-    "nan_twin_checks_passed": 11,
-    "dots_on_mapped_catalogue_px": 0,
+    "no_nan_inside_footprint": true,
+    "values_in_0_1": true,
+    "single_band_float32": true,
+    "crs_matches": true,
+    "shape_matches": true,
+    "transform_matches": true,
+    "outside_footprint": "zeros in the all-finite audit encoding",
+    "positive_pixels": 40000,
+    "dots_on_mapped_catalogue_pixels": 0,
     "dots_outside_footprint": 0
   },
-  "uniqueness": {
-    "tool": "scripts/verify_unique.py vs registry/rasters (56 prior scored rasters)",
-    "verdict": "REVIEW",
-    "n_registry": 56,
-    "max_abs_spearman_dense": 0.014,
-    "max_jaccard": 0.031456,
-    "max_frac_within_3px_raw": 0.8401,
-    "raw_max_reference": "13GEMSDOE__13gems_20261001_r13-lattice-s5_v2_nan-outside.tif (206,895-dot spacing-5 lattice)",
-    "raw_max_reference_random_control_frac_within_3px": 0.8389,
-    "excess_over_random_control_for_that_reference": 0.0012,
-    "brief_threshold_frac_within_3px": 0.7,
-    "literal_70pct_rule": "TRIPPED on the raw statistic (0.8401 > 0.70)",
-    "interpretation": "Chance-level density overlap with a dense lattice (random control 0.839). Not a copy: Spearman max 0.014, Jaccard max 0.031, excess over control +0.0012. Flagged for owner decision; not cleared as a clean PASS."
+  "submission": {
+    "name": "h56-multiscale-tensor-persistence-40000dots-20261009T162812Z",
+    "note": "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots",
+    "note_characters": 86,
+    "download_allowed_for_audit": true,
+    "submit_allowed": false,
+    "weekly_slot_used": false,
+    "file": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif",
+    "zip": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.zip",
+    "nan_twin": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-nan.tif"
   },
-  "striping": {
-    "lane_mask_px": 1105919,
-    "lane_mask_definition": "gems55 coherence-based mask (build_lane, thresh 0.55, lag 60 px)",
-    "older_count_px": 86947,
-    "older_count_definition": "gems/tensor.py row-median z>4 (129 rows); a different detector, not a miscount",
-    "axis_status": "UNRECONCILED (see docs/irregularities.md IR-55-028)"
+  "verdict": "negative",
+  "promotion": "do_not_promote",
+  "projection_written_as_score": false,
+  "organizer_confirmed_scores": [],
+  "budget": {
+    "experiments_used": 3,
+    "limit": 3,
+    "hours_limit": 2,
+    "weekly_slot_used": false
   },
-  "archive_superseded": {
-    "file": "docs/downloads/archive-superseded/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
-    "reason": "Superseded by the pre-registered N* = 160000 file. Same negative holdout verdict at N=40000.",
-    "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368"
-  },
-  "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)",
-  "weekly_slot_selection": "separate selector step; not performed (no holdout win)"
+  "review_passes": [
+    "implementation",
+    "bug/assumption audit",
+    "requirement/source/strict-uniqueness audit"
+  ]
 }

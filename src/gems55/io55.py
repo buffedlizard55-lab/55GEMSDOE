@@ -31,9 +31,33 @@ from rasterio.transform import Affine
 REPO = Path(__file__).resolve().parents[2]
 DATA = REPO / "data"
 
-FEATURES_TIF = DATA / "gems-geodawn-numerical-features.tif"
+# The organiser calls this payload ``training_features.tif``.  Older sibling
+# mirrors used the descriptive GeoDAWN filename; ``feature_path`` below accepts
+# that name as a read-only compatibility alias without making the pipeline
+# depend on a private mirror.
+# On-disk name is the competition's name; the sibling-repo alias training_features.tif is a fallback.
+# (IR-55-026: naming mismatch fixed once here, in the shared I/O module.)
+FEATURES_TIF = (DATA / "gems-geodawn-numerical-features.tif"
+                if (DATA / "gems-geodawn-numerical-features.tif").exists()
+                else DATA / "training_features.tif")
+FEATURES_TIF_LEGACY = DATA / "gems-geodawn-numerical-features.tif"
 LABELS_TIF = DATA / "labels.tif"
 TEMPLATE_TIF = DATA / "sample_submission.tif"
+
+
+def feature_path() -> Path:
+    """Return the available official feature-stack path.
+
+    The competition download is named ``training_features.tif``.  A legacy
+    descriptive filename is accepted only when the canonical name is absent;
+    this makes a fresh data placement and the existing bridge reproducible while
+    keeping one authoritative path in the code.
+    """
+    if FEATURES_TIF.exists():
+        return FEATURES_TIF
+    if FEATURES_TIF_LEGACY.exists():
+        return FEATURES_TIF_LEGACY
+    return FEATURES_TIF
 
 # --- grid contract (asserted against the template in tests/test_io.py) -------
 CRS_EPSG = 32611
@@ -99,8 +123,9 @@ def read_labels(path: Path = LABELS_TIF) -> np.ndarray:
         return src.read(1).astype(np.int8)
 
 
-def read_band(band: int, path: Path = FEATURES_TIF) -> tuple[np.ndarray, np.ndarray]:
+def read_band(band: int, path: Path | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Read one float32 band and its valid mask (sentinel -> False)."""
+    path = feature_path() if path is None else Path(path)
     with rasterio.open(path) as src:
         x = src.read(band).astype(np.float32)
     valid = x > FEATURE_SENTINEL
@@ -108,7 +133,8 @@ def read_band(band: int, path: Path = FEATURES_TIF) -> tuple[np.ndarray, np.ndar
     return x, valid
 
 
-def band_descriptions(path: Path = FEATURES_TIF) -> dict[int, str]:
+def band_descriptions(path: Path | None = None) -> dict[int, str]:
+    path = feature_path() if path is None else Path(path)
     with rasterio.open(path) as src:
         return {i: src.tags(i).get("description", "") for i in range(1, src.count + 1)}
 
