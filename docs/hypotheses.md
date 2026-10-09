@@ -1,6 +1,6 @@
 # Tensor-dimensionality hypotheses — preregistration shortlist
 
-**Status: proposals only. No candidate was implemented or evaluated.** The shortlist stays inside the assigned tensor-dimensionality lane. Relative opportunity and cost are qualitative research priorities—not `HOLDOUT-DTI`, not projections, and not scores. The checkout contains no code/data/registry, so novelty against the wider archive and performance against the current holdout best are not established.
+**Status (updated 2026-10-09): rank 1 (the tensor lane) was implemented and tested on the spatial holdout and is NEGATIVE (see the results section below). H-B to H-F are new, out-of-lane proposals: they were not implemented or evaluated, and each needs lane approval under AGENTS.md first.** The shortlist stays inside the assigned tensor-dimensionality lane. Relative opportunity and cost are qualitative research priorities—not `HOLDOUT-DTI`, not projections, and not scores. The checkout contains no code/data/registry, so novelty against the wider archive and performance against the current holdout best are not established.
 
 ## Candidate ranking
 
@@ -39,6 +39,30 @@ No candidate in this list requires a new geothermal observation dataset to formu
 
 A tensor dimensionality index is a source-geometry discriminator under potential-field assumptions, not a fault detector by itself. Geological interpretation and the held-out prediction test remain necessary.
 
+
+## Reconciliation with the earlier ranked table (2026-10-09)
+
+- Rank 1 in the table above is the tensor lane. It has since been run. Its final HOLDOUT-DTI result is negative on the primary Q4 protocol: 0.1019 vs 0.1627 random at N = 160,000 (see the 2026-10-09 final-pass section below and docs/run-card.json).
+- The "registry absent, gate cannot pass" note in the frozen validation plan (step 6) is out of date. The registry is present (56 rasters, scripts/build_registry.py). verify_unique.py gives REVIEW for the final file (IR-55-030).
+- The earlier results section below comes from a concurrent session. Its numbers use 60,594 withheld positives and labels E1–E3. This session uses 60,988 withheld positives and labels exp8, exp9 and exp10. The two sets are not interchangeable and neither has been overwritten.
+- The "Strike test: failed" line below is contested. IR-55-017 and the strike-test entry in the run card both record this. The holdout_v1 strike test confirmed a strike prediction at 0.302 vs 0.222 (500 segments). The two protocols differ.
+
+## New hypotheses H-B to H-F (2026-10-09) — ranked by expected DTI gain, then cost
+
+Break-even bar for any new dot (computed, not assumed): a dot raises DTI only if its expected kernel credit exceeds alpha·DTI/(1+alpha·DTI). At the random control DTI 0.0757 this is 0.2×0.0757/1.0151 ≈ **0.0149 per dot**. Gain labels below are priors, not measurements, and are not HOLDOUT-DTI. H-A (visible-prior gate, exp8/exp9) was tested before this list and failed; it is not repeated here.
+
+| Rank | Hypothesis | Layers (band numbers from docs/data_dictionary.md) | Physical reasoning | Expected DTI gain (prior) | Implementation cost | Out of lane? |
+|---|---|---|---|---|---|---|
+| 1 | **H-F — 1 m lidar DEM scarp detection.** Fault scarps in young alluvium show as topographic steps. | 1 m DEM from USGS 3DEP (not in the competition stack) | Quaternary faults in the label set are usually expressed as scarps; a scarp map is the most direct independent evidence for an unmapped trace. | **High** (potentially the largest, unquantified) | **High**: 3DEP tiles not reachable from this sandbox (curl returned 000 for prd-tnm S3); large download; scarp detector needs its own canary. | Yes. Blocked on data access. |
+| 2 | **H-B — depth-to-basement step.** A fault offsets the magnetic basement, so the depth surface shows a step across the trace. | 15 (depth to basement), 2 (RTP mag) | A fault can offset basement without any surface trace, so the step is independent of mapping. | Moderate (partly redundant with ridge detectors on band 2) | Medium: derivative of an existing band, co-location with ridges, sensitivity to the basement-model interpolation. | Yes (not a tensor method). |
+| 3 | **H-D — geodetic strain-rate corridors.** Unmapped faults sit in deforming crust. | 4 (second invariant), 7 (shear rate), 8 (dilatation rate) | Strain accumulates on structures whether or not they are mapped. | Low–moderate (coarse grid; interpolation artefacts likely) | Low–medium: bands are provided; needs a leakage canary on the strain-derived features. | Yes. |
+| 4 | **H-C — tilt-angle zero-contour.** Zero-contours of the tilt angle locate horizontal edges. | 6 (tilt / total curvature) | Standard edge-location method (citation not verified in this session; do not cite until it is). | Low–moderate. Highly redundant with the tensor lane's ridges, which use the same field derivatives. | Low: band provided, contouring is simple. | Yes. |
+| 5 | **H-E — seismicity lineaments.** Earthquake density and distance trace active structures. | 10 (distance to earthquake), 16 (earthquake intensity) | Seismicity clusters along active faults. | Low. Leakage risk: the seismic layers are derived from an external catalogue, so the canary must run first. | Low: bands provided. | Yes. |
+
+Ordering rationale: rank 1 has the largest physical upside but is blocked, so its cost is high and its gain is untested. Ranks 2–4 use bands already in the stack, so their costs are lower, but their redundancy with the tensor lane limits their gain. Rank 5 is cheap but has a leakage risk.
+
+**Nothing in H-B to H-F has been implemented or evaluated.** AGENTS.md keeps this checkout to the tensor-dimensionality lane, so each candidate needs lane approval, a preregistered plan, a leakage canary (AUC > 0.90 = leakage), a held-out evaluation, and the uniqueness gate before any slot is considered.
+
 ## Result of the tensor-lane run (2026-10-09) — HOLDOUT-DTI
 
 Evaluator `gems.metric v1` (DTI α=0.2, β=0.8, R=300 m). Holdout = four quadrant folds of catalogue fault segments, visible faults masked pixel-exactly. 60,594 withheld positive pixels. 95% CI from a 1,000-rep block bootstrap (10 km blocks).
@@ -54,3 +78,18 @@ Leakage canary: every single feature has AUC 0.48–0.52 on ridge pixels (thresh
 **Verdict for the tensor lane: negative.** From E1 to E2 the weighted true positives fell from 3,794 to 2,816 and false positives from 82,002 to 59,039, while missed positives rose from 56,800 to 57,778. The weight removed signal and noise at similar rates, so the Tversky score fell. This is the opposite of the lane's premise and is recorded as a result. Possible next experiments (within the lane only): pixel-matched strike test, and a chance-corrected uniqueness check.
 
 Out-of-lane ideas (tilt-angle zero-contours, geodetic strain, seismicity alignments, 1 m DEM scarps) were drafted in this session and are **parked**. `AGENTS.md` keeps this checkout to the tensor lane, so they are not implemented here. They need a separate lane approval and their own preregistration.
+
+## Final pass of the tensor lane (2026-10-09, this session) — HOLDOUT-DTI
+
+Evaluator: src/gems55/dti55.py (exact official DTI; verified against a brute-force transcription and the official worked example). Protocols: Q4 quadrant hide-and-recover (PRIMARY) and B = 15 px distance-banded whole-segment folds (SECONDARY). Withheld positives: 60,988. Labels: HOLDOUT-DTI in every case. No organiser score exists.
+
+| Experiment | What it tested | Result |
+|---|---|---|
+| exp8 run 2 | H-A visible-prior gate | Q4 fails (H-A-500 0.0521 vs random 0.0742); promote = false |
+| exp9 | H-A at distance bands 3, 15, 30 px | H-A fails at every band ≥ 1.5 km (B15: H-A-500 0.0001, worse than random in all 10 folds) |
+| exp10 | Dot-mass sweep, N ∈ {20k, 40k, 80k, 160k} | Q4: tensor_full 0.0459 / 0.0666 / 0.0889 / 0.1019 vs random 0.0422 / 0.0742 / 0.1202 / 0.1627 |
+
+- **Pre-registered file: N* = 160,000** (argmax of tensor_full on Q4). Label: **NEGATIVE**. Audit note: tensor_full's Q4 score rises monotonically with N, so the argmax sits on the upper edge of the tested grid. The rule therefore selects the largest N tested; a larger N was not tested and the budget is spent. Q4 loses to random at N = 40k, 80k and 160k. At N = 20k it is +0.0030 (p = 0.25, not significant).
+- Secondary, B = 15 px: tensor beats random at N = 40k (+0.0015, p = 0.008) and N = 160k (+0.0026, p = 0.004), but not at 80k (p = 0.20). The sign depends on the protocol (IR-55-031). The primary governs under the rule.
+- Shipped file: docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif (sha256 ffd2a892…). Validator 12/12. Uniqueness REVIEW (IR-55-030). Note that the holdout arm differs from the shipped emitter (IR-55-032).
+- Budget: 3 of 3 experiments used.

@@ -80,6 +80,19 @@ magnetic basement.</td><td>15 (depth to basement), 2 (RTP mag)</td>
 <td>A mapped fault need not offset the basement; an unmapped one that does is
 visible only in the depth surface.</td><td>new</td><td>5 — not built (budget)</td></tr>
 </table>
+<h2>New hypotheses H-B to H-F (2026-10-09), ranked</h2>
+<p>Gain labels are priors, not measurements, and are not HOLDOUT-DTI. Break-even bar for any
+new dot: expected kernel credit above alpha·DTI/(1+alpha·DTI) ≈ 0.0149 per dot at the random control
+DTI 0.0757 (HOLDOUT-DTI, 60,988 withheld positives). None of these has been implemented or evaluated.
+Out-of-lane items need lane approval (AGENTS.md). Full text: docs/hypotheses.md.</p>
+<table>
+<tr><th>Rank</th><th>Hypothesis</th><th>Layers (band no.)</th><th>Expected DTI gain (prior)</th><th>Implementation cost</th><th>Status</th></tr>
+<tr><td>1</td><td><b>H-F</b> 1 m lidar DEM scarps</td><td>1 m DEM, USGS 3DEP (not in stack)</td><td>High (unquantified)</td><td>High: 3DEP tiles unreachable from the sandbox</td><td>Blocked on data access</td></tr>
+<tr><td>2</td><td><b>H-B</b> depth-to-basement step</td><td>15, 2</td><td>Moderate</td><td>Medium</td><td>Out of lane; not built</td></tr>
+<tr><td>3</td><td><b>H-D</b> geodetic strain-rate corridors</td><td>4, 7, 8</td><td>Low–moderate</td><td>Low–medium (leakage canary first)</td><td>Out of lane; not built</td></tr>
+<tr><td>4</td><td><b>H-C</b> tilt-angle zero-contour</td><td>6</td><td>Low–moderate (redundant with tensor ridges)</td><td>Low</td><td>Out of lane; not built</td></tr>
+<tr><td>5</td><td><b>H-E</b> seismicity lineaments</td><td>10, 16</td><td>Low (leakage risk)</td><td>Low</td><td>Out of lane; not built</td></tr>
+</table>
 <div class="card">
 <h3 style="margin-top:0">Outcome, and what it does to the ranking</h3>
 <p>Candidate 1 was built and validated. Its strike prediction held; its locator

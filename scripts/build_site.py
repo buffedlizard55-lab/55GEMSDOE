@@ -113,8 +113,10 @@ def main() -> None:
     grid, _ = io55.read_template()
     lab = io55.read_labels()
     uniq = load("uniqueness.json")
-    _subs = sorted(EVID.glob("submission_*.json"))
-    sub = json.loads(_subs[-1].read_text()) if _subs else {}
+    # pick the sidecar of the PUBLISHED file, not the lexicographically last one (IR-55-027)
+    _pub = sorted(DL.glob("*-zeros.tif"))[-1].stem.replace("-zeros", "")
+    _sp = EVID / f"submission_{_pub}.json"
+    sub = json.loads(_sp.read_text()) if _sp.exists() else {}
     e1 = load("holdout_v1_n40000.json")
     e4 = load("exp4_arrangement_n40000.json")
     strip = load("striping_diagnostic.json")
@@ -129,7 +131,7 @@ def main() -> None:
     npos = int((arr > 0).sum())
     h_prim, h_twin, h_zip = sha256(primary), sha256(twin), sha256(zpath)
 
-    note = sub.get("portal_note", "")
+    note = json.loads((DOCS / "run-card.json").read_text())["submission"]["note"]
     name = primary.stem.replace("-zeros", "")
 
     tf = e1.get("tensor_full", {})
@@ -138,18 +140,22 @@ def main() -> None:
     can = e1.get("leakage_canary", {})
 
     # ---------------- index -------------------------------------------------
+    rc = json.loads((DOCS / "run-card.json").read_text())   # measured by scripts/make_final_card.py
+    hd = rc["holdout_dti"]; uq = rc["uniqueness"]; vo = rc["validator_output"]
+    n_ok, n_all = vo["checks_passed"], vo["checks_passed"] + vo["checks_failed"]
     idx = f"""
 <div class="dl">
 <h2>DOWNLOAD THE SUBMISSION</h2>
-<p style="margin:4px 0 12px"><b>{html.escape(name)}</b></p>
+<p style="margin:4px 0 12px"><b>{html.escape(name)}</b> &nbsp;·&nbsp; 160,000 dots, binary 0/1, EPSG:32611, 100 m</p>
 <a class="btn" href="downloads/{primary.name}" download>⬇ Download the .tif to submit</a>
 <a class="btn sec" href="downloads/{zpath.name}" download>⬇ Download .zip</a>
-<a class="btn sec" href="downloads/{twin.name}" download>NaN-outside twin</a>
+<a class="btn sec" href="downloads/{twin.name}" download>NaN-outside twin (comparison only)</a>
 <p style="margin:12px 0 4px"><b>Upload the first file (<code>{html.escape(primary.name)}</code>).</b>
-It is the all-finite encoding, which is the one the portal's
-<code>[0,1]</code> range check accepts.</p>
-<p class="small">Portal “Note” field (optional, {len(note)}/140 chars):
+It is the all-finite (zeros) encoding. The NaN twin is for comparison only.</p>
+<p class="small">Portal “Note” field ({len(note)}/140 chars):
 <code>{html.escape(note)}</code></p>
+<p class="small"><b>Status: download allowed. Submit allowed but not recommended. No weekly slot used.</b>
+Labels: HOLDOUT-DTI only. No organiser-confirmed score exists for this file.</p>
 </div>
 
 <div class="card">
@@ -157,30 +163,31 @@ It is the all-finite encoding, which is the one the portal's
 <table>
 <tr><th>Question</th><th>Answer</th><th>Evidence</th></tr>
 <tr><td>Does it meet the official format contract?</td>
-<td><span class="pill ok">YES — 12/12 checks</span></td>
-<td>single band, float32, EPSG:32611, 3730×3292, transform
-(100,0,243350,0,−100,4508550), every value in [0,1], no NaN, no dot on a mapped
-catalogue pixel. Re-read from the written bytes by
-<code>scripts/validate_submission.py</code>.</td></tr>
+<td><span class="pill ok">YES — {n_ok}/{n_all} checks</span></td>
+<td>single band, float32, EPSG:32611, 3730×3292, transform (100,0,243350,0,−100,4508550), 100 m pixel size read from the transform, every value in [0,1], no NaN, no dot on a mapped catalogue pixel. Re-read from the written bytes by <code>scripts/validate_submission.py</code>.</td></tr>
 <tr><td>Will it trip “Predicted values must be in range [0, 1]”?</td>
 <td><span class="pill ok">NO</span></td>
 <td>min 0.0, max 1.0, NaN count 0 across all {grid.width*grid.height:,} cells.</td></tr>
 <tr><td>Is it unique vs every earlier scored raster?</td>
-<td><span class="pill ok">YES</span></td>
-<td>max |Spearman| {uniq.get('max_spearman_dense')} vs {uniq.get('n_registry')} prior
-rasters (threshold 0.90); max Jaccard {uniq.get('max_jaccard')}; density-matched
-3-px overlap {uniq.get('max_frac_within_3px_density_matched')} (threshold 0.70).</td></tr>
+<td><span class="pill warn">REVIEW — not a copy</span></td>
+<td>max |Spearman| {uq['max_abs_spearman_dense']} vs {uq['n_registry']} prior rasters (threshold 0.90); max Jaccard {uq['max_jaccard']}. The literal 70% raw 3-px rule trips ({uq['max_frac_within_3px_raw']}) only against a 206,895-dot spacing-5 lattice, where a random control gets {uq['raw_max_reference_random_control_frac_within_3px']} (excess {uq['excess_over_random_control_for_that_reference']:+.4f}). Chance-level, flagged for owner decision (IR-55-030).</td></tr>
 <tr><td>Is it <i>expected</i> to beat the current best score?</td>
 <td><span class="pill bad">NO — negative result</span></td>
-<td>On the leakage-free spatial holdout this surface scores
-{tf.get('pooled',{}).get('dti',0):.4f} pooled DTI versus
-{rnd.get('pooled',{}).get('dti',0):.4f} for a uniform-random control at the same
-mass. It has not beaten the control, so it must not be promoted into a weekly
-slot on the strength of this evidence.</td></tr>
+<td>On the leakage-free Q4 holdout this surface (N = {rc['submission']['n_dots']:,}) scores {hd['value']:.4f} HOLDOUT-DTI (95% CI {hd['ci95'][0]:.4f}–{hd['ci95'][1]:.4f}, fold-level, {hd['withheld_positive_count']:,} withheld positives, evaluator src/gems55/dti55.py) versus {hd['uniform_random_control']:.4f} for uniform random at the same mass. It loses to random on Q4 at N = 40k, 80k and 160k and is not distinguishable at 20k. The B = 15 px secondary is positive (IR-55-031) but the primary governs. It must not be promoted into a weekly slot.</td></tr>
 </table>
 <p><b>Bottom line:</b> the file is <i>format-safe and legal to upload</i>, and it is
 <i>scientifically a negative result</i>. Upload it only if you want the negative
 result on the board; do not expect it to beat 0.3195.</p>
+</div>
+
+<div class="card">
+<h3 style="margin-top:0">What changed in the final pass (2026-10-09)</h3>
+<ul>
+<li><b>Experiment budget spent: 3 of 3.</b> E1 = exp8 run 2 (H-A visible-prior gate; Q4 fails, promote = false). E2 = exp9 distance-banded folds (H-A fails at every band ≥ 1.5 km). E3 = exp10 dot-mass sweep.</li>
+<li><b>Pre-registered final file: N* = 160,000</b> (argmax of tensor_full on Q4). Label <b>NEGATIVE</b>: Q4 fails at N*, though B = 15 px is significantly positive. This file replaces the 40k file, which is archived as superseded.</li>
+<li><b>Template fixes, each applied once:</b> validator pixel size (IR-55-025), feature-raster name in prepare_data (IR-55-026), site and card sidecar selection (IR-55-027), per-fold canary (IR-55-017), segment-fold leak (IR-55-018).</li>
+<li><b>Open:</b> striping axis (IR-55-028), striping counts from two detectors (IR-55-029), literal uniqueness flag (IR-55-030).</li>
+</ul>
 </div>
 
 <h2>Executive summary</h2>
@@ -248,7 +255,7 @@ grid contract)</td></tr>
 </table>
 
 <h2>Run card</h2>
-<pre>{html.escape(json.dumps(load("runcard.json") or {}, indent=2))}</pre>
+<pre>{html.escape(json.dumps(json.loads((DOCS / "run-card.json").read_text()), indent=2))}</pre>
 """
 
     # ---------------- submit ------------------------------------------------
@@ -405,6 +412,19 @@ magnetic basement.</td><td>15 (depth to basement), 2 (RTP mag)</td>
 <td>A mapped fault need not offset the basement; an unmapped one that does is
 visible only in the depth surface.</td><td>new</td><td>5 — not built (budget)</td></tr>
 </table>
+<h2>New hypotheses H-B to H-F (2026-10-09), ranked</h2>
+<p>Gain labels are priors, not measurements, and are not HOLDOUT-DTI. Break-even bar for any
+new dot: expected kernel credit above alpha·DTI/(1+alpha·DTI) ≈ 0.0149 per dot at the random control
+DTI 0.0757 (HOLDOUT-DTI, 60,988 withheld positives). None of these has been implemented or evaluated.
+Out-of-lane items need lane approval (AGENTS.md). Full text: docs/hypotheses.md.</p>
+<table>
+<tr><th>Rank</th><th>Hypothesis</th><th>Layers (band no.)</th><th>Expected DTI gain (prior)</th><th>Implementation cost</th><th>Status</th></tr>
+<tr><td>1</td><td><b>H-F</b> 1 m lidar DEM scarps</td><td>1 m DEM, USGS 3DEP (not in stack)</td><td>High (unquantified)</td><td>High: 3DEP tiles unreachable from the sandbox</td><td>Blocked on data access</td></tr>
+<tr><td>2</td><td><b>H-B</b> depth-to-basement step</td><td>15, 2</td><td>Moderate</td><td>Medium</td><td>Out of lane; not built</td></tr>
+<tr><td>3</td><td><b>H-D</b> geodetic strain-rate corridors</td><td>4, 7, 8</td><td>Low–moderate</td><td>Low–medium (leakage canary first)</td><td>Out of lane; not built</td></tr>
+<tr><td>4</td><td><b>H-C</b> tilt-angle zero-contour</td><td>6</td><td>Low–moderate (redundant with tensor ridges)</td><td>Low</td><td>Out of lane; not built</td></tr>
+<tr><td>5</td><td><b>H-E</b> seismicity lineaments</td><td>10, 16</td><td>Low (leakage risk)</td><td>Low</td><td>Out of lane; not built</td></tr>
+</table>
 <div class="card">
 <h3 style="margin-top:0">Outcome, and what it does to the ranking</h3>
 <p>Candidate 1 was built and validated. Its strike prediction held; its locator
@@ -475,7 +495,7 @@ undirected azimuths, so the null column confirms the comparison is calibrated.</
 reported for reference: its AUC of 1.000 in folds 1–3 is a <i>definitional</i>
 artefact of measuring it against fold 0's visible set (those pixels are inside
 fold 0's visible catalogue), not a leak in a lane feature. See irregularities
-IR-55-06.</p>
+IR-55-006.</p>
 
 <h3>4. Arrangement sweep (same holdout, N = 40,000)</h3>
 <table><tr><th>Arm</th><th>Pooled DTI</th><th>Dots</th><th>Mean credit / dot</th></tr>{arr}</table>
@@ -495,7 +515,7 @@ quadrants produced much larger numbers (up to 0.4982 pooled DTI for a
 catalogue-annulus prior at 29,843 dots). Those numbers are reported for
 completeness and are <b>flagged as leakage</b>: splitting a mapped trace on a
 20-px lattice leaves the visible continuation of the same trace flanking every
-withheld piece, so the task degenerates into gap-filling. See IR-55-05. No
+withheld piece, so the task degenerates into gap-filling. See IR-55-005. No
 submission was built from that holdout.</p>
 
 <h3>7. Survey-line diagnostic</h3>
@@ -575,7 +595,7 @@ list word for word</td></tr>
 <h2>Irregularities flagged for review</h2>
 <table>
 <tr><th>ID</th><th>Finding</th><th>Impact</th><th>Action taken</th></tr>
-<tr><td>IR-55-01</td><td><b>The repository was empty.</b> At session start
+<tr><td>IR-55-001</td><td><b>The repository was empty.</b> At session start
 <code>55GEMSDOE</code> contained a single 11-byte <code>README.md</code> reading
 “# 55GEMSDOE”. The run brief says to reuse the template's cached feature stack,
 <code>evaluate_holdout.py</code> and <code>submission_writer.py</code>, and to
@@ -584,7 +604,7 @@ check uniqueness against a registry.</td>
 <td>Built all three shared tools here as the single implementation (no private
 fork) and constructed the registry by downloading 56 prior scored rasters from
 sibling repositories via the GitHub blob API.</td></tr>
-<tr><td>IR-55-02</td><td><b>No DrivenData credentials and no general network.</b>
+<tr><td>IR-55-002</td><td><b>No DrivenData credentials and no general network.</b>
 The sandbox reaches only github.com, api.github.com, codeload.github.com,
 pypi.org and registry.npmjs.org. drivendata.org, usgs.gov, github.io and
 raw.githubusercontent.com all fail at the TCP layer.</td>
@@ -593,7 +613,7 @@ unreachable from the build environment.</td>
 <td>Recovered the official rasters from prior repositories under the same account
 and verified them by content address (see Sources). Prior site content was read
 through a research tool with broader reach, never assumed.</td></tr>
-<tr><td>IR-55-03</td><td><b>Transcription ambiguity in the published
+<tr><td>IR-55-003</td><td><b>Transcription ambiguity in the published
 dimensionality formula.</b> Karimi &amp; Kletetschka (2024) Eq. 4 renders as
 I = −(I₂/2)²/(I₁/2)³. Substituting the standard invariants, that normalisation
 reaches only 8/27 ≈ 0.296 at the pure-3-D endpoint, contradicting the same
@@ -603,7 +623,7 @@ both documented endpoints exact.</td>
 <td>Implemented the endpoint-exact form, unit-tested both endpoints analytically,
 computed the eigenvalue ratio −λ2/λ1 alongside it, and disclosed the ambiguity
 here rather than presenting either as settled fact.</td></tr>
-<tr><td>IR-55-04</td><td><b>The lane brief's flight-line direction is wrong for
+<tr><td>IR-55-004</td><td><b>The lane brief's flight-line direction is wrong for
 these grids.</b> The brief asserts east–west flight-line striping. Three
 independent measurements say north–south: the 1–20 km spectral annulus carries
 more power with its wavevector along east–west for both fields (0.104 vs 0.089
@@ -614,7 +634,7 @@ the artefact.</td>
 <td>Measured the direction first, verified the azimuth convention on a synthetic
 field, and masked the measured direction. Both readings are published in
 <code>evidence/striping_diagnostic.json</code>.</td></tr>
-<tr><td>IR-55-05</td><td><b>The segment-level holdout leaks.</b> Cutting mapped
+<tr><td>IR-55-005</td><td><b>The segment-level holdout leaks.</b> Cutting mapped
 traces on a 20-px lattice leaves the visible continuation of the same trace
 flanking every withheld piece, so a catalogue-proximity prior scores 0.4982 by
 gap-filling rather than by discovery.</td>
@@ -622,14 +642,14 @@ gap-filling rather than by discovery.</td>
 <td>Labelled the result as leakage, built no submission from it, and used the
 contiguous-quadrant holdout (where the catalogue prior is structurally
 unavailable) as the decision instrument.</td></tr>
-<tr><td>IR-55-06</td><td><b>The leakage-canary control is a definitional
+<tr><td>IR-55-006</td><td><b>The leakage-canary control is a definitional
 artefact.</b> <code>neg_visible_catalogue_distance</code> reaches AUC 1.000 in
 folds 1–3 because it is measured against fold 0's visible set, which contains
 those folds' truth pixels by construction.</td>
 <td>Low — no lane feature is affected; all lane AUCs are 0.41–0.54.</td>
 <td>Documented rather than deleted, because the artefact is instructive about how
 quickly a catalogue-derived control becomes meaningless across folds.</td></tr>
-<tr><td>IR-55-07</td><td><b>The organiser template is not what its caption
+<tr><td>IR-55-007</td><td><b>The organiser template is not what its caption
 says.</b> The problem description calls the sample submission “a sample
 submission that predicts total fault absence”, but the file contains 60,988
 pixels equal to 1.0 and 5,106,385 equal to 0.0 — exactly the mapped-fault count.
@@ -638,14 +658,14 @@ It is the existing-faults raster, not an all-zero raster.</td>
 it as a zero baseline.</td>
 <td>Used only its shape, CRS, transform and NaN footprint, all of which were
 re-verified against the labels raster.</td></tr>
-<tr><td>IR-55-08</td><td><b>The 3-px uniqueness rule is vacuous against dense
+<tr><td>IR-55-008</td><td><b>The 3-px uniqueness rule is vacuous against dense
 references.</b> A prior spacing-5 lattice with 206,895 positives puts 84.1% of
 <i>any</i> 40,000-dot set within 3 px of its dots.</td>
 <td>Medium — the rule as written would flag every submission as a duplicate.</td>
 <td>Added a uniform-random control at matched size and reported the excess over
 it (+0.0399 max), plus the raw statistic restricted to the 43 density-matched
-references (max 0.6694, under the 0.70 threshold). Both readings are published.</td></tr>
-<tr><td>IR-55-12</td><td><b>The 0.2778 anchor is a projection, not a score.</b>
+references (max 0.6694, under the 0.70 threshold) for the superseded 40k file. For the 160k file the same statistic is 0.8401, flagged in IR-55-030. Both readings are published.</td></tr>
+<tr><td>IR-55-012</td><td><b>The 0.2778 anchor is a projection, not a score.</b>
 GEMSDOE32's own audit manifest lists
 <code>gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros</code> as
 <code>receipt: null</code> and “…projected 0.2747; UNSCORED”. All 24 entries in that
@@ -657,7 +677,7 @@ the same size (proxy DTI 0.0049 vs 0.0267), while the raster associated with the
 live 0.2600 sits immediately adjacent to mapped traces and scores 0.0686. Full
 analysis, algebraic bounds and evidence classes in
 <code>evidence/anchor_verdict.json</code>.</td></tr>
-<tr><td>IR-55-10</td><td><b>A concurrent session ran the same lane and its
+<tr><td>IR-55-010</td><td><b>A concurrent session ran the same lane and its
 guardrail tests forbade publishing any TIF.</b> PR #3 merged to <code>main</code>
 mid-session with an independent implementation of this lane (<code>gems/</code>)
 whose <code>tests/test_site_status.py</code> asserted <code>docs/downloads</code>
@@ -671,7 +691,7 @@ zero failures, and that the site states plainly whether it is OK to download and
 submit. The fail-closed intent is kept and strengthened. Both sessions' pages are
 retained and cross-linked. Their holdout numbers (ridge 0.0578, full lane 0.0444,
 max canary AUC 0.518) independently replicate this session's negative verdict.</td></tr>
-<tr><td>IR-55-11</td><td><b>Input data confirmed by two independent routes.</b>
+<tr><td>IR-55-011</td><td><b>Input data confirmed by two independent routes.</b>
 The concurrent session pins SHA-256 hashes from a sibling-repo manifest; this
 session reassembled the same files from five GitHub blobs in a different
 repository. All three hashes match exactly — <code>labels.tif</code>
@@ -680,11 +700,20 @@ grid 4371c82e… (their <code>training_features.tif</code> pin).</td>
 <td>Positive finding, not a defect.</td>
 <td>Recorded here because it is the strongest available evidence that the rasters
 under every number on this site are the genuine organiser files.</td></tr>
-<tr><td>IR-55-09</td><td><b>Budget overrun.</b> The brief caps the session at
+<tr><td>IR-55-009</td><td><b>Budget overrun.</b> The brief caps the session at
 3 experiments or 2 hours. Five experiment scripts were run and wall time exceeded
 2 hours, because two protocol corrections (the holdout design and the uniqueness
 control) each required a re-run.</td>
 <td>Process only.</td><td>Reported here rather than hidden.</td></tr>
+<tr><td>IR-55-025</td><td><b>The validator's "resolution is 100 m" check tested the shape, not the pixel size.</b> A raster with the right shape but a 200 m transform would have passed.</td><td>Medium — a wrong-resolution file could be uploaded.</td><td>Fixed once in scripts/validate_submission.py. The check now reads |a| and |e| from the transform. Both encodings pass 12/12 and 11/11.</td></tr>
+<tr><td>IR-55-026</td><td><b>Feature-raster naming mismatch.</b> prepare_data.py and run_tensor_lane.py looked for <code>training_features.tif</code>. The file on disk is <code>gems-geodawn-numerical-features.tif</code> (the io55 name). The same pin, sha256 4371c82e…, applies to both.</td><td>Low — prepare_data exited 1 on a correct install.</td><td>Fixed once in both scripts. prepare_data.py now exits 0 with all three pins OK.</td></tr>
+<tr><td>IR-55-027</td><td><b>Sidecar selection picked the lexicographically last file.</b> "160000" sorts before "40000", so the site and card generators would have described the superseded 40k file.</td><td>Medium — the page would describe the wrong file.</td><td>build_site.py now selects the sidecar of the published file. make_final_card.py replaces make_runcard.py for docs/run-card.json. evidence/runcard.json is stale and superseded.</td></tr>
+<tr><td>IR-55-028</td><td><b>Striping axis is unreconciled.</b> ScienceBase (Glen &amp; Earney 2024) says flight lines run at azimuth 90° (E–W). The lane masks rows (E–W lines). striping_diagnostic.json reports N–S on real RTP data, but its own coherence numbers are equal (0.185 along x, 0.187 along y). A crude high-pass test here (row-means std 6.3 vs column-means std 8.9; y/x gradient RMS ratio 0.77) leans the other way. No conclusion is cited.</td><td>High — if the striping is N–S, the lane's 21% mask is on the wrong axis.</td><td>Open. The E–W assumption is kept as the ScienceBase statement. Needs the flight-line shapefile (not reachable from the sandbox) to settle it.</td></tr>
+<tr><td>IR-55-029</td><td><b>Two striping counts from two different detectors.</b> 86,947 px (129 rows, z&gt;4, gems/tensor.py) and 1,105,919 px (21.4%, coherence-based gems55 lane mask, thresh 0.55, lag 60 px). These are not a miscount.</td><td>Medium — the lane mask is far larger than the older detector's.</td><td>Both are reported. The shipped file and exp10 use the 1,105,919-px mask. The 86,947 figure is cited only as the other detector's output.</td></tr>
+<tr><td>IR-55-030</td><td><b>Literal uniqueness flag on the 160k file.</b> verify_unique returns REVIEW. The raw 3-px statistic is 0.8401 against a 206,895-dot spacing-5 lattice. A random control on that lattice gets 0.8389 (excess +0.0012). Spearman max 0.014, Jaccard max 0.031.</td><td>Medium — the brief's literal 70% rule trips.</td><td>Not cleared as a clean PASS. The file is not a copy in any content measure. The owner must decide whether a chance-level lattice overlap counts. The 40k file passed the density-matched reading (0.6694).</td></tr>
+<tr><td>IR-55-031</td><td><b>The secondary protocol disagrees with the primary.</b> At N = 160k, B = 15 px gives tensor 0.0238 vs random 0.0212 (p = 0.004, positive). Q4 gives 0.1019 vs 0.1627 (negative). At N = 40k, B = 15 px is +0.0015 (p = 0.008), and B = 30 px is +0.0009 (p = 0.20).</td><td>Medium — the lane's sign depends on the protocol.</td><td>Reported as is. The pre-registered rule (Q4 primary and B = 15 must both pass) gives NEGATIVE. The mixed sign is itself a finding.</td></tr>
+<tr><td>IR-55-032</td><td><b>The holdout arm is not the shipped emitter.</b> exp10 restricts emission to each fold's withheld domain, excludes striping outright, and uses per-fold seeds. The shipped writer uses the full footprint, down-weights striping by 0.25, and uses seed 55. The holdout therefore does not measure the shipped file exactly.</td><td>Medium — the shipped file is not the file that was scored.</td><td>Disclosed. Not corrected in this pass, because a full-footprint holdout would need a different protocol, and the budget is spent.</td></tr>
+<tr><td>IR-55-033</td><td><b>Zeros versus NaN outside the footprint.</b> The rules say "null or nan". The site chooses zeros on the basis of the portal's [0, 1] range check. That reasoning is not verified against the portal.</td><td>Low–medium — an encoding mismatch could fail the upload.</td><td>The zeros file is the primary. The NaN twin is published for comparison. Confirm on the portal before relying on either.</td></tr>
 </table>
 """
 

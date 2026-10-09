@@ -298,6 +298,9 @@ def make_segment_folds(
 ) -> list[Fold]:
     """Hide-and-recover over *whole fault segments*, per the run brief.
 
+    ``Fold.withheld`` is the FOOTPRINT (the region a prediction may occupy), not the
+    truth neighbourhood.  See IR-55-18.
+
     The catalogue is cut into whole segments: connected components of the mapped
     fault mask, further split by a regular ``split_px``-pixel lattice so that one
     long mapped trace becomes several independent segments.  Segments are dealt
@@ -332,11 +335,17 @@ def make_segment_folds(
     fold_of_seg = np.where(seg_id >= 0, assign[inv], -1)
 
     folds = []
+    fp = np.asarray(footprint, dtype=bool)
     for k in range(n_folds):
         truth = cat & (fold_of_seg == k)
         if truth.sum() == 0:
             continue
         buf = ndimage.binary_dilation(truth, iterations=buffer_px)
         visible = cat & ~truth & ~buf
-        folds.append(Fold(name=f"seg{k}", withheld=truth | buf, visible=visible, truth=truth))
+        # IR-55-18 (fixed in this template): ``withheld`` used to be ``truth | buf``.
+        # Emission is restricted to ``withheld & ~visible`` by every caller, so that
+        # region was built FROM the hidden truth and placed dots on the answer
+        # (random control scored 0.33 vs 0.07 on the quadrant protocol).  A fold must
+        # emit and score over the whole footprint, minus the visible catalogue.
+        folds.append(Fold(name=f"seg{k}", withheld=fp.copy(), visible=visible, truth=truth))
     return folds

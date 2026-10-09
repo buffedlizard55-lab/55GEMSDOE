@@ -39,23 +39,23 @@ footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size
 <h2>How to submit this file to the competition</h2>
 <div class="dl">
 <h2>STEP 1 — download</h2>
-<a class="btn" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif" download>⬇ h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif</a>
-<p class="small">SHA-256 <code>b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368</code></p>
+<a class="btn" href="downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif" download>⬇ h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif</a>
+<p class="small">SHA-256 <code>ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273</code></p>
 </div>
 <ol>
 <li><b>Download</b> the file above. Use the <code>-zeros</code> encoding, not the
 <code>-nan</code> twin.</li>
 <li><b>Optionally verify</b> the bytes:
-<pre>sha256sum h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif
-# expect b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368</pre></li>
+<pre>sha256sum h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif
+# expect ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273</pre></li>
 <li><b>Sign in</b> to DrivenData and open
 <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS
 Prize Challenge → Submit</a>. Uploads need a human login; this project holds no
 credentials.</li>
 <li><b>Choose the file</b> under “File to submit”. A single-band GeoTIFF or a zip
 containing one GeoTIFF is accepted.</li>
-<li><b>Paste the note</b> (86 characters, the field is optional):
-<pre>tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots</pre></li>
+<li><b>Paste the note</b> (119 characters, the field is optional):
+<pre>h55 tensor-dim lane, 160k dots. NEGATIVE on holdout (Q4 0.102 vs random 0.163). Format-valid. Do not use a weekly slot.</pre></li>
 <li><b>Submit.</b> Check the weekly submission cap on the submission page first —
 promotion into a real slot is a separate decision from generating a file.</li>
 </ol>

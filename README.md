@@ -10,56 +10,48 @@ state, and the download.
 
 ## 1. Download the submission
 
+**Final file (2026-10-09, pre-registered N\* = 160,000).** Measured by `scripts/make_final_card.py`; the full run card is `docs/run-card.json`.
+
 | | |
 |---|---|
-| **File to upload** | `docs/downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif` |
-| **Zip** | `docs/downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip` |
-| **NaN-outside twin** (reference only, do **not** upload) | `…-nan.tif` |
-| **Portal “Note”** (86 / 140 chars) | `tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots` |
-| **SHA-256 (.tif)** | `b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368` |
+| **File to upload** | `docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` |
+| **Zip** | `docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip` |
+| **NaN-outside twin** (comparison only) | `…-nan.tif` |
+| **Portal “Note”** (119 / 140 chars) | `h55 tensor-dim lane, 160k dots. NEGATIVE on holdout (Q4 0.102 vs random 0.163). Format-valid. Do not use a weekly slot.` |
+| **SHA-256 (.tif)** | `ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273` |
+| **Superseded** | `docs/downloads/archive-superseded/…40000dots…` (sha `b7c7225d…`), same negative verdict at N = 40k |
 
 ### Is it OK to download and submit this file?
 
 | Question | Answer |
 |---|---|
-| Meets the official format contract? | **YES** — 12/12 checks, re-read from the written bytes |
+| Meets the official format contract? | **YES** — 12/12 checks, re-read from the written bytes (single band, float32, EPSG:32611, 3730×3292, 100 m from the transform, values in [0,1], 0 NaN, 0 dots on mapped catalogue px) |
 | Will it trip `Predicted values must be in range [0, 1]`? | **NO** — min 0.0, max 1.0, **0 NaN** across all 12,279,160 cells |
-| Unique against every earlier scored raster? | **YES** — max abs Spearman **0.0043** vs 56 rasters (threshold 0.90); max Jaccard 0.0080; density-matched 3-px overlap 0.6694 (threshold 0.70) |
-| Expected to beat the current best score? | **NO — negative result.** Holdout DTI **0.0667** vs **0.0757** for a uniform-random control at the same mass, and below it in 4/4 folds |
+| Unique against every earlier scored raster? | **REVIEW — not a copy.** Max abs Spearman 0.014 and max Jaccard 0.031 vs 56 rasters. The literal 70% raw 3-px rule trips (0.8401) only against a 206,895-dot spacing-5 lattice, where a random control scores 0.8389 (excess +0.0012). Flagged for owner decision (IR-55-030). |
+| Expected to beat the current best score? | **NO — negative result.** HOLDOUT-DTI **0.1019** (Q4, 95% CI 0.0877–0.1185, fold-level, 60,988 withheld positives, evaluator `src/gems55/dti55.py`) vs **0.1627** for a uniform-random control at the same mass. Random wins on Q4 at N = 40k, 80k and 160k. |
 
-**The file is format-safe and legal to upload. It is scientifically a negative
-result.** Upload it only if you want the negative result on the board. Do not
-spend a weekly slot expecting it to beat 0.3195.
+**Verdict.** Download: allowed. Submit: allowed in format, **not recommended**, and no weekly slot is used. The file is format-valid and not a copy, but scientifically negative. Do not expect it to beat 0.3195. Organiser score: none exists for this file. The site's download box reads the same values from `docs/run-card.json`.
 
-Site: `docs/` (GitHub Pages) — the executive summary and the download button are
-the first thing on `docs/index.html`.
+Site: `docs/` (GitHub Pages). The executive summary and the download button are the first thing on `docs/index.html`.
 
 ---
 
 ## 2. Current state (measured, not asserted)
 
-* **Grid contract, measured from the organiser template:** 3292 × 3730 (w × h),
-  EPSG:32611, 100 m, transform `(100, 0, 243350, 0, −100, 4508550)`,
-  5,167,373 valid px, 7,111,787 NaN, 60,988 mapped catalogue px.
-* **Tests:** `36 passed` (16 in this session's `tests_numeric/test_core.py` + 14
-  from the concurrent session's numeric tests), plus `6 passed` stdlib-only site
-  guardrails in `tests/test_site_status.py`. Both suites run in CI. The numeric
-  tests cover exactness of the DTI evaluator against a They cover exactness of the DTI evaluator against a
-  brute-force transcription, the official worked example ratio, the FFT gradient
-  tensor against an analytic harmonic solution, the closed-form eigen-decomposition
-  against `numpy.linalg.eigh`, both dimensionality endpoints, the survey-line
-  degeneracy, and the grid contract.
-* **Confirmed:** the tensor **strike** prediction. Withheld faults' strikes agree
-  with the tensor strike more often than random ridges' do — 0.302 vs 0.222 within
-  20° (+8.0 pp); mean |Δθ| 38.03° vs 45.05°, 95 % CI of the difference
-  [−9.19, −4.68]° (excludes 0). 45.0° is the exact null mean for independent
-  undirected azimuths, so the null is calibrated.
-* **Refuted:** the tensor surface as a **locator**. It loses to uniform placement
-  at every dot budget and every NMS separation tested.
-* **Metric algebra, verified numerically:** `TP_w + FN_w = |G|` identically, so
-  **`DTI = TP_w / (0.2·N + 0.8·|G|)`**. Coverage dominates precision: a false
-  positive costs 0.2, an uncovered truth pixel costs 0.8. This is the single most
-  transferable finding in the repo.
+* **Final pass, 2026-10-09 (3 of 3 experiments used):**
+  * exp8 run 2 (H-A visible-prior gate): Q4 fails; `promote = false`.
+  * exp9 (distance bands 3/15/30 px): H-A fails at every band ≥ 1.5 km.
+  * exp10 (dot-mass sweep 20k/40k/80k/160k): on Q4, `tensor_full` is 0.0459 / 0.0666 / 0.0889 / 0.1019 vs random 0.0422 / 0.0742 / 0.1202 / 0.1627. Pre-registered N\* = 160,000 → label **NEGATIVE**.
+  * Secondary B = 15 px: tensor beats random at N = 40k (p = 0.008) and N = 160k (p = 0.004). The primary Q4 governs, so the label is NEGATIVE (IR-55-031).
+* **Grid contract, measured from the organiser template:** 3292 × 3730 (w × h), EPSG:32611, 100 m, transform `(100, 0, 243350, 0, −100, 4508550)`, 5,167,373 valid px, 7,111,787 NaN, 60,988 mapped catalogue px.
+* **Tests:** `pytest tests_numeric` → 30 passed; `python -m unittest tests.test_site_status` → 6 OK. Both run in CI. The numeric tests cover exactness of the DTI evaluator against a brute-force transcription, the official worked-example ratio, the FFT gradient tensor against an analytic harmonic solution, the closed-form eigen-decomposition against `numpy.linalg.eigh`, both dimensionality endpoints, the survey-line degeneracy, and the grid contract.
+* **Template fixes, each applied once in the shared template:** per-fold leakage canary (IR-55-017); segment-fold leak, withheld = full footprint (IR-55-018); validator pixel-size check (IR-55-025); feature-raster name in `prepare_data.py` and `run_tensor_lane.py` (IR-55-026); sidecar selection in `build_site.py` (IR-55-027).
+* **Strike prediction (contested, not confirmed for the final lane):** on the `holdout_v1` protocol, withheld faults' strikes agree with the tensor strike more often than random ridges' (0.302 vs 0.222 within 20°, 500 segments, CI of the mean difference [−9.19, −4.68]°). A different run-card protocol returned RUN_FAILED (0.4319 vs 0.8764, 910 segments). Treat the strike claim as unresolved.
+* **Refuted:** the tensor surface as a **locator**. It loses to uniform placement on Q4 at every dot budget tested (20k–160k). On the distance-banded secondary it is only marginally positive.
+* **Metric algebra, verified numerically:** `TP_w + FN_w = |G|` identically, so **`DTI = TP_w / (0.2·N + 0.8·|G|)`**. Coverage dominates precision: a false positive costs 0.2, an uncovered truth pixel costs 0.8.
+* **Break-even bar for any new dot (computed):** `α·DTI/(1+α·DTI)` ≈ 0.0149 per dot at the random control DTI 0.0757.
+* **New hypotheses (not implemented, out of lane):** H-B to H-F, ranked in `docs/hypotheses.md`. Each needs lane approval under AGENTS.md.
+* **Open:** striping axis (IR-55-028), two striping detectors (IR-55-029), literal uniqueness flag (IR-55-030), holdout arm vs shipped emitter (IR-55-032), zeros vs NaN encoding (IR-55-033).
 
 ---
 
@@ -77,7 +69,7 @@ api.github.com) lists that exact file as its `primary` candidate with
 > UNSCORED**
 
 All 24 entries in that manifest carry `receipt: null`. So 0.2778 is a *projection*
-carried forward as a score — exactly what the brief forbids. Logged **IR-55-12**.
+carried forward as a score — exactly what the brief forbids. Logged **IR-55-012**.
 Until this session found it, this README and the run card treated 0.2778, 0.3195
 and 0.3774 as ORGANIZER-CONFIRMED anchors. **None of them is receipted.** They are
 USER-SUPPLIED claims.
@@ -142,20 +134,23 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 bash scripts/download_competition_data.sh   # needs `gh` auth; or log in at DrivenData
 .venv/bin/python scripts/prepare_and_cache.py  # verifies data/, builds data/cache/lane_v1.npz
 .venv/bin/python scripts/prepare_data.py        # concurrent session's sha256 pin check
-.venv/bin/python -m pytest -q                     # everything: 36 tests
+.venv/bin/python -m pytest -q                     # numeric suite: 30 tests
 python3 -m unittest discover -s tests -v          # site guardrails, stdlib only
 .venv/bin/python -m pytest tests_numeric -q       # maths, 30 tests
 .venv/bin/python scripts/diagnose_striping.py
 .venv/bin/python scripts/evaluate_holdout.py --tag v1 --n-dots 40000
+# experiments already run (E1–E3). Re-running them spends budget:
+# .venv/bin/python scripts/exp8_visible_prior_gate.py   .venv/bin/python scripts/exp9_distance_band.py   .venv/bin/python scripts/exp10_mass_sweep.py
 .venv/bin/python scripts/exp2_placement.py 40000 v1
 .venv/bin/python scripts/exp3_segment_holdout.py v1 24000,40000   # leakage-flagged
 .venv/bin/python scripts/exp4_arrangement.py v1 40000
 .venv/bin/python scripts/build_registry.py
-.venv/bin/python scripts/submission_writer.py --tag v1 --n-dots 40000 --min-sep 3.0
-.venv/bin/python scripts/validate_submission.py docs/downloads/*.tif
-.venv/bin/python scripts/verify_unique.py docs/downloads/<the -zeros file>.tif
-.venv/bin/python scripts/make_runcard.py
-.venv/bin/python scripts/build_site.py
+# Final file (N* = 160000, pre-registered in scripts/exp10_mass_sweep.py). The three experiments are spent.
+.venv/bin/python scripts/submission_writer.py --tag v1 --n-dots 160000
+.venv/bin/python scripts/validate_submission.py docs/downloads/*-zeros.tif docs/downloads/*-nan.tif
+.venv/bin/python scripts/verify_unique.py docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif --out evidence/uniqueness_160000dots.json
+.venv/bin/python scripts/make_final_card.py     # writes docs/run-card.json and docs/status.json
+.venv/bin/python scripts/build_site.py          # run AFTER make_final_card.py
 ```
 
 `data/` is gitignored (the feature grid alone is 419 MB). The registry rasters
@@ -321,7 +316,7 @@ a session that produced no raster but contradicts the owner's standing requireme
 for an obvious, downloadable, validated submission. `tests/test_site_status.py` was
 therefore fixed **once, in place**: it now requires that any published TIF exists,
 that its SHA-256 matches the run card, that it passes the validator, and that the
-site states plainly whether it is OK to download and submit. See IR-55-10.
+site states plainly whether it is OK to download and submit. See IR-55-010.
 
 Both sessions' pages are kept. Theirs: `docs/executive-summary.html`,
 `docs/results.html`, `docs/data_dictionary.html`, `docs/leaderboard-analysis.html`,
@@ -355,7 +350,22 @@ Both sessions' pages are kept. Theirs: `docs/executive-summary.html`,
    keys on raw credit and is therefore raster-scan degenerate on a flat prior;
    that is a known defect, logged, not hidden). (c) Obtain the 1 m DEM tiles and
    test LiDAR scarp geometry gated by tensor dimensionality.
-7. **Irregularities.** Nine are logged in `docs/irregularities.html`, including
-   the empty starting repository, the wrong flight-line direction in the lane
-   brief, the leakage in the segment-level holdout, the template that is not the
-   all-zero raster its caption claims, and the vacuous 3-px uniqueness rule.
+7. **Irregularities.** IR-55-001 to IR-55-033 are logged in `docs/irregularities.md`
+   and rendered in `docs/irregularities.html`. They include the empty starting
+   repository, the wrong flight-line direction in the lane brief, the leakage in the
+   segment-level holdout, the vacuous 3-px uniqueness rule, and the final-pass items
+   below.
+8. **Striping axis unresolved (IR-55-028).** ScienceBase says flight lines run E–W; the
+   lane masks rows (E–W) but `striping_diagnostic.json` says N–S, and its own coherence
+   numbers do not support that call. The 21% mask (1,105,919 px, IR-55-029) may be on the
+   wrong axis. Settling it needs the flight-line shapefile, which is unreachable here.
+9. **Literal uniqueness flag on the shipped file (IR-55-030).** The 160k file trips the
+   raw 70% 3-px rule against one dense lattice, at chance level. This is not a copy, but
+   the owner has to decide whether it counts.
+10. **The holdout arm is not the shipped emitter (IR-55-032).** exp10 restricts emission to
+    withheld folds and excludes striping outright. The shipped writer down-weights
+    striping by 0.25 and uses seed 55. The holdout does not score the shipped file exactly.
+11. **Encoding (IR-55-033).** Rules allow null or nan outside the footprint. The site uses
+    zeros on the basis of the portal range check, which is not verified against the portal.
+12. **Budget.** Three experiments were used (exp8 run 2, exp9, exp10). Out-of-lane
+    hypotheses H-B to H-F in `docs/hypotheses.md` are proposals only.

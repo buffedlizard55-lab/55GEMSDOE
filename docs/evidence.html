@@ -71,7 +71,7 @@ undirected azimuths, so the null column confirms the comparison is calibrated.</
 reported for reference: its AUC of 1.000 in folds 1–3 is a <i>definitional</i>
 artefact of measuring it against fold 0's visible set (those pixels are inside
 fold 0's visible catalogue), not a leak in a lane feature. See irregularities
-IR-55-06.</p>
+IR-55-006.</p>
 
 <h3>4. Arrangement sweep (same holdout, N = 40,000)</h3>
 <table><tr><th>Arm</th><th>Pooled DTI</th><th>Dots</th><th>Mean credit / dot</th></tr><tr><td>flat_sep3</td><td class='num'>0.0749</td><td class='num'>40,000</td><td class='num'>0.1074</td></tr><tr><td>ridge_sep3</td><td class='num'>0.0416</td><td class='num'>40,000</td><td class='num'>0.0591</td></tr><tr><td>ridge_sep6</td><td class='num'>0.0337</td><td class='num'>40,000</td><td class='num'>0.0478</td></tr><tr><td>ridge_sep10</td><td class='num'>0.0258</td><td class='num'>40,000</td><td class='num'>0.0365</td></tr><tr><td>ridge_sep16</td><td class='num'>0.0215</td><td class='num'>40,000</td><td class='num'>0.0304</td></tr><tr><td>ridge_sep24</td><td class='num'>0.0195</td><td class='num'>40,000</td><td class='num'>0.0276</td></tr><tr><td>tensor_sep3</td><td class='num'>0.0667</td><td class='num'>40,000</td><td class='num'>0.0954</td></tr><tr><td>tensor_sep6</td><td class='num'>0.0520</td><td class='num'>40,000</td><td class='num'>0.0741</td></tr><tr><td>tensor_sep10</td><td class='num'>0.0377</td><td class='num'>40,000</td><td class='num'>0.0536</td></tr><tr><td>tensor_sep16</td><td class='num'>0.0297</td><td class='num'>40,000</td><td class='num'>0.0421</td></tr><tr><td>tensor_sep24</td><td class='num'>0.0270</td><td class='num'>40,000</td><td class='num'>0.0382</td></tr><tr><td>tensor_2d_sep3</td><td class='num'>0.0685</td><td class='num'>40,000</td><td class='num'>0.0979</td></tr><tr><td>tensor_2d_sep6</td><td class='num'>0.0493</td><td class='num'>40,000</td><td class='num'>0.0702</td></tr><tr><td>tensor_2d_sep10</td><td class='num'>0.0355</td><td class='num'>40,000</td><td class='num'>0.0504</td></tr><tr><td>tensor_2d_sep16</td><td class='num'>0.0301</td><td class='num'>40,000</td><td class='num'>0.0426</td></tr><tr><td>tensor_2d_sep24</td><td class='num'>0.0276</td><td class='num'>40,000</td><td class='num'>0.0391</td></tr></table>
@@ -91,7 +91,7 @@ quadrants produced much larger numbers (up to 0.4982 pooled DTI for a
 catalogue-annulus prior at 29,843 dots). Those numbers are reported for
 completeness and are <b>flagged as leakage</b>: splitting a mapped trace on a
 20-px lattice leaves the visible continuation of the same trace flanking every
-withheld piece, so the task degenerates into gap-filling. See IR-55-05. No
+withheld piece, so the task degenerates into gap-filling. See IR-55-005. No
 submission was built from that holdout.</p>
 
 <h3>7. Survey-line diagnostic</h3>

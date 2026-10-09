@@ -1,0 +1,304 @@
+{
+  "experiment": "exp10_mass_sweep (E3, last)",
+  "label": "HOLDOUT-DTI (fold-pooled, per-fold visible-only; dti55 exact metric)",
+  "protocols": {
+    "Q4_primary": {
+      "20000": {
+        "N_requested": 20000,
+        "random": {
+          "fold_pooled_dti": 0.04223810186669715,
+          "fold_mean_dti": 0.05196208259212767,
+          "per_fold_dti": [
+            0.021873,
+            0.035661,
+            0.087125,
+            0.06319
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 20000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.045908144827883204,
+          "fold_mean_dti": 0.05500673892685975,
+          "per_fold_dti": [
+            0.026541,
+            0.041899,
+            0.090433,
+            0.061154
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 20000
+        },
+        "tensor_minus_random_mean": 0.0030446563347320743,
+        "tensor_minus_random_signflip_p_two_sided": 0.25,
+        "tensor_folds_beating_random": "3/4"
+      },
+      "40000": {
+        "N_requested": 40000,
+        "random": {
+          "fold_pooled_dti": 0.0742156636939414,
+          "fold_mean_dti": 0.08753265994188321,
+          "per_fold_dti": [
+            0.042838,
+            0.064675,
+            0.135754,
+            0.106863
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.06659348188046123,
+          "fold_mean_dti": 0.07418604544828375,
+          "per_fold_dti": [
+            0.047217,
+            0.072027,
+            0.095119,
+            0.082381
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000
+        },
+        "tensor_minus_random_mean": -0.01334661449359945,
+        "tensor_minus_random_signflip_p_two_sided": 0.5,
+        "tensor_folds_beating_random": "2/4"
+      },
+      "80000": {
+        "N_requested": 80000,
+        "random": {
+          "fold_pooled_dti": 0.12022795332628432,
+          "fold_mean_dti": 0.13542436482752648,
+          "per_fold_dti": [
+            0.075861,
+            0.11362,
+            0.195748,
+            0.156468
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 80000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.08889390094328901,
+          "fold_mean_dti": 0.09133768008092713,
+          "per_fold_dti": [
+            0.081524,
+            0.090975,
+            0.103583,
+            0.089269
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 80000
+        },
+        "tensor_minus_random_mean": -0.04408668474659935,
+        "tensor_minus_random_signflip_p_two_sided": 0.25,
+        "tensor_folds_beating_random": "1/4"
+      },
+      "160000": {
+        "N_requested": 160000,
+        "random": {
+          "fold_pooled_dti": 0.16268402704607413,
+          "fold_mean_dti": 0.17352950392979058,
+          "per_fold_dti": [
+            0.122216,
+            0.145319,
+            0.229887,
+            0.196695
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 160000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.10194963079852716,
+          "fold_mean_dti": 0.10306036273261769,
+          "per_fold_dti": [
+            0.098929,
+            0.094377,
+            0.116766,
+            0.102169
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 160000
+        },
+        "tensor_minus_random_mean": -0.0704691411971729,
+        "tensor_minus_random_signflip_p_two_sided": 0.125,
+        "tensor_folds_beating_random": "0/4"
+      }
+    },
+    "B15_secondary": {
+      "20000": {
+        "N_requested": 20000,
+        "random": {
+          "fold_pooled_dti": 0.004603774990577634,
+          "fold_mean_dti": 0.004603132029590404,
+          "per_fold_dti": [
+            0.00335,
+            0.007644,
+            0.003845,
+            0.00544,
+            0.002972,
+            0.005478,
+            0.004626,
+            0.004254,
+            0.00316,
+            0.005262
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 20000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.005101015520241178,
+          "fold_mean_dti": 0.005103835906795188,
+          "per_fold_dti": [
+            0.005502,
+            0.005096,
+            0.004201,
+            0.005314,
+            0.006376,
+            0.006013,
+            0.004183,
+            0.005683,
+            0.004702,
+            0.003968
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 20000
+        },
+        "tensor_minus_random_mean": 0.0005007038772047833,
+        "tensor_minus_random_signflip_p_two_sided": 0.384765625,
+        "tensor_folds_beating_random": "6/10"
+      },
+      "40000": {
+        "N_requested": 40000,
+        "random": {
+          "fold_pooled_dti": 0.007746611746748294,
+          "fold_mean_dti": 0.007748608495563379,
+          "per_fold_dti": [
+            0.008728,
+            0.008155,
+            0.008465,
+            0.008889,
+            0.007694,
+            0.006793,
+            0.005552,
+            0.008086,
+            0.008089,
+            0.007035
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.009199143100404997,
+          "fold_mean_dti": 0.009201765128973942,
+          "per_fold_dti": [
+            0.009965,
+            0.009352,
+            0.009232,
+            0.008687,
+            0.01008,
+            0.010968,
+            0.008782,
+            0.008597,
+            0.007997,
+            0.008358
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000
+        },
+        "tensor_minus_random_mean": 0.0014531566334105618,
+        "tensor_minus_random_signflip_p_two_sided": 0.0078125,
+        "tensor_folds_beating_random": "8/10"
+      },
+      "80000": {
+        "N_requested": 80000,
+        "random": {
+          "fold_pooled_dti": 0.014416618084950062,
+          "fold_mean_dti": 0.014420657101838963,
+          "per_fold_dti": [
+            0.013978,
+            0.013818,
+            0.012349,
+            0.014131,
+            0.014734,
+            0.017415,
+            0.012098,
+            0.017598,
+            0.013501,
+            0.014587
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 80000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.01536288457927622,
+          "fold_mean_dti": 0.015361238651942976,
+          "per_fold_dti": [
+            0.016489,
+            0.016088,
+            0.015511,
+            0.01587,
+            0.016249,
+            0.016113,
+            0.015608,
+            0.014643,
+            0.013022,
+            0.01402
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 80000
+        },
+        "tensor_minus_random_mean": 0.000940581550104012,
+        "tensor_minus_random_signflip_p_two_sided": 0.1953125,
+        "tensor_folds_beating_random": "6/10"
+      },
+      "160000": {
+        "N_requested": 160000,
+        "random": {
+          "fold_pooled_dti": 0.021196785103013028,
+          "fold_mean_dti": 0.02119397295004331,
+          "per_fold_dti": [
+            0.020405,
+            0.021462,
+            0.019293,
+            0.02505,
+            0.019884,
+            0.020534,
+            0.021551,
+            0.02305,
+            0.019518,
+            0.021194
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 160000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.023839710601390767,
+          "fold_mean_dti": 0.023836952932936546,
+          "per_fold_dti": [
+            0.024649,
+            0.023405,
+            0.024797,
+            0.025037,
+            0.02323,
+            0.024754,
+            0.024612,
+            0.023455,
+            0.020588,
+            0.023842
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 160000
+        },
+        "tensor_minus_random_mean": 0.002642979982893238,
+        "tensor_minus_random_signflip_p_two_sided": 0.00390625,
+        "tensor_folds_beating_random": "9/10"
+      }
+    }
+  },
+  "decision": {
+    "N_star_by_Q4_tensor_full": 160000,
+    "label": "NEGATIVE",
+    "reason": "tensor_full(N*) must beat random(N*) on Q4 and on B15 with p<0.05"
+  },
+  "seconds": 307.1
+}

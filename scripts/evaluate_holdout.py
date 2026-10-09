@@ -134,24 +134,30 @@ def main() -> None:
         "plunge": plunge,
         "dim_inv_raw": dim_inv,
     }
-    # catalogue-distance control, derived ONLY from visible faults of fold 0.
+    # Catalogue-distance control.  It MUST be recomputed from each fold's own
+    # visible set.  (IR-55-17: the previous version used fold 0's visible set for
+    # every fold, which contains the withheld truth of folds 1-3 and reported
+    # AUC 0.877 -- leakage, not signal.  Corrected AUC is ~0.52.)
     from scipy import ndimage
 
-    f0 = folds[0]
-    vis_dist = ndimage.distance_transform_edt(~f0.visible)
-    feats["neg_visible_catalogue_distance"] = (-vis_dist).astype(np.float32)
-    for name, arr in feats.items():
-        aucs = []
-        for f in folds:
-            pos = f.truth
-            neg = base_elig & f.withheld & ~cat
-            nidx = np.nonzero(neg.ravel())[0]
-            take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
-            negm = np.zeros(grid.shape, dtype=bool)
-            negm.ravel()[take] = True
-            y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
+    per_fold_dist = {id(f): (-ndimage.distance_transform_edt(~f.visible)).astype(np.float32) for f in folds}
+    aucs_by_feat: dict[str, list[float]] = {name: [] for name in feats}
+    aucs_by_feat["neg_visible_catalogue_distance"] = []
+    for f in folds:
+        pos = f.truth
+        neg = base_elig & f.withheld & ~cat
+        nidx = np.nonzero(neg.ravel())[0]
+        take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
+        negm = np.zeros(grid.shape, dtype=bool)
+        negm.ravel()[take] = True
+        y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
+        for name, arr in feats.items():
             s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
-            aucs.append(holdout55.auc(s, y))
+            aucs_by_feat[name].append(holdout55.auc(s, y))
+        arr = per_fold_dist[id(f)]
+        s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
+        aucs_by_feat["neg_visible_catalogue_distance"].append(holdout55.auc(s, y))
+    for name, aucs in aucs_by_feat.items():
         canary[name] = {"auc_per_fold": [float(a) for a in aucs], "auc_mean": float(np.mean(aucs))}
     res["leakage_canary"] = canary
     res["leakage_flagged_gt_0p90"] = sorted(

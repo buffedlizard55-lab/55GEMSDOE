@@ -38,15 +38,16 @@ footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size
 <nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="anchor-0.2778.html">The 0.2778 anchor</a><span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> <a href="executive-summary.html" style="font-size:13px">Exec summary (v1)</a><a href="results.html" style="font-size:13px">Results (v1)</a><a href="data_dictionary.html" style="font-size:13px">Data dictionary</a><a href="leaderboard-analysis.html" style="font-size:13px">Leaderboard analysis</a></nav></div></header><main>
 <div class="dl">
 <h2>DOWNLOAD THE SUBMISSION</h2>
-<p style="margin:4px 0 12px"><b>h55-tensor2d-strikegate-40000dots-20261009T052235Z</b></p>
-<a class="btn" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif" download>⬇ Download the .tif to submit</a>
-<a class="btn sec" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip" download>⬇ Download .zip</a>
-<a class="btn sec" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif" download>NaN-outside twin</a>
-<p style="margin:12px 0 4px"><b>Upload the first file (<code>h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif</code>).</b>
-It is the all-finite encoding, which is the one the portal's
-<code>[0,1]</code> range check accepts.</p>
-<p class="small">Portal “Note” field (optional, 86/140 chars):
-<code>tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots</code></p>
+<p style="margin:4px 0 12px"><b>h55-tensor2d-strikegate-160000dots-20261009T164334Z</b> &nbsp;·&nbsp; 160,000 dots, binary 0/1, EPSG:32611, 100 m</p>
+<a class="btn" href="downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif" download>⬇ Download the .tif to submit</a>
+<a class="btn sec" href="downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip" download>⬇ Download .zip</a>
+<a class="btn sec" href="downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-nan.tif" download>NaN-outside twin (comparison only)</a>
+<p style="margin:12px 0 4px"><b>Upload the first file (<code>h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif</code>).</b>
+It is the all-finite (zeros) encoding. The NaN twin is for comparison only.</p>
+<p class="small">Portal “Note” field (119/140 chars):
+<code>h55 tensor-dim lane, 160k dots. NEGATIVE on holdout (Q4 0.102 vs random 0.163). Format-valid. Do not use a weekly slot.</code></p>
+<p class="small"><b>Status: download allowed. Submit allowed but not recommended. No weekly slot used.</b>
+Labels: HOLDOUT-DTI only. No organiser-confirmed score exists for this file.</p>
 </div>
 
 <div class="card">
@@ -55,29 +56,30 @@ It is the all-finite encoding, which is the one the portal's
 <tr><th>Question</th><th>Answer</th><th>Evidence</th></tr>
 <tr><td>Does it meet the official format contract?</td>
 <td><span class="pill ok">YES — 12/12 checks</span></td>
-<td>single band, float32, EPSG:32611, 3730×3292, transform
-(100,0,243350,0,−100,4508550), every value in [0,1], no NaN, no dot on a mapped
-catalogue pixel. Re-read from the written bytes by
-<code>scripts/validate_submission.py</code>.</td></tr>
+<td>single band, float32, EPSG:32611, 3730×3292, transform (100,0,243350,0,−100,4508550), 100 m pixel size read from the transform, every value in [0,1], no NaN, no dot on a mapped catalogue pixel. Re-read from the written bytes by <code>scripts/validate_submission.py</code>.</td></tr>
 <tr><td>Will it trip “Predicted values must be in range [0, 1]”?</td>
 <td><span class="pill ok">NO</span></td>
 <td>min 0.0, max 1.0, NaN count 0 across all 12,279,160 cells.</td></tr>
 <tr><td>Is it unique vs every earlier scored raster?</td>
-<td><span class="pill ok">YES</span></td>
-<td>max |Spearman| 0.0043 vs 56 prior
-rasters (threshold 0.90); max Jaccard 0.007993; density-matched
-3-px overlap 0.6694 (threshold 0.70).</td></tr>
+<td><span class="pill warn">REVIEW — not a copy</span></td>
+<td>max |Spearman| 0.014 vs 56 prior rasters (threshold 0.90); max Jaccard 0.031456. The literal 70% raw 3-px rule trips (0.8401) only against a 206,895-dot spacing-5 lattice, where a random control gets 0.8389 (excess +0.0012). Chance-level, flagged for owner decision (IR-55-030).</td></tr>
 <tr><td>Is it <i>expected</i> to beat the current best score?</td>
 <td><span class="pill bad">NO — negative result</span></td>
-<td>On the leakage-free spatial holdout this surface scores
-0.0667 pooled DTI versus
-0.0757 for a uniform-random control at the same
-mass. It has not beaten the control, so it must not be promoted into a weekly
-slot on the strength of this evidence.</td></tr>
+<td>On the leakage-free Q4 holdout this surface (N = 160,000) scores 0.1019 HOLDOUT-DTI (95% CI 0.0877–0.1185, fold-level, 60,988 withheld positives, evaluator src/gems55/dti55.py) versus 0.1627 for uniform random at the same mass. It loses to random on Q4 at N = 40k, 80k and 160k and is not distinguishable at 20k. The B = 15 px secondary is positive (IR-55-031) but the primary governs. It must not be promoted into a weekly slot.</td></tr>
 </table>
 <p><b>Bottom line:</b> the file is <i>format-safe and legal to upload</i>, and it is
 <i>scientifically a negative result</i>. Upload it only if you want the negative
 result on the board; do not expect it to beat 0.3195.</p>
+</div>
+
+<div class="card">
+<h3 style="margin-top:0">What changed in the final pass (2026-10-09)</h3>
+<ul>
+<li><b>Experiment budget spent: 3 of 3.</b> E1 = exp8 run 2 (H-A visible-prior gate; Q4 fails, promote = false). E2 = exp9 distance-banded folds (H-A fails at every band ≥ 1.5 km). E3 = exp10 dot-mass sweep.</li>
+<li><b>Pre-registered final file: N* = 160,000</b> (argmax of tensor_full on Q4). Label <b>NEGATIVE</b>: Q4 fails at N*, though B = 15 px is significantly positive. This file replaces the 40k file, which is archived as superseded.</li>
+<li><b>Template fixes, each applied once:</b> validator pixel size (IR-55-025), feature-raster name in prepare_data (IR-55-026), site and card sidecar selection (IR-55-027), per-fold canary (IR-55-017), segment-fold leak (IR-55-018).</li>
+<li><b>Open:</b> striping axis (IR-55-028), striping counts from two detectors (IR-55-029), literal uniqueness flag (IR-55-030).</li>
+</ul>
 </div>
 
 <h2>Executive summary</h2>
@@ -131,11 +133,11 @@ catalogue proxy, and the mean kernel credit per pixel there is only
 100 m, transform (100, 0, 243350, 0, −100, 4508550)</td></tr>
 <tr><td>Footprint / catalogue</td><td class="mono">5,167,373 valid px /
 60,988 mapped fault px</td></tr>
-<tr><td>Submission</td><td class="mono">40,000 unit dots, 0 on catalogue px,
+<tr><td>Submission</td><td class="mono">160,000 unit dots, 0 on catalogue px,
 0 outside footprint</td></tr>
-<tr><td>SHA-256 (.tif)</td><td class="mono small">b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368</td></tr>
-<tr><td>SHA-256 (.zip)</td><td class="mono small">b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9</td></tr>
-<tr><td>SHA-256 (NaN twin)</td><td class="mono small">847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679</td></tr>
+<tr><td>SHA-256 (.tif)</td><td class="mono small">ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273</td></tr>
+<tr><td>SHA-256 (.zip)</td><td class="mono small">3c0cc3f4efd858716c9b4c6fe8568f1bc9aa324d54ca7a6fd932831f5a14d9a6</td></tr>
+<tr><td>SHA-256 (NaN twin)</td><td class="mono small">c3185ec459f84c5fd9a9c117f4611c25ec754e1a113c12139baca60e29501d74</td></tr>
 <tr><td>Lane surface</td><td class="mono">mean dim 0.327,
 p10 0.058, p90 0.617;
 1,105,919 px survey-line masked</td></tr>
@@ -146,73 +148,121 @@ grid contract)</td></tr>
 
 <h2>Run card</h2>
 <pre>{
+  &quot;project&quot;: &quot;55GEMSDOE&quot;,
   &quot;hypothesis&quot;: &quot;Gradient ridges on RTP-magnetic and isostatic-gravity grids cannot separate a strike-extended fault or contact from a compact intrusion or vent, because both produce ridges. The potential-field gradient tensor can: its dimensionality index is zero for strictly two-dimensional sources and its intermediate eigenvector carries strike. Gating ridges on being near-2-D AND on eigenvector strike agreeing with the ridge&#x27;s own orientation should therefore preferentially retain unmapped, elongated, less conspicuous traces.&quot;,
   &quot;mechanism&quot;: &quot;FFT gradient tensor of bands 2 (RTP mag) and 13 (isostatic gravity) after nearest-neighbour NaN fill, along-track micro-levelling and a 400 m - 6 km band-pass; Tzz derived as -(Txx+Tyy) so the tensor is exactly traceless; closed-form 3x3 eigen-decomposition; dimensionality I = 27 e3^2 / (4 (-e2)^3) (I=0 2-D, I=1 3-D, both endpoints unit-tested); strike = azimuth of the intermediate eigenvector; score = corroborated ridge rank x (1-I) x exp(-(dtheta/25deg)^2) x plunge weight x survey-line mask.&quot;,
   &quot;non_fault_process_that_could_mimic_it&quot;: &quot;Airborne survey-line striping. It is measured here to run north-south, not east-west as the lane brief asserts (IR-55-04). Analytically a field varying only across the flight lines has eigenvalues (|f&#x27;&#x27;|,0,-|f&#x27;&#x27;|) - indistinguishable from a 2-D source striking along the lines - so the tensor cannot reject it and it must be masked geometrically. Secondary mimics: lithologic contacts and dike swarms (genuinely 2-D but not faults) and basin-margin alluvial edges.&quot;,
+  &quot;generated_by&quot;: &quot;scripts/make_final_card.py&quot;,
+  &quot;verdict&quot;: &quot;negative&quot;,
+  &quot;verdict_reason&quot;: &quot;Pre-registered rule (exp10): N* = argmax over N of tensor_full on the Q4 primary protocol = 160000. At N*, tensor_full scores 0.1019 vs uniform random 0.1627 (Q4, 60,988 withheld positives), and beats random in 0/4 folds (p=0.125). The B=15 px secondary is mixed: tensor 0.0238 vs random 0.0212 (p=0.00390625), a significant gain there but not on the primary, so the label rule (both must pass) gives NEGATIVE. No weekly slot.&quot;,
+  &quot;submission&quot;: {
+    &quot;file&quot;: &quot;docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif&quot;,
+    &quot;name&quot;: &quot;h55-tensor2d-strikegate-160000dots-20261009T164334Z&quot;,
+    &quot;note&quot;: &quot;h55 tensor-dim lane, 160k dots. NEGATIVE on holdout (Q4 0.102 vs random 0.163). Format-valid. Do not use a weekly slot.&quot;,
+    &quot;note_characters&quot;: 119,
+    &quot;weekly_slot_used&quot;: false,
+    &quot;n_dots&quot;: 160000,
+    &quot;crs&quot;: &quot;EPSG:32611&quot;,
+    &quot;shape&quot;: [
+      3730,
+      3292
+    ],
+    &quot;cell_m&quot;: 100,
+    &quot;values&quot;: &quot;0 or 1 (binary dots), float32, single band, zeros outside footprint&quot;
+  },
+  &quot;raster_sha256&quot;: &quot;ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273&quot;,
+  &quot;nan_twin&quot;: {
+    &quot;file&quot;: &quot;docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-nan.tif&quot;,
+    &quot;sha256&quot;: &quot;c3185ec459f84c5fd9a9c117f4611c25ec754e1a113c12139baca60e29501d74&quot;
+  },
+  &quot;zip&quot;: {
+    &quot;file&quot;: &quot;docs/downloads/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip&quot;,
+    &quot;sha256&quot;: &quot;3c0cc3f4efd858716c9b4c6fe8568f1bc9aa324d54ca7a6fd932831f5a14d9a6&quot;
+  },
   &quot;holdout_dti&quot;: {
-    &quot;label&quot;: &quot;HOLDOUT-DTI (evaluator: src/gems55/dti55.py, exact official DTI, verified against a brute-force transcription and against the official worked example)&quot;,
-    &quot;protocol&quot;: &quot;4 contiguous-quadrant hide-and-recover, 3 px buffer, visible faults masked pixel-exactly, catalogue-derived features recomputed per fold, pooled scoring&quot;,
-    &quot;n_withheld_positives_total&quot;: 60988,
-    &quot;this_lane_pooled_dti&quot;: 0.06670118698244415,
-    &quot;this_lane_fold_mean&quot;: 0.07418604544828375,
-    &quot;this_lane_fold_sd&quot;: 0.020308741296680758,
-    &quot;this_lane_fold_ci95&quot;: [
-      0.05600790445991459,
-      0.08934589204746593
+    &quot;evidence_class&quot;: &quot;HOLDOUT-DTI&quot;,
+    &quot;status&quot;: &quot;RUN&quot;,
+    &quot;evaluator_version&quot;: &quot;src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)&quot;,
+    &quot;protocol&quot;: &quot;Q4 contiguous-quadrant hide-and-recover (PRIMARY), per-fold visible-only faults, 3 px buffer; secondary B=15 px distance-banded whole-segment folds (exp9/exp10).&quot;,
+    &quot;value&quot;: 0.1019,
+    &quot;value_meaning&quot;: &quot;tensor_full at N=160000, Q4, fold-pooled DTI&quot;,
+    &quot;withheld_positive_count&quot;: 60988,
+    &quot;ci95&quot;: [
+      0.0877,
+      0.1185
     ],
-    &quot;uniform_random_control_pooled_dti&quot;: 0.07572925371015232,
-    &quot;uniform_random_control_fold_ci95&quot;: [
-      0.05711247628318898,
-      0.12139421481046019
-    ],
-    &quot;n_dots&quot;: 40000,
-    &quot;leakage_canary_max_lane_feature_auc&quot;: 0.5415634566308328,
-    &quot;leakage_flagged_gt_0.90&quot;: [],
-    &quot;strike_test&quot;: {
-      &quot;frac_within_20deg_withheld&quot;: 0.302,
-      &quot;frac_within_20deg_random&quot;: 0.2222795754427848,
-      &quot;mean_abs_dtheta_withheld_deg&quot;: 38.03430339738727,
-      &quot;mean_abs_dtheta_random_deg&quot;: 45.04546568753565,
-      &quot;mean_diff_ci95_deg&quot;: [
-        -9.190059511700968,
-        -4.683395349864613
-      ],
-      &quot;verdict&quot;: &quot;CONFIRMED - CI excludes zero; 45.0 deg is the calibrated null mean&quot;
-    }
-  },
-  &quot;correlation_overlap_vs_registry&quot;: {
-    &quot;n_registry_rasters&quot;: 56,
-    &quot;max_abs_spearman_dense_footprint&quot;: 0.0043,
-    &quot;threshold&quot;: 0.9,
-    &quot;max_jaccard&quot;: 0.007993,
-    &quot;max_frac_our_dots_within_3px_raw&quot;: 0.8413,
-    &quot;max_frac_3px_excess_over_random_control&quot;: 0.0399,
-    &quot;max_frac_within_3px_density_matched&quot;: 0.6694,
-    &quot;n_density_matched_references&quot;: 43,
-    &quot;threshold_frac_3px&quot;: 0.7,
-    &quot;verdict&quot;: &quot;PASS-UNIQUE-CONTROL-ADJUSTED&quot;,
-    &quot;note&quot;: &quot;raw 3-px statistic is 0.841 only against a 206,895-dot spacing-5 lattice; the uniform-random control reaches the same value, so the excess (+0.0399) and the density-matched statistic (0.6694 &lt; 0.70) are the informative readings (IR-55-08).&quot;
-  },
-  &quot;raster_sha256&quot;: {
-    &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif&quot;: &quot;b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368&quot;,
-    &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif&quot;: &quot;847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679&quot;,
-    &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip&quot;: &quot;b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9&quot;
+    &quot;ci95_method&quot;: &quot;fold-level t-interval over 4 quadrant folds (df=3); indicative only&quot;,
+    &quot;uniform_random_control&quot;: 0.1627,
+    &quot;tensor_minus_random&quot;: -0.0705,
+    &quot;signflip_p_two_sided_Q4&quot;: 0.125,
+    &quot;folds_beating_random_Q4&quot;: &quot;0/4&quot;,
+    &quot;B15_secondary&quot;: {
+      &quot;tensor_full&quot;: 0.0238,
+      &quot;random&quot;: 0.0212,
+      &quot;signflip_p_two_sided&quot;: 0.00390625,
+      &quot;direction&quot;: &quot;tensor &gt; random (significant)&quot;,
+      &quot;label_rule_passed&quot;: &quot;not applicable: label rule requires the Q4 primary to pass, and it fails&quot;
+    },
+    &quot;exp9_B15_at_N40000&quot;: {
+      &quot;random&quot;: 0.0077,
+      &quot;tensor_full&quot;: 0.0092,
+      &quot;H-A-500&quot;: 0.0001,
+      &quot;H-A-1500&quot;: 0.0056
+    },
+    &quot;all_N_Q4&quot;: {
+      &quot;20000&quot;: 0.0459,
+      &quot;40000&quot;: 0.0666,
+      &quot;80000&quot;: 0.0889,
+      &quot;160000&quot;: 0.1019
+    },
+    &quot;all_N_Q4_random&quot;: {
+      &quot;20000&quot;: 0.0422,
+      &quot;40000&quot;: 0.0742,
+      &quot;80000&quot;: 0.1202,
+      &quot;160000&quot;: 0.1627
+    },
+    &quot;leakage_canary&quot;: &quot;per-fold mean AUC of single lane features &lt;= 0.90 in exp8/exp9 (max 0.555 at B=15, ridge). The visible-distance control reached 0.899 at B=3 (below 0.90) and 0.654 at B=15; it is a control, not a lane feature.&quot;,
+    &quot;organizer_score_status&quot;: &quot;none exists for this file (organiser-confirmed score: not available)&quot;
   },
   &quot;validator_output&quot;: {
-    &quot;tool&quot;: &quot;scripts/validate_submission.py (re-reads the written bytes with rasterio)&quot;,
-    &quot;checks_passed&quot;: &quot;12/12 on the -zeros encoding, 11/11 on the -nan twin&quot;,
-    &quot;no_nan_inside_footprint&quot;: true,
-    &quot;values_in_0_1&quot;: true,
-    &quot;crs_shape_transform_match_template&quot;: true,
-    &quot;dots_on_mapped_catalogue_pixels&quot;: 0,
+    &quot;tool&quot;: &quot;scripts/validate_submission.py (re-reads written bytes with rasterio)&quot;,
+    &quot;status&quot;: &quot;PASS&quot;,
+    &quot;zeros_status&quot;: &quot;PASS&quot;,
+    &quot;checks_passed&quot;: 12,
+    &quot;checks_failed&quot;: 0,
+    &quot;nan_twin_status&quot;: &quot;PASS&quot;,
+    &quot;nan_twin_checks_passed&quot;: 11,
+    &quot;dots_on_mapped_catalogue_px&quot;: 0,
     &quot;dots_outside_footprint&quot;: 0
   },
-  &quot;submission_name&quot;: &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z&quot;,
-  &quot;submission_note&quot;: &quot;tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots&quot;,
-  &quot;submission_note_length&quot;: 86,
-  &quot;verdict&quot;: &quot;NEGATIVE&quot;,
-  &quot;verdict_reason&quot;: &quot;The strike prediction is confirmed, but emitted as a prediction surface the lane does not beat a uniform-random control at matched mass (0.0667 vs 0.0757 pooled, and below it in 4 of 4 folds at every NMS separation tested). The file is format-valid and unique, so it is downloadable and legal to upload, but it must not be promoted into a weekly slot on this evidence.&quot;,
-  &quot;metric_finding_of_general_value&quot;: &quot;TP_w + FN_w = |G| identically, so DTI = TP_w/(0.2N + 0.8|G|). Coverage, not per-pixel precision, dominates: a false positive costs 0.2 and an uncovered truth pixel costs 0.8. Verified numerically at eight dot budgets.&quot;
+  &quot;uniqueness&quot;: {
+    &quot;tool&quot;: &quot;scripts/verify_unique.py vs registry/rasters (56 prior scored rasters)&quot;,
+    &quot;verdict&quot;: &quot;REVIEW&quot;,
+    &quot;n_registry&quot;: 56,
+    &quot;max_abs_spearman_dense&quot;: 0.014,
+    &quot;max_jaccard&quot;: 0.031456,
+    &quot;max_frac_within_3px_raw&quot;: 0.8401,
+    &quot;raw_max_reference&quot;: &quot;13GEMSDOE__13gems_20261001_r13-lattice-s5_v2_nan-outside.tif (206,895-dot spacing-5 lattice)&quot;,
+    &quot;raw_max_reference_random_control_frac_within_3px&quot;: 0.8389,
+    &quot;excess_over_random_control_for_that_reference&quot;: 0.0012,
+    &quot;brief_threshold_frac_within_3px&quot;: 0.7,
+    &quot;literal_70pct_rule&quot;: &quot;TRIPPED on the raw statistic (0.8401 &gt; 0.70)&quot;,
+    &quot;interpretation&quot;: &quot;Chance-level density overlap with a dense lattice (random control 0.839). Not a copy: Spearman max 0.014, Jaccard max 0.031, excess over control +0.0012. Flagged for owner decision; not cleared as a clean PASS.&quot;
+  },
+  &quot;striping&quot;: {
+    &quot;lane_mask_px&quot;: 1105919,
+    &quot;lane_mask_definition&quot;: &quot;gems55 coherence-based mask (build_lane, thresh 0.55, lag 60 px)&quot;,
+    &quot;older_count_px&quot;: 86947,
+    &quot;older_count_definition&quot;: &quot;gems/tensor.py row-median z&gt;4 (129 rows); a different detector, not a miscount&quot;,
+    &quot;axis_status&quot;: &quot;UNRECONCILED (see docs/irregularities.md IR-55-028)&quot;
+  },
+  &quot;archive_superseded&quot;: {
+    &quot;file&quot;: &quot;docs/downloads/archive-superseded/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif&quot;,
+    &quot;reason&quot;: &quot;Superseded by the pre-registered N* = 160000 file. Same negative holdout verdict at N=40000.&quot;,
+    &quot;sha256&quot;: &quot;b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368&quot;
+  },
+  &quot;organizer_score_status&quot;: &quot;none exists for this file (organiser-confirmed score: not available)&quot;,
+  &quot;weekly_slot_selection&quot;: &quot;separate selector step; not performed (no holdout win)&quot;
 }</pre>
 </main>
 <footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.

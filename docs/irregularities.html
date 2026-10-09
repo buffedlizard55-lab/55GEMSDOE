@@ -39,7 +39,7 @@ footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size
 <h2>Irregularities flagged for review</h2>
 <table>
 <tr><th>ID</th><th>Finding</th><th>Impact</th><th>Action taken</th></tr>
-<tr><td>IR-55-01</td><td><b>The repository was empty.</b> At session start
+<tr><td>IR-55-001</td><td><b>The repository was empty.</b> At session start
 <code>55GEMSDOE</code> contained a single 11-byte <code>README.md</code> reading
 “# 55GEMSDOE”. The run brief says to reuse the template's cached feature stack,
 <code>evaluate_holdout.py</code> and <code>submission_writer.py</code>, and to
@@ -48,7 +48,7 @@ check uniqueness against a registry.</td>
 <td>Built all three shared tools here as the single implementation (no private
 fork) and constructed the registry by downloading 56 prior scored rasters from
 sibling repositories via the GitHub blob API.</td></tr>
-<tr><td>IR-55-02</td><td><b>No DrivenData credentials and no general network.</b>
+<tr><td>IR-55-002</td><td><b>No DrivenData credentials and no general network.</b>
 The sandbox reaches only github.com, api.github.com, codeload.github.com,
 pypi.org and registry.npmjs.org. drivendata.org, usgs.gov, github.io and
 raw.githubusercontent.com all fail at the TCP layer.</td>
@@ -57,7 +57,7 @@ unreachable from the build environment.</td>
 <td>Recovered the official rasters from prior repositories under the same account
 and verified them by content address (see Sources). Prior site content was read
 through a research tool with broader reach, never assumed.</td></tr>
-<tr><td>IR-55-03</td><td><b>Transcription ambiguity in the published
+<tr><td>IR-55-003</td><td><b>Transcription ambiguity in the published
 dimensionality formula.</b> Karimi &amp; Kletetschka (2024) Eq. 4 renders as
 I = −(I₂/2)²/(I₁/2)³. Substituting the standard invariants, that normalisation
 reaches only 8/27 ≈ 0.296 at the pure-3-D endpoint, contradicting the same
@@ -67,7 +67,7 @@ both documented endpoints exact.</td>
 <td>Implemented the endpoint-exact form, unit-tested both endpoints analytically,
 computed the eigenvalue ratio −λ2/λ1 alongside it, and disclosed the ambiguity
 here rather than presenting either as settled fact.</td></tr>
-<tr><td>IR-55-04</td><td><b>The lane brief's flight-line direction is wrong for
+<tr><td>IR-55-004</td><td><b>The lane brief's flight-line direction is wrong for
 these grids.</b> The brief asserts east–west flight-line striping. Three
 independent measurements say north–south: the 1–20 km spectral annulus carries
 more power with its wavevector along east–west for both fields (0.104 vs 0.089
@@ -78,7 +78,7 @@ the artefact.</td>
 <td>Measured the direction first, verified the azimuth convention on a synthetic
 field, and masked the measured direction. Both readings are published in
 <code>evidence/striping_diagnostic.json</code>.</td></tr>
-<tr><td>IR-55-05</td><td><b>The segment-level holdout leaks.</b> Cutting mapped
+<tr><td>IR-55-005</td><td><b>The segment-level holdout leaks.</b> Cutting mapped
 traces on a 20-px lattice leaves the visible continuation of the same trace
 flanking every withheld piece, so a catalogue-proximity prior scores 0.4982 by
 gap-filling rather than by discovery.</td>
@@ -86,14 +86,14 @@ gap-filling rather than by discovery.</td>
 <td>Labelled the result as leakage, built no submission from it, and used the
 contiguous-quadrant holdout (where the catalogue prior is structurally
 unavailable) as the decision instrument.</td></tr>
-<tr><td>IR-55-06</td><td><b>The leakage-canary control is a definitional
+<tr><td>IR-55-006</td><td><b>The leakage-canary control is a definitional
 artefact.</b> <code>neg_visible_catalogue_distance</code> reaches AUC 1.000 in
 folds 1–3 because it is measured against fold 0's visible set, which contains
 those folds' truth pixels by construction.</td>
 <td>Low — no lane feature is affected; all lane AUCs are 0.41–0.54.</td>
 <td>Documented rather than deleted, because the artefact is instructive about how
 quickly a catalogue-derived control becomes meaningless across folds.</td></tr>
-<tr><td>IR-55-07</td><td><b>The organiser template is not what its caption
+<tr><td>IR-55-007</td><td><b>The organiser template is not what its caption
 says.</b> The problem description calls the sample submission “a sample
 submission that predicts total fault absence”, but the file contains 60,988
 pixels equal to 1.0 and 5,106,385 equal to 0.0 — exactly the mapped-fault count.
@@ -102,14 +102,14 @@ It is the existing-faults raster, not an all-zero raster.</td>
 it as a zero baseline.</td>
 <td>Used only its shape, CRS, transform and NaN footprint, all of which were
 re-verified against the labels raster.</td></tr>
-<tr><td>IR-55-08</td><td><b>The 3-px uniqueness rule is vacuous against dense
+<tr><td>IR-55-008</td><td><b>The 3-px uniqueness rule is vacuous against dense
 references.</b> A prior spacing-5 lattice with 206,895 positives puts 84.1% of
 <i>any</i> 40,000-dot set within 3 px of its dots.</td>
 <td>Medium — the rule as written would flag every submission as a duplicate.</td>
 <td>Added a uniform-random control at matched size and reported the excess over
 it (+0.0399 max), plus the raw statistic restricted to the 43 density-matched
-references (max 0.6694, under the 0.70 threshold). Both readings are published.</td></tr>
-<tr><td>IR-55-12</td><td><b>The 0.2778 anchor is a projection, not a score.</b>
+references (max 0.6694, under the 0.70 threshold) for the superseded 40k file. For the 160k file the same statistic is 0.8401, flagged in IR-55-030. Both readings are published.</td></tr>
+<tr><td>IR-55-012</td><td><b>The 0.2778 anchor is a projection, not a score.</b>
 GEMSDOE32's own audit manifest lists
 <code>gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros</code> as
 <code>receipt: null</code> and “…projected 0.2747; UNSCORED”. All 24 entries in that
@@ -121,7 +121,7 @@ the same size (proxy DTI 0.0049 vs 0.0267), while the raster associated with the
 live 0.2600 sits immediately adjacent to mapped traces and scores 0.0686. Full
 analysis, algebraic bounds and evidence classes in
 <code>evidence/anchor_verdict.json</code>.</td></tr>
-<tr><td>IR-55-10</td><td><b>A concurrent session ran the same lane and its
+<tr><td>IR-55-010</td><td><b>A concurrent session ran the same lane and its
 guardrail tests forbade publishing any TIF.</b> PR #3 merged to <code>main</code>
 mid-session with an independent implementation of this lane (<code>gems/</code>)
 whose <code>tests/test_site_status.py</code> asserted <code>docs/downloads</code>
@@ -135,7 +135,7 @@ zero failures, and that the site states plainly whether it is OK to download and
 submit. The fail-closed intent is kept and strengthened. Both sessions' pages are
 retained and cross-linked. Their holdout numbers (ridge 0.0578, full lane 0.0444,
 max canary AUC 0.518) independently replicate this session's negative verdict.</td></tr>
-<tr><td>IR-55-11</td><td><b>Input data confirmed by two independent routes.</b>
+<tr><td>IR-55-011</td><td><b>Input data confirmed by two independent routes.</b>
 The concurrent session pins SHA-256 hashes from a sibling-repo manifest; this
 session reassembled the same files from five GitHub blobs in a different
 repository. All three hashes match exactly — <code>labels.tif</code>
@@ -144,11 +144,20 @@ grid 4371c82e… (their <code>training_features.tif</code> pin).</td>
 <td>Positive finding, not a defect.</td>
 <td>Recorded here because it is the strongest available evidence that the rasters
 under every number on this site are the genuine organiser files.</td></tr>
-<tr><td>IR-55-09</td><td><b>Budget overrun.</b> The brief caps the session at
+<tr><td>IR-55-009</td><td><b>Budget overrun.</b> The brief caps the session at
 3 experiments or 2 hours. Five experiment scripts were run and wall time exceeded
 2 hours, because two protocol corrections (the holdout design and the uniqueness
 control) each required a re-run.</td>
 <td>Process only.</td><td>Reported here rather than hidden.</td></tr>
+<tr><td>IR-55-025</td><td><b>The validator's "resolution is 100 m" check tested the shape, not the pixel size.</b> A raster with the right shape but a 200 m transform would have passed.</td><td>Medium — a wrong-resolution file could be uploaded.</td><td>Fixed once in scripts/validate_submission.py. The check now reads |a| and |e| from the transform. Both encodings pass 12/12 and 11/11.</td></tr>
+<tr><td>IR-55-026</td><td><b>Feature-raster naming mismatch.</b> prepare_data.py and run_tensor_lane.py looked for <code>training_features.tif</code>. The file on disk is <code>gems-geodawn-numerical-features.tif</code> (the io55 name). The same pin, sha256 4371c82e…, applies to both.</td><td>Low — prepare_data exited 1 on a correct install.</td><td>Fixed once in both scripts. prepare_data.py now exits 0 with all three pins OK.</td></tr>
+<tr><td>IR-55-027</td><td><b>Sidecar selection picked the lexicographically last file.</b> "160000" sorts before "40000", so the site and card generators would have described the superseded 40k file.</td><td>Medium — the page would describe the wrong file.</td><td>build_site.py now selects the sidecar of the published file. make_final_card.py replaces make_runcard.py for docs/run-card.json. evidence/runcard.json is stale and superseded.</td></tr>
+<tr><td>IR-55-028</td><td><b>Striping axis is unreconciled.</b> ScienceBase (Glen &amp; Earney 2024) says flight lines run at azimuth 90° (E–W). The lane masks rows (E–W lines). striping_diagnostic.json reports N–S on real RTP data, but its own coherence numbers are equal (0.185 along x, 0.187 along y). A crude high-pass test here (row-means std 6.3 vs column-means std 8.9; y/x gradient RMS ratio 0.77) leans the other way. No conclusion is cited.</td><td>High — if the striping is N–S, the lane's 21% mask is on the wrong axis.</td><td>Open. The E–W assumption is kept as the ScienceBase statement. Needs the flight-line shapefile (not reachable from the sandbox) to settle it.</td></tr>
+<tr><td>IR-55-029</td><td><b>Two striping counts from two different detectors.</b> 86,947 px (129 rows, z&gt;4, gems/tensor.py) and 1,105,919 px (21.4%, coherence-based gems55 lane mask, thresh 0.55, lag 60 px). These are not a miscount.</td><td>Medium — the lane mask is far larger than the older detector's.</td><td>Both are reported. The shipped file and exp10 use the 1,105,919-px mask. The 86,947 figure is cited only as the other detector's output.</td></tr>
+<tr><td>IR-55-030</td><td><b>Literal uniqueness flag on the 160k file.</b> verify_unique returns REVIEW. The raw 3-px statistic is 0.8401 against a 206,895-dot spacing-5 lattice. A random control on that lattice gets 0.8389 (excess +0.0012). Spearman max 0.014, Jaccard max 0.031.</td><td>Medium — the brief's literal 70% rule trips.</td><td>Not cleared as a clean PASS. The file is not a copy in any content measure. The owner must decide whether a chance-level lattice overlap counts. The 40k file passed the density-matched reading (0.6694).</td></tr>
+<tr><td>IR-55-031</td><td><b>The secondary protocol disagrees with the primary.</b> At N = 160k, B = 15 px gives tensor 0.0238 vs random 0.0212 (p = 0.004, positive). Q4 gives 0.1019 vs 0.1627 (negative). At N = 40k, B = 15 px is +0.0015 (p = 0.008), and B = 30 px is +0.0009 (p = 0.20).</td><td>Medium — the lane's sign depends on the protocol.</td><td>Reported as is. The pre-registered rule (Q4 primary and B = 15 must both pass) gives NEGATIVE. The mixed sign is itself a finding.</td></tr>
+<tr><td>IR-55-032</td><td><b>The holdout arm is not the shipped emitter.</b> exp10 restricts emission to each fold's withheld domain, excludes striping outright, and uses per-fold seeds. The shipped writer uses the full footprint, down-weights striping by 0.25, and uses seed 55. The holdout therefore does not measure the shipped file exactly.</td><td>Medium — the shipped file is not the file that was scored.</td><td>Disclosed. Not corrected in this pass, because a full-footprint holdout would need a different protocol, and the budget is spent.</td></tr>
+<tr><td>IR-55-033</td><td><b>Zeros versus NaN outside the footprint.</b> The rules say "null or nan". The site chooses zeros on the basis of the portal's [0, 1] range check. That reasoning is not verified against the portal.</td><td>Low–medium — an encoding mismatch could fail the upload.</td><td>The zeros file is the primary. The NaN twin is published for comparison. Confirm on the portal before relying on either.</td></tr>
 </table>
 </main>
 <footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.
