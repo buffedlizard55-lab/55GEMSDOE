@@ -32,7 +32,7 @@ official worked example (3.00 / (3.00 + 0.2·1.89 + 0.8·2.00) = 0.60).</p>
 <tr><td>kernel credit harvested per dot</td><td>0.0074</td><td>0.0897</td><td>0.0382</td><td>0.0399 / 0.0400</td></tr>
 <tr><td>ratio to a random scatter of the same size</td><td><b>0.18×</b></td><td><b>2.24×</b></td><td>0.94×</td><td>1.00×</td></tr>
 <tr><td>dots on mapped-fault pixels</td><td>0</td><td>0</td><td>0</td><td>—</td></tr>
-<tr><td>min distance to a mapped fault</td><td>2 px = 224 m</td><td>1 px = 100 m</td><td>1 px</td><td>—</td></tr>
+<tr><td>min distance to a mapped fault</td><td>2.236 px = 224 m</td><td>1.000 px = 100 m</td><td>1.000 px = 100 m</td><td>—</td></tr>
 <tr><td>median distance to a mapped fault</td><td>19.6 px ≈ 1.96 km</td><td>15.0 px ≈ 1.50 km</td><td>23.0 px ≈ 2.30 km</td><td>—</td></tr>
 <tr><td>strongest correlation with any of the 19 official bands</td><td>|ρ| 0.0469</td><td>|ρ| 0.0503</td><td>|ρ| 0.0112</td><td>—</td></tr>
 </table>
@@ -45,7 +45,8 @@ footprint uniformly. The raster actually associated with a live <b>0.2600</b> is
 <b>13.9×</b>, and the two embody opposite
 philosophies.</p>
 <p>h33 enforces “0 within 200 m of the catalogue” — measured here as a minimum
-distance of 2 px = 224 m and a median of
+distance of 2.236 px = 224 m (√5 px, a
+diagonal neighbour, so the 200 m rule genuinely holds) and a median of
 1.96 km. The 0.2600 anchor does the reverse: its dots sit
 <i>immediately adjacent</i> to mapped traces (min 1 px = 100 m,
 median 1.50 km) while never landing on them
