@@ -50,7 +50,7 @@ official worked example (3.00 / (3.00 + 0.2·1.89 + 0.8·2.00) = 0.60).</p>
 <tr><td>kernel credit harvested per dot</td><td>{f(h33['credit_per_dot'])}</td><td>{f(d28['credit_per_dot'])}</td><td>{f(ours['credit_per_dot'])}</td><td>{f(r37['credit_per_dot'])} / {f(r44['credit_per_dot'])}</td></tr>
 <tr><td>ratio to a random scatter of the same size</td><td><b>{f(h33['catalogue_proxy_DTI']/r37['catalogue_proxy_DTI'],2)}×</b></td><td><b>{f(d28['catalogue_proxy_DTI']/r44['catalogue_proxy_DTI'],2)}×</b></td><td>{f(ours['catalogue_proxy_DTI']/r40['catalogue_proxy_DTI'],2)}×</td><td>1.00×</td></tr>
 <tr><td>dots on mapped-fault pixels</td><td>{h33['dots_on_visible_fault_px']}</td><td>{d28['dots_on_visible_fault_px']}</td><td>{ours['dots_on_visible_fault_px']}</td><td>—</td></tr>
-<tr><td>min distance to a mapped fault</td><td>{h33['min_distance_to_mapped_fault_px']:.0f} px = {h33['min_distance_to_mapped_fault_px']*100:.0f} m</td><td>{d28['min_distance_to_mapped_fault_px']:.0f} px = {d28['min_distance_to_mapped_fault_px']*100:.0f} m</td><td>{ours['min_distance_to_mapped_fault_px']:.0f} px</td><td>—</td></tr>
+<tr><td>min distance to a mapped fault</td><td>{h33['min_distance_to_mapped_fault_px']:.3f} px = {h33['min_distance_to_mapped_fault_px']*100:.0f} m</td><td>{d28['min_distance_to_mapped_fault_px']:.3f} px = {d28['min_distance_to_mapped_fault_px']*100:.0f} m</td><td>{ours['min_distance_to_mapped_fault_px']:.3f} px = {ours['min_distance_to_mapped_fault_px']*100:.0f} m</td><td>—</td></tr>
 <tr><td>median distance to a mapped fault</td><td>{h33['median_distance_to_mapped_fault_px']:.1f} px ≈ {h33['median_distance_to_mapped_fault_px']/10:.2f} km</td><td>{d28['median_distance_to_mapped_fault_px']:.1f} px ≈ {d28['median_distance_to_mapped_fault_px']/10:.2f} km</td><td>{ours['median_distance_to_mapped_fault_px']:.1f} px ≈ {ours['median_distance_to_mapped_fault_px']/10:.2f} km</td><td>—</td></tr>
 <tr><td>strongest correlation with any of the 19 official bands</td><td>|ρ| {f(h33['max_abs_band_spearman'])}</td><td>|ρ| {f(d28['max_abs_band_spearman'])}</td><td>|ρ| {f(ours['max_abs_band_spearman'])}</td><td>—</td></tr>
 </table>
@@ -63,7 +63,8 @@ footprint uniformly. The raster actually associated with a live <b>0.2600</b> is
 <b>{f(d28['catalogue_proxy_DTI']/h33['catalogue_proxy_DTI'],1)}×</b>, and the two embody opposite
 philosophies.</p>
 <p>h33 enforces “0 within 200 m of the catalogue” — measured here as a minimum
-distance of {h33['min_distance_to_mapped_fault_px']:.0f} px = {h33['min_distance_to_mapped_fault_px']*100:.0f} m and a median of
+distance of {h33['min_distance_to_mapped_fault_px']:.3f} px = {h33['min_distance_to_mapped_fault_px']*100:.0f} m (√5 px, a
+diagonal neighbour, so the 200 m rule genuinely holds) and a median of
 {h33['median_distance_to_mapped_fault_px']/10:.2f} km. The 0.2600 anchor does the reverse: its dots sit
 <i>immediately adjacent</i> to mapped traces (min {d28['min_distance_to_mapped_fault_px']:.0f} px = {d28['min_distance_to_mapped_fault_px']*100:.0f} m,
 median {d28['median_distance_to_mapped_fault_px']/10:.2f} km) while never landing on them
