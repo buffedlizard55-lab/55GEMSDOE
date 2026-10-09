@@ -235,5 +235,55 @@
    "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
    "download_link_published": false
   }
- ]
+ ],
+ "parallel_session_artifacts": {
+  "source": "PR #16 (merged to main 2026-10-09) \u2014 a parallel session in this same repository",
+  "why_unpublished": "The site must offer exactly one download so the answer to 'is it OK to submit this?' is unambiguous. Only this session's raster carries a promotion-grade holdout DTI with a spatial-block CI, a leakage canary, and a 61-raster symmetric uniqueness scan. The parallel rasters are preserved byte-for-byte under evidence/parallel_session_16/ and copied into registry/rasters/ so they are part of every future uniqueness scan.",
+  "validation_recorded_by_that_session": "32/32 local tests; no HOLDOUT-DTI, no leakage canary, no registry uniqueness scan",
+  "primary_submission_of_that_session": "tensor-gradient-gated-168854px-20261009T202306Z",
+  "items": [
+   {
+    "file": "evidence/parallel_session_16/tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+    "sha256": "16f3fd048f4aa65e83aafde9b041ed7fd4a84c7b1fd6266d9ba8451f16972b30",
+    "size_bytes": 10567086,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-continuous-1875224px-20261009T202053Z-zeros.tif",
+    "sha256": "abd30a9c3aad35c9f24fe6bf21aacae236dc368cc2a1e8972d2be5f33f6f7e66",
+    "size_bytes": 9721662,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-gradient-gated-168854px-20261009T202306Z-nan.tif",
+    "sha256": "46e36695e5227d386dd7acc701aacb6386a9a9c05275d4aec4ae6f0669d4ab4b",
+    "size_bytes": 2389373,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif",
+    "sha256": "95db328f1c4aec2ab35b9da2c8fd12f88ac864cf8bd03f0c0af6c4d1ddc03c76",
+    "size_bytes": 1599432,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
+    "sha256": "e7533fd89de166702a482db411289f1866614800a69514f00a232d46a8514302",
+    "size_bytes": 1747674,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-triscale-poisson-50035dots-20261009T201613Z-zeros.tif",
+    "sha256": "f0c2f4251c5a60242354742102303ae635442469dc4472f87e414b6bee268586",
+    "size_bytes": 966503,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   }
+  ]
+ }
 }

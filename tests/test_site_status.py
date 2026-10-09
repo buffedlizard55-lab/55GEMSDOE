@@ -202,6 +202,21 @@ class SiteIntegrityTests(unittest.TestCase):
             self.assertIn(phrase, text, phrase)
         self.assertIn("how to submit", (DOCS / "index.html").read_text().lower())
 
+    def test_parallel_session_artifacts_are_preserved_but_unpublished(self) -> None:
+        status = json.loads((DOCS / "status.json").read_text())
+        block = status["parallel_session_artifacts"]
+        for item in block["items"]:
+            self.assertFalse(item["download_link_published"], item["file"])
+            self.assertEqual(item["role"], "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY")
+            path = ROOT / item["file"]
+            self.assertTrue(path.is_file(), item["file"])
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), item["sha256"])
+            self.assertFalse(path.parent.samefile(DOCS / "downloads"))
+        # and they are inside the uniqueness registry so future scans see them
+        registry = json.loads((ROOT / "registry" / "registry.json").read_text())
+        self.assertGreaterEqual(
+            len([k for k in registry if k.startswith("PARALLEL16__")]), 6)
+
     def test_historical_artifacts_stay_unlinked(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
         self.assertFalse(status["historical_raster"]["download_link_published"])
@@ -239,6 +254,62 @@ class SiteIntegrityTests(unittest.TestCase):
             note = card["submission"]["note"]
             self.assertLessEqual(len(note), 140, name)
             self.assertEqual(card["submission"]["note_characters"], len(note), name)
+
+
+    def test_session_run_card_is_negative_blocked_and_fail_closed(self) -> None:
+        card = json.loads((DOCS / "run-card-session-20261009.json").read_text())
+        self.assertEqual(card["verdict"], "NEGATIVE_BLOCKED")
+        self.assertEqual(card["submission"]["status"], "DO_NOT_DOWNLOAD_OR_SUBMIT")
+        self.assertFalse(card["submission"]["file_link_published"])
+        self.assertIsNone(card["submission"]["organizer_receipt"])
+        self.assertIsNone(card["submission"]["note"])
+        self.assertFalse(card["raster"]["generated"])
+        self.assertIsNone(card["raster"]["sha256"])
+        self.assertIsNone(card["holdout_dti"]["value"])
+        self.assertIsNone(card["holdout_dti"]["ci95"])
+        self.assertEqual(card["budget"]["new_experiments_run_in_session"], 0)
+        self.assertFalse(card["budget"]["weekly_slot_used"])
+        self.assertIn("null or NaN", card["validator_findings"]["official_format_contract"])
+        self.assertTrue(all(src.startswith("https://") for src in card["sources"]))
+
+    def test_session_leaderboard_capture_is_labelled_and_consistent(self) -> None:
+        capture = json.loads((ROOT / "evidence/leaderboard_capture_20261009_live.json").read_text())
+        self.assertTrue(capture["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        self.assertIn("NOT ORGANIZER-CONFIRMED", capture["evidence_class"])
+        ranks = [row["rank"] for row in capture["rows"]]
+        self.assertEqual(ranks, list(range(1, len(ranks) + 1)))
+        scores = [row["best_public_dw_tversky"] for row in capture["rows"]]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        top = capture["rows"][0]
+        self.assertEqual((top["participant"], top["best_public_dw_tversky"]), ("xiaofanhu", 0.3774))
+        ext = next(row for row in capture["rows"] if row["participant"] == "extradr19")
+        self.assertEqual((ext["rank"], ext["best_public_dw_tversky"]), (17, 0.2778))
+
+    def test_official_range_contract_is_stated_before_the_download(self) -> None:
+        # the portal rejects values outside [0,1]; every visitor must see that
+        text = (DOCS / "executive-summary.html").read_text()
+        self.assertIn("Predicted values must be in range", text)
+        self.assertIn("[0, 1]", text)
+        # the legacy submit.html is a pointer, not a second download surface
+        submit = (DOCS / "submit.html").read_text()
+        self.assertIn("download.html", submit)
+        self.assertIn("Predicted values must be in range [0, 1]", text)
+        self.assertNotIn('.tif"', submit.lower())
+
+    def test_readme_carries_the_full_standing_brief(self) -> None:
+        readme = (ROOT / "README.md").read_text()
+        # the owner's rule: the whole prompt lives in the README as the recurring
+        # starting point, verbatim
+        self.assertIn("standing prompt, verbatim", readme)
+        for phrase in ("PARALLEL-RUN PROTOCOL", "LEAKAGE CANARY", "RUN CARD",
+                       "ORGANIZER-CONFIRMED", "Negative results are deliverables",
+                       "Maximize P(Win)", "Own the Outcome",
+                       "Predicted values must be in range"):
+            self.assertIn(phrase, readme, phrase)
+        # and the current gate state is stated, not implied
+        self.assertIn("CLEARED TO DOWNLOAD AND SUBMIT", readme)
+        self.assertIn("NOT_SUPPORTED", readme)
+        self.assertIn("0.0380906", readme)
 
 
 if __name__ == "__main__":

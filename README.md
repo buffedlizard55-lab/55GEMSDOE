@@ -4,8 +4,9 @@
 > The artifact is [`docs/downloads/gems55-tensor_full-n16000-sep3-20261009T211747Z-nan.tif`](docs/downloads/gems55-tensor_full-n16000-sep3-20261009T211747Z-nan.tif)
 > (16,000 isolated dots, sha256 `927dc17f7f5d890b2f382e266ade5d775474631ee96674f8ff3cbc1f1b7c7693`).
 > It passes every structural check against the authentic organizer template, is statistically
-> independent of all 55 valid registry rasters (max |Spearman| = 0.0037), and beats a mass-matched
-> random control on the holdout by 1.12x with a confidence interval that excludes the control.
+> independent of all 61 valid registry rasters (max |Spearman| = 0.0245, max Jaccard = 0.00695),
+> and beats a mass-matched random control on the holdout by 1.12x with a confidence interval that
+> excludes the control.
 >
 > **Caveat 1 — the lane's own confirmatory test failed.** Withheld fault segments do *not* agree
 > with the tensor strike more often than random detected ridges do (25.3 % vs 50.4 % within 20 deg,
