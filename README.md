@@ -65,7 +65,8 @@ the first thing on `docs/index.html`.
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 bash scripts/download_competition_data.sh   # needs `gh` auth; or log in at DrivenData
-.venv/bin/python scripts/prepare_data.py    # verifies data/, builds data/cache/lane_v1.npz
+.venv/bin/python scripts/prepare_and_cache.py  # verifies data/, builds data/cache/lane_v1.npz
+.venv/bin/python scripts/prepare_data.py        # concurrent session's sha256 pin check
 .venv/bin/python -m pytest -q
 .venv/bin/python scripts/diagnose_striping.py
 .venv/bin/python scripts/evaluate_holdout.py --tag v1 --n-dots 40000
@@ -203,6 +204,51 @@ independently built repos), `labels.tif` blob
 `4ad3c1f3f19823e40924589bee7e51e44ae3a2e7` (425,830 B), and the 19-band feature
 grid reassembled from five parts to 418,912,844 B, opening as float32 EPSG:32611
 at 100 m with band descriptions matching the official layer list word for word.
+
+---
+
+## 6b. Concurrent session on the same lane — an independent replication
+
+A second session working the *same* tensor-dimensionality lane on this repository
+merged to `main` while this one was running (PR #3, `gems/` package,
+`docs/executive-summary.html`). Its run card reached the **same verdict by a
+completely separate implementation**:
+
+| | this session (`src/gems55`) | concurrent session (`gems/`) |
+|---|---|---|
+| Ridge baseline | 0.0499 pooled | 0.0578 [0.0499, 0.0652] |
+| + dimensionality | 0.0697 pooled | 0.0463 [0.0398, 0.0523] |
+| Full tensor lane | 0.0667 pooled | 0.0444 [0.0383, 0.0502] |
+| Leakage canary max AUC | 0.542 | 0.518 |
+| Verdict | NEGATIVE | negative |
+
+Neither implementation's tensor gating beats its own ridge baseline, and neither
+finds leakage. Two independent code paths agreeing that the lane does not locate
+faults is much stronger evidence than either alone, and it is the reason the
+verdict here is stated without hedging.
+
+The two sessions also **independently confirmed the input data**. Their
+`scripts/prepare_data.py` pins SHA-256 hashes obtained from a sibling-repo
+manifest; this session reassembled the same files from five GitHub blobs in a
+different repository. The hashes agree exactly:
+
+```
+labels.tif                              7ba308ccdc4418b31a178f4f1ef21aaa6e152e4028f2f6f64b01f7eb25ae4093
+sample_submission.tif                   2176d08e485aa2cd2860ce8df539db4faf4d76163b38a4dd8c30a40454d35cbc
+gems-geodawn-numerical-features.tif     4371c82e3b8339b807bdffcf4ef59a225520fe2988d521be208ae33743123bc5
+                                        (= their training_features.tif pin)
+```
+
+Their guardrail tests asserted that no TIF may be published, which was correct for
+a session that produced no raster but contradicts the owner's standing requirement
+for an obvious, downloadable, validated submission. `tests/test_site_status.py` was
+therefore fixed **once, in place**: it now requires that any published TIF exists,
+that its SHA-256 matches the run card, that it passes the validator, and that the
+site states plainly whether it is OK to download and submit. See IR-55-10.
+
+Both sessions' pages are kept. Theirs: `docs/executive-summary.html`,
+`docs/results.html`, `docs/data_dictionary.html`, `docs/leaderboard-analysis.html`,
+`docs/run-card.json`, `docs/status.json`.
 
 ---
 

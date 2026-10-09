@@ -1,0 +1,110 @@
+{
+  "schema": "55gemsdoe.run-card.v1",
+  "run_id": "55GEMSDOE-TENSOR-LANE-REVIEW-2026-10-09",
+  "status": "format_cleared_science_negative",
+  "hypothesis": "Low-pass RTP-magnetic and isostatic-gravity gradient tensors will distinguish strike-extended near-2-D structures from compact 3-D bodies; retaining only ridges whose tensor eigenvector strike agrees with the ridge axis may recover whole withheld fault segments better than random ridges.",
+  "mechanism": "Band-limit each scalar potential-field grid and compute its gradient tensor independently within the four official GeoDAWN acquisition blocks; derive a dimensionality index from tensor eigenvalues and strike from the quasi-2-D eigenvector; suppress compact signatures and east-west flight-line stripes; evaluate strike concordance on held-out whole fault segments.",
+  "named_non_fault_mimic": "Long lithologic contacts, dikes, intrusive bodies, volcanic/vent sources, acquisition-block seams, east-west flight-line striping, tie-line/leveling residuals, and FFT edge artifacts can mimic or distort the target signature.",
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "status": "RUN",
+    "evaluator_version": "gems.metric v1 (private re-implementation; see irregularity IR-55-012)",
+    "withheld_positive_count": 60594,
+    "value": 0.0444,
+    "ci95": [
+      0.0383,
+      0.0502
+    ],
+    "comparators": {
+      "E1_ridge_baseline": {
+        "value": 0.0578,
+        "ci95": [
+          0.0499,
+          0.0652
+        ]
+      },
+      "E2_plus_dimensionality": {
+        "value": 0.0463,
+        "ci95": [
+          0.0398,
+          0.0523
+        ]
+      }
+    },
+    "reason": "Quadrant-fold hide-and-recover over catalogue segments; visible faults masked pixel-exactly; 1000-rep block bootstrap (10 km)."
+  },
+  "leakage_canary": {
+    "status": "RUN",
+    "features_tested_alone": [
+      "gradient_magnitude",
+      "neg_dimensionality_mag",
+      "neg_dimensionality_grav",
+      "strike_agreement",
+      "E1_score",
+      "E3_score"
+    ],
+    "auc": {
+      "gradient_magnitude": 0.5179,
+      "neg_dimensionality_mag": 0.5183,
+      "neg_dimensionality_grav": 0.4803,
+      "strike_agreement": 0.5066,
+      "E1_score": 0.5182,
+      "E3_score": 0.5184
+    },
+    "auc_above_0_90_is_leakage_until_proven": true,
+    "leak_flag_any": false
+  },
+  "strike_prediction_test": {
+    "status": "RUN_FAILED",
+    "comparison": "Held-out fault strikes versus random ridges (design caveat IR-55-017)",
+    "withheld_match_rate": 0.4319,
+    "random_ridge_match_rate": 0.8764,
+    "fisher_one_sided_p": 1.0
+  },
+  "correlation_overlap_vs_registry": {
+    "registry_rasters_scanned": 56,
+    "max_abs_spearman_dense": 0.0043,
+    "threshold_spearman": 0.9,
+    "max_jaccard": 0.007993,
+    "max_frac_within_3px_raw": 0.8413,
+    "max_frac_3px_excess_over_random_control": 0.0399,
+    "max_frac_within_3px_density_matched": 0.6694,
+    "threshold_frac_3px": 0.7,
+    "verdict": "PASS-UNIQUE-CONTROL-ADJUSTED"
+  },
+  "raster_sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
+  "validator_output": {
+    "status": "PASS",
+    "tool": "scripts/validate_submission.py",
+    "checks_passed": 12,
+    "checks_failed": 0,
+    "no_nan_inside_footprint": true,
+    "values_in_0_1_inside_footprint": true,
+    "single_band_float32": true,
+    "crs_matches": true,
+    "shape_matches": true,
+    "transform_matches": true,
+    "outside_footprint_null_or_nan": "zeros (all-finite encoding)"
+  },
+  "submission": {
+    "name": "h55-tensor2d-strikegate-40000dots-20261009T052235Z",
+    "note": "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots",
+    "note_characters": 86,
+    "download_allowed": true,
+    "weekly_slot_used": false,
+    "file": "docs/downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif"
+  },
+  "verdict": "negative",
+  "projection_written_as_score": false,
+  "budget": {
+    "experiments_used": 3,
+    "limit": 3,
+    "hours_limit": 2,
+    "weekly_slot_used": false
+  },
+  "review_passes": [
+    "implementation",
+    "bug/assumption audit (sign bug, nodata gaps, footprint outside data, saturated overlap)",
+    "requirement and source audit (main AGENTS.md gates)"
+  ]
+}

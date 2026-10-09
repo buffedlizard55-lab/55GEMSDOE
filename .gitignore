@@ -15,3 +15,10 @@ registry/rasters/
 
 # 12 MB boolean grid, reproducible from submission_writer.py with the same seed
 evidence/dots_*.npy
+# Competition payloads are NOT redistributable under our reading of the rules (see docs/irregularities.md)
+data/*
+!data/README.md
+!data/SOURCES.md
+# Local scratch / outputs
+outputs/
+.venv*/

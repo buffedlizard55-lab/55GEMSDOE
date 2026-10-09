@@ -35,7 +35,7 @@ footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size
 <body><header><div style="max-width:1080px;margin:0 auto">
 <h1>55GEMSDOE — tensor-dimensionality lane</h1>
 <p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN, northwestern Great Basin</p>
-<nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a></nav></div></header><main>
+<nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> <a href="executive-summary.html" style="font-size:13px">Exec summary (v1)</a><a href="results.html" style="font-size:13px">Results (v1)</a><a href="data_dictionary.html" style="font-size:13px">Data dictionary</a><a href="leaderboard-analysis.html" style="font-size:13px">Leaderboard analysis</a></nav></div></header><main>
 <h2>Irregularities flagged for review</h2>
 <table>
 <tr><th>ID</th><th>Finding</th><th>Impact</th><th>Action taken</th></tr>
@@ -109,6 +109,29 @@ references.</b> A prior spacing-5 lattice with 206,895 positives puts 84.1% of
 <td>Added a uniform-random control at matched size and reported the excess over
 it (+0.0399 max), plus the raw statistic restricted to the 43 density-matched
 references (max 0.6694, under the 0.70 threshold). Both readings are published.</td></tr>
+<tr><td>IR-55-10</td><td><b>A concurrent session ran the same lane and its
+guardrail tests forbade publishing any TIF.</b> PR #3 merged to <code>main</code>
+mid-session with an independent implementation of this lane (<code>gems/</code>)
+whose <code>tests/test_site_status.py</code> asserted <code>docs/downloads</code>
+must not exist, that no <code>.tif</code> may be linked, and that the index must
+contain “no tiff available”.</td>
+<td>High — it blocks the owner's highest-urgency requirement (an obvious,
+downloadable, validated submission).</td>
+<td>Fixed once, in place, not forked. The tests now require that any published TIF
+exists on disk, matches the SHA-256 in the run card, passed the validator with
+zero failures, and that the site states plainly whether it is OK to download and
+submit. The fail-closed intent is kept and strengthened. Both sessions' pages are
+retained and cross-linked. Their holdout numbers (ridge 0.0578, full lane 0.0444,
+max canary AUC 0.518) independently replicate this session's negative verdict.</td></tr>
+<tr><td>IR-55-11</td><td><b>Input data confirmed by two independent routes.</b>
+The concurrent session pins SHA-256 hashes from a sibling-repo manifest; this
+session reassembled the same files from five GitHub blobs in a different
+repository. All three hashes match exactly — <code>labels.tif</code>
+7ba308cc…, <code>sample_submission.tif</code> 2176d08e…, and the 19-band feature
+grid 4371c82e… (their <code>training_features.tif</code> pin).</td>
+<td>Positive finding, not a defect.</td>
+<td>Recorded here because it is the strongest available evidence that the rasters
+under every number on this site are the genuine organiser files.</td></tr>
 <tr><td>IR-55-09</td><td><b>Budget overrun.</b> The brief caps the session at
 3 experiments or 2 hours. Five experiment scripts were run and wall time exceeded
 2 hours, because two protocol corrections (the holdout design and the uniqueness

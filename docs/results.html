@@ -1,0 +1,122 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Results</title><link rel="stylesheet" href="site.css"></head><body><p><a href="index.html">&larr; Overview</a></p><h1>Results — tensor-dimensionality lane (2026-10-09)</h1>
+<p><strong>Every number on this page is HOLDOUT-DTI.</strong> None is an organiser-confirmed score. No candidate TIFF is published, and no download is allowed (see <a href="status.json">status</a> and <a href="run-card.json">run card</a>).</p>
+<h2>Holdout (evaluator <code>gems.metric v1</code>)</h2>
+<ul>
+<li>DTI with α = 0.2, β = 0.8, triangular kernel R = 300 m (3 px). The formula was checked against the worked example on the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description page</a>.</li>
+<li>Holdout: four quadrant folds (NW, NE, SW, SE) of catalogue fault segments (3,199 segments). Each fold's segments are withheld. Visible faults are masked pixel-exactly.</li>
+<li>Withheld positives: <strong>60,594 px</strong>.</li>
+<li>95% CI: block bootstrap, 1,000 reps, 10 km blocks.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Experiment</th>
+<th>What it is</th>
+<th>HOLDOUT-DTI</th>
+<th>95% CI</th>
+<th>TP_w</th>
+<th>FP_w</th>
+<th>FN_w</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>Ridge baseline (RTP gradient ridges, flight-line rows masked)</td>
+<td><strong>0.0578</strong></td>
+<td>0.0499 – 0.0652</td>
+<td>3,794.0</td>
+<td>82,001.6</td>
+<td>56,800.0</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>E1 × (1 − magnetic dimensionality index)</td>
+<td>0.0463</td>
+<td>0.0398 – 0.0523</td>
+<td>2,816.3</td>
+<td>59,038.8</td>
+<td>57,777.7</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>E2 × (1 − mean of magnetic and gravity indices) × strike-agreement gate (lane method)</td>
+<td>0.0444</td>
+<td>0.0383 – 0.0502</td>
+<td>2,662.9</td>
+<td>54,759.9</td>
+<td>57,931.1</td>
+</tr>
+</tbody>
+</table>
+<p>Experiment budget: 3 of 3 used.</p>
+<h2>Leakage canary (each feature alone, AUC on ridge pixels)</h2>
+<p>Positives are ridge pixels within 300 m of a catalogue fault (n = 23,530). Negatives are ridge pixels farther away (n = 161,645). Threshold for leakage: AUC &gt; 0.90.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>AUC</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gradient magnitude</td>
+<td>0.5179</td>
+<td>no</td>
+</tr>
+<tr>
+<td>− dimensionality (magnetic)</td>
+<td>0.5183</td>
+<td>no</td>
+</tr>
+<tr>
+<td>− dimensionality (gravity)</td>
+<td>0.4803</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Strike agreement</td>
+<td>0.5066</td>
+<td>no</td>
+</tr>
+<tr>
+<td>E1 score</td>
+<td>0.5182</td>
+<td>no</td>
+</tr>
+<tr>
+<td>E3 score</td>
+<td>0.5184</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>No leakage is detected. The features also carry little signal (AUC ≈ 0.5).</p>
+<h2>Strike prediction test</h2>
+<ul>
+<li>Withheld fault strike matches the field's tensor strike: <strong>43.2%</strong> (N = 910 segments).</li>
+<li>Random ridge orientation matches the field's tensor strike: <strong>87.6%</strong> (N = 133,448 px).</li>
+<li>One-sided Fisher p = 1.0. The test <strong>failed</strong>. Its design is not a fair comparison (irregularity IR-55-017).</li>
+</ul>
+<h2>Uniqueness (registry scan)</h2>
+<ul>
+<li>Same-grid GEMSDOE rasters compared: 630 of 632 (63 repos).</li>
+<li>Max Spearman (E1, footprint): 0.165, below the 0.90 threshold.</li>
+<li>Overlap rule (≥70% of dots within 3 px of one registry raster): flagged 70 of 630 for E1 and for E3. The rule is saturated by dense registry rasters and is not chance-corrected (IR-55-020).</li>
+<li>Result files: <a href="results/registry_check_tensor_lane_E1.json">E1</a>, <a href="results/registry_check_E3.json">E3</a>.</li>
+</ul>
+<h2>Local candidate files (not published)</h2>
+<p>Both pass the official format validator (single band, float32, EPSG:32611, shape and transform match the template, NaN exactly outside the footprint, values in [0, 1]). They are held locally only (gitignored <code>outputs/</code>), because the gates did not pass.</p>
+<ul>
+<li>E1 sha256 <code>038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424</code></li>
+<li>E3 sha256 <code>25f2ccf40c096efe9b25bed9ab8c28151d48123a7ba4527c85ac490c3dc18d80</code></li>
+</ul>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">python scripts/prepare_data.py                 # checks the sha256 pins in data/
+python scripts/run_tensor_lane.py --out outputs/x.tif --tag x --results docs/results/tensor_lane_results.json
+python scripts/registry_check.py outputs/x_E1_ridge_baseline.tif &lt;registry_dir&gt; docs/results/registry_check_E1.json
+python scripts/make_run_card.py
+</code></pre></body></html>

@@ -1,0 +1,78 @@
+{
+  "run_card_version": 1,
+  "lane": "tensor-dimensionality (Pedersen & Rasmussen 1990 index; Beiki & Pedersen 2010 strike)",
+  "hypothesis": "Near-2-D gradient ridges whose tensor strike agrees with ridge orientation mark strike-extended faults, and down-weighting compact 3-D signatures raises recovery of withheld catalogue faults.",
+  "mechanism": "FFT pseudogravity/isostatic gradient tensor -> dimensionality I=|lam_min|/|lam_mid| and min-eigenvector strike; ridges of horizontal gradient of RTP; E-W flight-line rows masked by robust row-residual test.",
+  "named_non_fault_mimic": "Lithologic contacts and dykes/sills (also 2-D) and E-W flight-line striping (1-D by construction); also vents/intrusions give ridges but are 3-D and should be down-weighted.",
+  "holdout_dti": {
+    "label": "HOLDOUT-DTI",
+    "evaluator": "gems.metric v1 (DrivenData distance-weighted Tversky, alpha=0.2, beta=0.8, R=300 m)",
+    "E1_ridge_baseline": {
+      "dti": 0.0578,
+      "ci95": [
+        0.0499,
+        0.0652
+      ],
+      "withheld_positive_px": 60594
+    },
+    "E2_plus_dimensionality": {
+      "dti": 0.0463,
+      "ci95": [
+        0.0398,
+        0.0523
+      ],
+      "withheld_positive_px": 60594
+    },
+    "E3_full_tensor_lane": {
+      "dti": 0.0444,
+      "ci95": [
+        0.0383,
+        0.0502
+      ],
+      "withheld_positive_px": 60594
+    }
+  },
+  "leakage_canary_auc": {
+    "gradient_magnitude": 0.5179,
+    "neg_dimensionality_mag": 0.5183,
+    "neg_dimensionality_grav": 0.4803,
+    "strike_agreement": 0.5066,
+    "E1_score": 0.5182,
+    "E3_score": 0.5184
+  },
+  "leakage_flag_any": false,
+  "strike_prediction_test": {
+    "withheld_segments_tested": 910,
+    "withheld_match_rate": 0.4319,
+    "random_ridge_pixels_tested": 133448,
+    "random_ridge_match_rate": 0.8764,
+    "fisher_one_sided_p": 1.0,
+    "note": "withheld-fault strike (PCA of segment) vs median tensor strike on the segment; random ridge = ridge orientation vs tensor strike at the same pixel, ridges >300 m from catalogue"
+  },
+  "registry": {
+    "rasters_total": 632,
+    "E1_max_spearman": 0.165,
+    "E1_duplicates_flagged_by_overlap_rule": 70,
+    "E3_duplicates_flagged_by_overlap_rule": 70,
+    "same_grid_compared": 630,
+    "overlap_rule_note": "saturated by dense registry rasters (up to 5.17M positive px ~ whole footprint); not chance-corrected"
+  },
+  "raster_sha256": {
+    "E1_ridge_baseline": "038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424",
+    "E3_full_tensor_lane": "25f2ccf40c096efe9b25bed9ab8c28151d48123a7ba4527c85ac490c3dc18d80"
+  },
+  "validator": {
+    "all_passed": true,
+    "values_in_0_1_inside": true,
+    "no_nan_inside_footprint": true,
+    "outside_null_or_nan": true,
+    "crs_epsg_32611": true,
+    "shape_matches_template": true,
+    "transform_matches_template": true
+  },
+  "submission_name": "NOT PUBLISHED - no upload (tensor lane negative)",
+  "submission_note": "No upload. Tensor lane negative on holdout (0.0444 vs ridge 0.0578). No cleared candidate.",
+  "verdict": "negative",
+  "organiser_confirmed_scores": [],
+  "budget": "3 experiments (E1,E2,E3) within the 2-hour budget; no submission slot used"
+}

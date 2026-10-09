@@ -1,0 +1,56 @@
+# Tensor-dimensionality hypotheses — preregistration shortlist
+
+**Status: proposals only. No candidate was implemented or evaluated.** The shortlist stays inside the assigned tensor-dimensionality lane. Relative opportunity and cost are qualitative research priorities—not `HOLDOUT-DTI`, not projections, and not scores. The checkout contains no code/data/registry, so novelty against the wider archive and performance against the current holdout best are not established.
+
+## Candidate ranking
+
+| Rank | Hypothesis and required layers | Physical signature | Why it could find a fault omitted from USGS / INGENIOUS | Difference from current repo and known prior work | Expected relative DTI opportunity / cost |
+|---|---|---|---|---|---|
+| **1** | **Joint RTP-magnetic + isostatic-gravity tensor dimensionality and strike concordance.** Competition-provided reduced-to-pole magnetic anomaly and isostatic gravity anomaly, plus official acquisition-block/flight-line footprints for processing controls. | Low-pass each acquisition block before FFT derivatives; form the symmetric potential-field gradient tensor; compute eigenvalue dimensionality and the quasi-2-D eigenvector strike; identify the local gradient-ridge axis; retain/weight only near-2-D ridges whose strike agrees with their own orientation; down-weight compact 3-D responses; remove flight-line striping. | A fault can produce a laterally persistent magnetic and/or density boundary even where no public fault trace is mapped. The signal is label-independent, so it can be tested on whole held-out catalogue segments; it is not derived by extending a visible line. It remains only a fault *candidate* until geological review. | No implementation exists in this checkout. The official template repository has no exact `evaluate_holdout.py` / `submission_writer.py` filenames and no demonstrated implementation of this exact tensor-index + strike-concordance filter. Sibling archives include `DILCOND`, magnetic-ridge, and magnetic/gravity cross-gradient concepts; their code and decoded rasters must be compared before claiming uniqueness. | **Highest priority; moderate-to-high scientific upside, unquantified. High cost** because block boundaries, spectral edge treatment, tensor stability, and strike/ridge agreement all need independent checks. |
+| **2** | **Scale-persistent near-2-D strike filter.** Same RTP-magnetic and isostatic-gravity layers and the same four block geometries. | Recompute dimensionality/strike after a small, preregistered set of low-pass scales; preserve ridge candidates only when dimensionality class and axial strike remain stable across scales. This is a stability test of the same tensor lane, not a separate detector family. | A real structural edge may retain its orientation over scale while derivative noise, shallow compact bodies, and flight-line artifacts change more rapidly. Stable responses may reveal a buried continuation that is absent from the catalogue. | No implementation in this checkout. It differs from one-scale edge and cross-gradient methods reported by siblings, but the scale rule must be checked against all earlier rasters; no novelty claim yet. | **Second priority; moderate upside, unquantified. Medium/high cost** (repeat tensor calculations and freeze scales without holdout tuning). |
+| **3** | **Gravity-only near-2-D tensor ridges.** Isostatic gravity anomaly only, with block mask. | Gravity Hessian eigenvalue index, near-2-D mask, strike from the smallest-absolute-eigenvalue eigenvector, and ridge/strike concordance. | A density boundary at a basin margin or basement offset may continue beyond mapped traces and may be weak in magnetics. This is an independent modality ablation and avoids magnetic remanence as a direct source of strike disagreement. | No such tensor implementation in this checkout. Sibling reports mention simple horizontal-gravity-gradient ridges; those are not the same statistic as the full eigenvalue dimensionality index plus strike test, but the raster-level overlap still has to be measured. | **Third priority; low-to-moderate upside, unquantified. Medium cost.** |
+| **4** | **RTP-derived pseudogravity tensor.** Reduced-to-pole magnetic anomaly, transformed to pseudogravity with declared field/magnetization assumptions, then the same tensor dimensionality and strike analysis. | Quasi-2-D eigenvalue signature and strike from the pseudogravity gradient tensor. | A source geometry expressed through pseudogravity may yield a more interpretable structural strike than raw RTP for a long contact or fault, including an unmapped continuation. | The method is distinct from raw magnetic ridge or magnetic/gravity cross-gradient scoring, but the 2011 method's assumptions and the archive's `DILCOND` work must be checked. No pseudogravity tensor is implemented in this checkout. | **Fourth priority; low-to-moderate upside, unquantified. Medium/high cost** because the magnetization-direction assumption and transform conditioning are additional risks. |
+
+## Prior-art boundary and external data
+
+- **Within this project checkout:** the original branch had no scientific code; the current work adds project documentation and site checks only. No candidate implementation exists here to differentiate from.
+- **Sibling archive:** GEMSDOE26 publishes a `DILCOND` result and GEMSDOE54 publishes magnetic-ridge/cross-gradient work. These owner-maintained reports are relevant warnings, not proof that the exact tensor method is new or already tested. A complete decoded-pixel and source-code registry scan is required before placement.
+- **Competition bands:** the official problem description lists reduced-to-pole magnetic anomaly and isostatic gravity anomaly in `training_features.tif`. The data page redirected to login in this review; the rasters are not in this checkout.
+- **Block and line metadata:** the official USGS GeoDAWN release states that the survey has four acquisition blocks and lists flight paths/survey outlines among its released files. It is public and marked CC0 on the USGS page. The exact polygons/flight paths have not been downloaded, intersected with the competition grid, or checksum-pinned here. Source: [USGS GeoDAWN data release](https://doi.org/10.5066/P93LGLVQ) and [overview](https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and).
+
+No candidate in this list requires a new geothermal observation dataset to formulate the test. If the block masks/flight-line data cannot be recovered from the shared cache, the named official fallback is the USGS GeoDAWN ScienceBase release linked above. It is publicly listed, but it is **not locally available in this checkout**, so the candidate is not yet runnable.
+
+## Frozen validation plan (not run)
+
+1. Identify the authoritative shared feature stack, whole-segment evaluator, writer, and registry. Do not substitute a private fork. Verify tool code and version before any fit.
+2. Freeze block polygons, FFT window/taper, low-pass bandwidth(s), dimensionality definition, ridge-orientation estimator, strike tolerance, stripe mask, and compact-body down-weight before querying holdout outcomes. Process each of the four official acquisition blocks independently.
+3. For each feature/rule alone, run the leak canary. AUC above 0.90 is leakage until proven otherwise. Recompute every label-derived channel from visible catalogue segments only.
+4. Withhold whole fault segments with a buffer; mask visible catalogue pixels exactly; use the shared evaluator to pool `HOLDOUT-DTI` at the organizer's α=0.2, β=0.8, 300 m triangular kernel. Report evaluator version, withheld-positive count, and paired whole-segment 95% CI.
+5. Test the prespecified strike prediction: compare axial strike agreement on held-out fault segments against matched random ridges. No result is reported until the shared evaluator returns it.
+6. Compare the continuous candidate surface with every registry raster before placement. Stop and log duplicate if |Spearman ρ| exceeds 0.90 or more than 70% of placed dots fall within 3 px of a registry raster. Repeat on final dots. The current registry is absent, so this gate cannot pass.
+7. Compare only with a same-evaluator current holdout best. No comparable baseline exists in this checkout. Do not spend a competition slot or publish a candidate TIFF before every gate passes.
+
+## Named non-fault mimics to preregister
+
+- Long lithologic contacts, dikes, and intrusive sheets can be two-dimensional or strike-extended without being faults.
+- Compact intrusions, volcanic/vent bodies, and topographic or magnetic source edges can make 3-D signatures.
+- East–west flight lines, tie lines, block seams, leveling/micro-leveling residuals, and FFT wraparound can create artificial ridges or preferred orientations.
+- Isostatic/gravity correction artifacts, remanent magnetization, and imperfect RTP/pseudogravity assumptions can shift or rotate a geophysical signature.
+
+A tensor dimensionality index is a source-geometry discriminator under potential-field assumptions, not a fault detector by itself. Geological interpretation and the held-out prediction test remain necessary.
+
+## Result of the tensor-lane run (2026-10-09) — HOLDOUT-DTI
+
+Evaluator `gems.metric v1` (DTI α=0.2, β=0.8, R=300 m). Holdout = four quadrant folds of catalogue fault segments, visible faults masked pixel-exactly. 60,594 withheld positive pixels. 95% CI from a 1,000-rep block bootstrap (10 km blocks).
+
+| Experiment | Hypothesis tested | HOLDOUT-DTI | 95% CI |
+|---|---|---|---|
+| E1 | Gradient ridges of RTP (stripe rows masked). Reference, not a tensor test | **0.0578** | 0.0499 – 0.0652 |
+| E2 | E1 weighted by (1 − dimensionality index), magnetic pseudogravity tensor | 0.0463 | 0.0398 – 0.0523 |
+| E3 | E2 combined with the gravity index and a strike-agreement gate (candidate lane method) | 0.0444 | 0.0383 – 0.0502 |
+
+Leakage canary: every single feature has AUC 0.48–0.52 on ridge pixels (threshold 0.90): no leakage detected, but also little discriminative signal. Strike test: **failed** (43.2% vs 87.6%; design caveat IR-55-017). Budget used: 3 experiments.
+
+**Verdict for the tensor lane: negative.** From E1 to E2 the weighted true positives fell from 3,794 to 2,816 and false positives from 82,002 to 59,039, while missed positives rose from 56,800 to 57,778. The weight removed signal and noise at similar rates, so the Tversky score fell. This is the opposite of the lane's premise and is recorded as a result. Possible next experiments (within the lane only): pixel-matched strike test, and a chance-corrected uniqueness check.
+
+Out-of-lane ideas (tilt-angle zero-contours, geodetic strain, seismicity alignments, 1 m DEM scarps) were drafted in this session and are **parked**. `AGENTS.md` keeps this checkout to the tensor lane, so they are not implemented here. They need a separate lane approval and their own preregistration.
