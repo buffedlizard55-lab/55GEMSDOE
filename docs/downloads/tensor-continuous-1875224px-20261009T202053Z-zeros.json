@@ -1,0 +1,11 @@
+{
+  "name": "tensor-continuous-1875224px-20261009T202053Z",
+  "note": "tensor-continuous t=0.050 n=1875224 20261009 zeros",
+  "experiment": 2,
+  "hypothesis": "Continuous tensor surface with wider bandpass and lower threshold",
+  "threshold": 0.05,
+  "n_positive_pixels": 1875224,
+  "sha256_zeros": "abd30a9c3aad35c9f24fe6bf21aacae236dc368cc2a1e8972d2be5f33f6f7e66",
+  "sha256_nan": "16f3fd048f4aa65e83aafde9b041ed7fd4a84c7b1fd6266d9ba8451f16972b30",
+  "timestamp_utc": "20261009T202053Z"
+}
