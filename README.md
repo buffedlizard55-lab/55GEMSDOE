@@ -63,6 +63,78 @@ the first thing on `docs/index.html`.
 
 ---
 
+## 2b. The 0.2778 anchor — answered, and the answer changes the target
+
+The brief asked why `h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros` scored
+**0.2778** and whether we can beat it. **It did not score 0.2778.** GEMSDOE32's
+own audit manifest (`docs/downloads/submissions_manifest.json`, generated
+2026-10-04T15:27:17Z by `scripts/audit_shipped.py`, fetched read-only from
+api.github.com) lists that exact file as its `primary` candidate with
+`receipt: null`, and the run note ends:
+
+> flank B=2 prune on the 0.2708 base: 37,654 dots, 0 within 200 m of the
+> catalogue; live-mirror +0.00487 in 4/4 folds, safety 2.08, **projected 0.2747;
+> UNSCORED**
+
+All 24 entries in that manifest carry `receipt: null`. So 0.2778 is a *projection*
+carried forward as a score — exactly what the brief forbids. Logged **IR-55-12**.
+Until this session found it, this README and the run card treated 0.2778, 0.3195
+and 0.3774 as ORGANIZER-CONFIRMED anchors. **None of them is receipted.** They are
+USER-SUPPLIED claims.
+
+Measured with the verified evaluator (`scripts/exp7_anchor_verdict.py` →
+`evidence/anchor_verdict.json`):
+
+| raster | dots | proxy DTI | credit/dot | vs random | min dist to a mapped fault |
+|---|---|---|---|---|---|
+| h33-2-b2 (“0.2778”) | 37,654 | **0.0049** | 0.0074 | **0.18×** | 2.236 px = 224 m |
+| d28 / live “0.2600” | 44,090 | **0.0686** | 0.0897 | **2.24×** | 1.000 px = 100 m |
+| ours h55 | 40,000 | 0.0269 | 0.0382 | 0.94× | 1.000 px |
+| uniform random, same N | — | 0.0306 | 0.0400 | 1.00× | — |
+
+**h33 harvests less kernel credit than throwing dots uniformly at the
+footprint**, because it enforces “0 dots within 200 m of the catalogue”. The
+raster tied to the live 0.2600 does the reverse — dots immediately adjacent to
+mapped traces, never on them — and measures 2.24× random. That is a
+factor of 13.9× between the two philosophies. Neither is explained by any of the
+19 official layers (strongest |ρ| 0.047 and 0.050, i.e. noise at this N),
+so the mechanism that works is **geometric relative to the catalogue**, not
+feature-driven.
+
+The 200 m buffer is the mistake. “Newly identified faults not in the USGS
+database” justifies excluding catalogue *pixels* — a dot on a catalogue pixel can
+never earn credit, and all three rasters correctly have 0 dots there. It does not
+justify a buffer: a fault 300 m from a mapped trace is still inside the scoring
+kernel and, on every structural prior, far likelier to be a fault than a point
+2 km away in a basin.
+
+**What any score costs.** Since `TP_w + FN_w = |G|` and `TP_w ≤ |G|`:
+
+| target | N = 44,090 requires |
+|---|---|
+| 0.2600 | |G| ≥ 2,895 px, 0.0171 credit/dot |
+| 0.2778 | |G| ≥ 3,150 px, 0.0198 credit/dot |
+| 0.3195 | |G| ≥ 3,785 px, 0.0274 credit/dot |
+| 0.3774 | |G| ≥ 4,767 px, 0.0408 credit/dot |
+
+A uniform scatter already delivers **0.0400 credit/dot**. So 0.2778 sits
+*below* the coverage plateau, and 0.3774 needs catalogue-level targeting. **The
+real target is 0.2600, and it is a placement result, not a detection result.**
+
+Conditional (labelled PROJECTION, never a score): if the hidden set is about as
+findable as the mapped catalogue, |G| ≈ 7,991 px. The model-free statement is only
+the floor, |G| ≥ 2,895.
+
+Full analysis with evidence classes on `docs/anchor-0.2778.html`.
+
+**Highest-leverage next experiment, still in-lane:** use the tensor strike
+estimator — the one part of this lane that tested positive — to decide *which way
+to extend* from mapped traces, and emit 1–3 px adjacent to catalogue pixels rather
+than ≥200 m away. That combines the measured winner (adjacency) with this lane's
+one confirmed asset (strike), and it is falsifiable on the same holdout.
+
+---
+
 ## 3. Reproduce
 
 ```bash
