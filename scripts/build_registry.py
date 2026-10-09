@@ -62,6 +62,17 @@ for f in sorted(TREES.glob("*.tsv")):
 seen = {}
 for repo, path, sz, base, k in index:
     seen.setdefault(k, (repo, path, sz, base))
+
+# A committed registry manifest is a valid fallback when the temporary sibling
+# checkout used by the original scanner is unavailable.  The manifest contains
+# only repo/path metadata; every raster is still fetched by content SHA below,
+# and no prior pixel is used by the candidate writer.
+if not seen and (ROOT / "registry" / "registry.json").exists():
+    manifest = json.loads((ROOT / "registry" / "registry.json").read_text())
+    for base, row in manifest.items():
+        key = str(row.get("scored_key", base))
+        seen.setdefault(key, (row["repo"], row["path"], int(row["size"]), Path(base).name))
+    print("using committed registry/registry.json because /tmp/trees is absent", flush=True)
 print(f"{len(seen)} distinct scored entries locatable on GitHub", flush=True)
 
 grid, _ = io55.read_template()

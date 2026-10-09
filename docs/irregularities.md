@@ -1,42 +1,33 @@
 # Irregularities and review flags
 
-All items below remain open unless marked otherwise. These are evidence/provenance issues, not proof of misconduct.
+These are explicit blockers or caveats, not hidden assumptions.
 
-| ID | Severity | Finding | Evidence / consequence | Resolution needed |
-|---|---|---|---|---|
-| IR-55-001 | **Blocking** | The original Arena branch had only `README.md`; this project work adds documentation, site pages, and status tests, but no competition data or scientific pipeline. | The current worktree has no competition rasters, sample metadata, cached feature stack, holdout code, submission writer, or registry corpus. | Identify and pin the canonical template/cache/evaluator/writer. Do not invent a private replacement. |
-| IR-55-002 | **Blocking** | The user-requested shared tool names are absent from this checkout; the separate template has different tools and a different holdout interface. | The public GEMSDOE template tree has `scripts/block_holdout_eval.py` and `src/submission_io.py`, not the requested exact filenames. The sibling GEMSDOE52 tree has similarly named modules, but is not identified as the authoritative shared template here. | Confirm which repository/version is canonical and whether its evaluator satisfies whole-segment buffered hide-and-recover, exact visible masking, pooled DTI, and segment-level uncertainty. If wrong, repair there through its supported process. |
-| IR-55-003 | **Blocking** | No cached feature stack is present locally. | The DrivenData data page redirected to login. A public owner-maintained bridge exists in another repository, but it is not in this checkout and is not organizer-authenticated by its hash manifest alone. | Use an approved, checksum-pinned data route; verify all grids, layer names, masks, and provenance before evaluation. |
-| IR-55-004 | **High** | Acquisition-block and flight-line masks are missing. | USGS states that GeoDAWN consists of four acquisition blocks and that flight-path/survey-outline files are in its public data release; no such files or derived masks exist here. | Obtain the official block/flight-line files, align them to the competition grid, and document checksum and coordinate handling before FFT processing. |
-| IR-55-005 | **High** | `0.2778` is not established as the score of the H33 TIFF. | **0.2778 — USER-REPORTED / NOT ORGANIZER-CONFIRMED** is linked to the filename in the request. The GEMSDOE32 page and its owner-generated artifact audit describe the H33 file as `UNSCORED` and a nearby number as a projection. A sibling review says a public-board row at the same value belongs to another participant and has no file link. | Obtain the organizer's submission-page receipt that ties this exact file/hash to the value, or keep the attribution unverified. Do not explain the candidate as a leaderboard success without that receipt. |
-| IR-55-006 | **High** | The prompt's claim that `0.3195` is the current high value conflicts with dated sibling reports. | **0.3195 — USER-REPORTED / NOT ORGANIZER-CONFIRMED** is in the prompt. A GEMSDOE54 sibling page says its 2026-10-09 live read showed **0.3774 — PUBLIC-LEADERBOARD SNAPSHOT, NOT A SUBMISSION-PAGE RECEIPT** in first place and `0.3195` at rank seven; it also places the `0.2778` row at rank thirteen and does not link it to H33. Our direct official-page fetch returned “Loading…”. | Verify the board in a browser/official receipt before asserting a current leaderboard high. Store the date and source; do not treat a public row as file attribution. |
-| IR-55-007 | **Medium** | The suffix `zeros` is ambiguous and is not evidence that the TIFF is all-zero. | The owner-generated GEMSDOE32 audit describes a `mode: zeros` artifact with emitted positive pixels, but the raster bytes were not re-read in this checkout. | Inspect the actual file only for learning; never reuse/copy it as a submission. Define the output encoding explicitly for any new TIFF. |
-| IR-55-008 | **Medium** | The precise cause of the prior portal range rejection is unknown for the user's uploaded file. | The official spec requires `[0,1]` values inside the scored grid and permits null/NaN outside the bounds. The rejected file and authentic sample are not present here. A separate template repository documents a different historical NaN-in-footprint failure, which cannot be assumed to be this upload. | Reproduce only with the exact rejected bytes and matching sample. Future writer must re-read output and check finite/range/mask/CRS/shape/transform. |
-| IR-55-009 | **High** | Tensor-lane novelty is not proven against prior sibling work. | The current checkout has no method code, but GEMSDOE26 reports a `DILCOND` family and GEMSDOE54 reports magnetic-ridge/cross-gradient methods. No full raster registry is present. | Run the required continuous-surface and final-dot uniqueness scan against the exhaustive registry before any placement. If the threshold trips, log duplicate and stop. |
-| IR-55-010 | **Blocking** | There is no same-evaluator current holdout best in this checkout. | No `HOLDOUT-DTI` result, folds, evaluator version, withheld-positive count, or CI are locally available. Results from other projects/evaluators cannot be assumed comparable. | Recover the canonical holdout artifacts and establish a baseline on the same folds/evaluator before testing the top candidate. |
-| IR-55-011 | **Medium** | The official leaderboard did not provide a machine-readable response to the current page fetch. | The fetched official leaderboard page contained “Loading…” only. | Do not publish this repository as an up-to-date live score feed until a documented official endpoint and scheduled parser are tested. |
-
-## Disposition
-
-No candidate surface or final-dot raster was created. No `HOLDOUT-DTI` was measured. Registry checks and format validation were not run. No competition slot was touched. The correct current user-facing status is **NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT**.
-
-## Additions from the tensor-lane run (2026-10-09, same review session)
-
-| ID | Severity | Finding | Evidence / consequence | Resolution needed |
-|---|---|---|---|---|
-| IR-55-012 | **High** | **Private evaluator/writer fork.** `gems/metric.py`, `gems/submission.py` and `gems/holdout.py` re-implement the DTI, writer and holdout because no authorised shared template was available in this checkout. `AGENTS.md` forbids a private fork. | The formula matches the official page, and its worked-example arithmetic is tested (`tests_numeric/test_metric.py`). It is still not the canonical evaluator. | Reconcile against the shared template's evaluator on identical inputs, then replace `gems/` with it or record a shared-tool repair there. Until then, all numbers are labelled with evaluator `gems.metric v1`. |
-| IR-55-013 | **High** | **Competition template is not a fault-absence file.** The sample-submission raster in the sibling's `data/bridge` has 60,988 positive cells, the same count as the training fault pixels. The official problem description says the sample is an "all-zero template". | Local check on the sibling bytes, whose sha256 matches the sibling manifest. The organisers' copy was not accessed. | Ask the organisers which file is authoritative. Do not use the template's 1-values as a baseline. |
-| IR-55-014 | Medium | **Feature rasters have real values outside the official footprint**: 1,540 finite RTP cells lie outside the template's valid mask (`rtp_band2`; same count in `iso_band13`). | `docs/results/tensor_lane_results.json` → `feature_values_outside_footprint`. The pipeline masks them to NaN, as the official format requires. | Note for the organisers. |
-| IR-55-015 | Medium | **Nodata sentinel −3.4028e38 appears inside the footprint** (3,061 cells in RTP and isostatic bands). | `feature_gaps_inside_footprint`. Filled with the footprint mean before the low-pass. | Note for the organisers. |
-| IR-55-016 | **High** | **Competition rasters live in a public sibling repository** (`buffedlizard55-lab/GEMSDOE`, `data/bridge/`, about 414 MB). The organisers' data page is login-gated, and external data is allowed only under a licence that permits use and sharing with the sponsor. This checkout does not contain the rasters: they were read from the sibling repo into the gitignored `data/` folder for local analysis only. | DrivenData rules: <https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/>; NLR rules: <https://docs.nlr.gov/docs/fy26osti/96647.pdf> (§A.5). | **Legal review.** Recommend removing the bridge from the public sibling repo and never committing payloads here. |
-| IR-55-017 | **High** | **Strike-prediction test is not a fair comparison.** Ridge orientation is perpendicular to the gradient, and the strike of a 2-D source is also perpendicular to it, so ridge-vs-field agreement is nearly built in. Result: withheld segments 43.2% (N=910) vs random ridges 87.6% (N=133,448), Fisher one-sided p=1.0. | `docs/results/tensor_lane_results.json` → `strike_test`. Reported as a failed prediction with this caveat. | Pixel-matched redesign: compare each withheld fault's own geometry against the field at the same pixels, on the same footprint. |
-| IR-55-018 | **High (fixed)** | **Azimuth sign bug.** Grid rows increase south, but azimuths were computed as if rows were north. Strikes were mirrored. | Fixed in `gems/tensor.py`. Regression test `tests_numeric/test_tensor.py::test_strike_is_north_convention_and_not_mirrored`. All reported numbers were regenerated after the fix. | None. |
-| IR-55-019 | Medium | **Dimensionality index normalisation not verified** against Pedersen & Rasmussen (1990). The index used is \|λ_min\|/\|λ_mid\|, from the Beiki TSVD abstract. | The 1990 paper was not retrievable. No independent check against the 1990 formula has been run. | Verify against the 1990 paper before publication. |
-| IR-55-020 | **High** | **Registry overlap rule is saturated.** Literal application flags 70 of 630 same-grid registry rasters, for both E1 and E3. Several registry rasters are dense, so a fixed 70% overlap threshold is easily met by chance. | `docs/results/registry_check_tensor_lane_E1.json`, `docs/results/registry_check_E3.json`. Max Spearman was 0.165 (E1). | The protocol needs a chance-corrected overlap (observed vs expected at the registry's positive density). Not yet implemented. |
-| IR-55-021 | Medium | **Acquisition blocks are not in the 19-band stack**, so the "process each block separately" step was not possible. The whole grid was processed. | Band tags, `data/README.md`. No block-ID raster was found in the 19-band stack. | Obtain block polygons from USGS GeoDAWN metadata (not reachable from this sandbox). |
-| IR-55-022 | Medium | **Sibling audit labels a projection** as `predicted_leaderboard_dti: 0.2747` for the GEMSDOE32 H33-2-B2 file (the audit JSON labels it a projection). | `docs/leaderboard-analysis.md`. | Treated as a projection. |
-| IR-55-023 | Medium | **Pages and data hosts blocked from this sandbox.** USGS S3 (`prd-tnm.s3.amazonaws.com`), the National Map downloader, ScienceBase, and OpenEI all failed to connect (curl HTTP 000, 2026-10-09). | Local curl checks. This blocks the official 1 m DEM route for any scarp hypothesis. | Obtain these from a machine with open egress, then re-verify hashes. |
-| IR-55-024 | Medium | **Merge conflict with `main`.** This branch and `main` both replaced the README and the site pages. Resolved by keeping `main`'s governing files and adding this session's results on top. Our two negative candidate TIFFs were removed from `docs/` so the no-TIFF rule (`tests/test_site_status.py`) holds. | `git merge origin/main` on `arena/6a696f4d-55gemsdoe`. | None. |
-
-### Disposition of this run
-Three holdout experiments were run (within the 3-experiment budget). Results are HOLDOUT-DTI only (see `docs/results.md`). The tensor lane is **negative**: E1 ridge baseline 0.0578 beat E2 0.0463 and E3 0.0444 on the same holdout, and the strike test failed. Nothing is cleared, no TIFF is published, and no weekly slot was used.
+1. **No leaderboard receipt.** The official leaderboard fetch returned only
+   “Loading…”. Values supplied in the owner brief and sibling pages remain
+   unverified claims; they are not `ORGANIZER-CONFIRMED`.
+2. **Strict uniqueness is saturated.** The new surface has max absolute Spearman
+   0.0223 against 56 registry rasters, but final-dot overlap within 3 px is 1.000
+   for the spacing-5 lattice and 0.736 for another prior raster. The literal
+   `>70%` stop rule therefore returns `DUPLICATE-STOP`; chance-adjusted overlap is
+   diagnostic only.
+3. **Holdout correction.** The historical quadrant evaluator was not the required
+   whole-segment hide-and-recover design. H56 uses five seeded whole-segment or
+   lattice folds, a 3 px buffer, per-fold visible-fault masking, and pooled DTI
+   components.
+4. **Data provenance.** Local payload hashes match a sibling GitHub bridge
+   manifest. The DrivenData data tab is login-gated in this environment;
+   organizer-authenticated bytes are not claimed. Do not redistribute payloads.
+5. **Acquisition blocks.** USGS documents four blocks and flight paths, but exact
+   official block polygons are not aligned in the local competition grid. True
+   block-separated FFT processing is a next-session task, not a current result.
+6. **Pseudogravity wording.** The direct RTP tensor is a constrained proxy. A
+   complete magnetic-to-pseudogravity transform requires an explicit
+   magnetization-direction convention; the pseudogravity candidate remains
+   unimplemented.
+7. **Portal range behavior.** The all-finite `-zeros.tif` removes NaN from the
+   local range check and passes the repository validator. The official format page
+   still says outside data should be null or NaN. No organizer receipt confirms
+   that this encoding is accepted, and the strict uniqueness stop is independent
+   of the range result.
+8. **Experiment cap reached.** Baseline, H56 multiscale, and gravity-only arms
+   were run. No further tuning should be done in this session.

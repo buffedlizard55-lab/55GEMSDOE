@@ -1,37 +1,43 @@
 #!/usr/bin/env python3
-"""Generate the GitHub Pages site from the measured evidence files.
+"""Build the auditable GitHub Pages site from the current run card/evidence.
 
-Every number on the site is read out of evidence/*.json or measured here from the
-rasters on disk.  Nothing is hand-transcribed, so the site cannot drift from the
-artifacts it describes.
+The page is intentionally fail-closed: format-valid does not become
+submit-cleared when the strict registry gate or the holdout promotion gate fails.
+No leaderboard value is inferred from a local holdout.
 """
-
 from __future__ import annotations
 
-import hashlib
 import html
 import json
-import sys
 from pathlib import Path
 
-import numpy as np
-import rasterio
-
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
-from gems55 import io55  # noqa: E402
-
 DOCS = ROOT / "docs"
 EVID = ROOT / "evidence"
-DL = DOCS / "downloads"
+DOWNLOADS = DOCS / "downloads"
 
+GRID = "3292 × 3730 (columns × rows), EPSG:32611, 100 m, transform (100, 0, 243350, 0, −100, 4508550)"
+TIF = "h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif"
+ZIP = "h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.zip"
+NAN = "h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-nan.tif"
+NOTE = "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots"
 
-def sha256(p: Path) -> str:
-    h = hashlib.sha256()
-    with open(p, "rb") as fh:
-        for b in iter(lambda: fh.read(1 << 20), b""):
-            h.update(b)
-    return h.hexdigest()
+CSS = """
+:root{--ink:#14271f;--muted:#5a6b62;--paper:#f5f7f2;--card:#fff;--line:#dce5dc;--green:#176747;--green2:#e5f3ea;--red:#9e332d;--redbg:#fff0ed;--amber:#8d5a10;--amberbg:#fff7e7;--shadow:0 12px 35px rgba(20,39,31,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.62 system-ui,-apple-system,Segoe UI,sans-serif}a{color:#126244;text-underline-offset:3px}a:hover{color:#093e2a}a:focus-visible{outline:3px solid #d7962d;outline-offset:3px}.wrap{max-width:1120px;margin:0 auto;padding:0 24px}.top{background:#10271e;color:#e8f3eb}.topin{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{color:#fff;text-decoration:none;font-weight:800;font-size:19px}.nav{display:flex;gap:15px;flex-wrap:wrap}.nav a{color:#d5e7da;text-decoration:none;font-size:14px}.hero{padding:58px 0 38px;background:linear-gradient(140deg,#edf5ee,#f5f7f2 65%,#e9f0e8);border-bottom:1px solid var(--line)}.eyebrow{font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;color:var(--green)}h1,h2,h3{line-height:1.18;letter-spacing:-.03em}h1{font-size:clamp(34px,5vw,54px);margin:12px 0 16px;max-width:850px}h2{font-size:clamp(24px,3vw,32px);margin:0 0 14px}h3{font-size:19px;margin:0 0 9px}.lead{font-size:18px;color:#334b3e;max-width:820px}.section{padding:42px 0}.section+.section{padding-top:10px}.banner{display:flex;gap:14px;padding:19px 21px;margin:22px 0;background:var(--redbg);border:1px solid #efc5bc;border-left:6px solid var(--red);border-radius:14px;box-shadow:var(--shadow)}.banner strong{display:block;color:#79211c;font-size:19px}.banner p{margin:4px 0;color:#633632}.audit{padding:21px;background:var(--amberbg);border:1px solid #ecd9ad;border-radius:14px;margin:22px 0}.audit strong{color:#6e4809}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.button{display:inline-flex;align-items:center;padding:11px 16px;border-radius:9px;background:var(--green);color:#fff;text-decoration:none;font-weight:800}.button.secondary{background:#fff;color:var(--green);border:1px solid var(--green)}.button.warn{background:#8d5a10;color:#fff}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 5px 20px rgba(20,39,31,.035)}.card p{color:var(--muted);margin:0}.label{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}.value{font-weight:800;font-size:21px;margin-top:6px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}.table{border-collapse:collapse;width:100%;min-width:700px}.table th,.table td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}.table th{background:#edf3ed;font-size:13px}.table tr:last-child td{border-bottom:0}.tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800;background:var(--green2);color:#28533c}.tag.red{background:#ffe2dc;color:#832d27}.tag.amber{background:#fff0ce;color:#765010}pre,code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}pre{background:#14221b;color:#e8f3eb;padding:14px;border-radius:9px;overflow:auto;font-size:13px}code{background:#edf2ee;border-radius:4px;padding:2px 5px;font-size:.92em}.small{font-size:13px;color:var(--muted)}.two{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.list li{margin:8px 0}.footer{background:#10271e;color:#d2e2d7;padding:28px 0;margin-top:30px}.footer a{color:#bde8cf}.md{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;overflow:auto}@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.topin{align-items:flex-start;flex-direction:column;padding:17px 0}}@media(max-width:520px){.wrap{padding:0 16px}.grid{grid-template-columns:1fr}.hero{padding-top:42px}}
+"""
+
+NAV = [
+    ("index.html", "Overview"),
+    ("submit.html", "Submission steps"),
+    ("results.html", "Results"),
+    ("hypotheses.html", "Hypotheses"),
+    ("method.html", "Method"),
+    ("evidence.html", "Evidence"),
+    ("leaderboard-analysis.html", "Anchor analysis"),
+    ("sources.html", "Sources"),
+    ("irregularities.html", "Irregularities"),
+]
 
 
 def load(name: str) -> dict:
@@ -39,667 +45,100 @@ def load(name: str) -> dict:
     return json.loads(p.read_text()) if p.exists() else {}
 
 
-CSS = """
-:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--acc:#4cc2ff;--ok:#3fb950;--bad:#f85149;--warn:#d29922}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
-font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
-header{padding:26px 22px;border-bottom:1px solid #21262d}
-main{max-width:1080px;margin:0 auto;padding:22px}
-h1{margin:0 0 6px;font-size:26px}h2{margin:34px 0 10px;font-size:20px;border-bottom:1px solid #21262d;padding-bottom:6px}
-h3{margin:22px 0 8px;font-size:16px;color:var(--acc)}
-p,li{color:var(--ink)}a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
-.sub{color:var(--mut);margin:0}
-table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
-th,td{border:1px solid #30363d;padding:7px 9px;text-align:left;vertical-align:top}
-th{background:#1c2129}td.num{text-align:right;font-variant-numeric:tabular-nums}
-code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-pre{background:#0b0f14;border:1px solid #30363d;border-radius:8px;padding:12px;overflow:auto;font-size:13px}
-code{background:#0b0f14;padding:1px 5px;border-radius:4px;font-size:13px}
-nav{margin-top:14px}nav a{margin-right:14px;font-size:14px}
-.dl{background:linear-gradient(135deg,#0f2f1c,#10222e);border:2px solid var(--ok);
-border-radius:12px;padding:20px;margin:18px 0}
-.dl h2{border:0;margin:0 0 10px;color:var(--ok)}
-.btn{display:inline-block;background:var(--ok);color:#04160b;font-weight:700;padding:12px 20px;
-border-radius:8px;margin:6px 8px 6px 0;font-size:16px}
-.btn.sec{background:#30363d;color:var(--ink)}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
-.pill.ok{background:#12331d;color:var(--ok);border:1px solid var(--ok)}
-.pill.bad{background:#3a1214;color:var(--bad);border:1px solid var(--bad)}
-.pill.warn{background:#332701;color:var(--warn);border:1px solid var(--warn)}
-.card{background:var(--panel);border:1px solid #30363d;border-radius:10px;padding:16px;margin:12px 0}
-.mono{font-variant-numeric:tabular-nums}
-.small{font-size:13px;color:var(--mut)}
-footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size:13px;border-top:1px solid #21262d}
-"""
-
-NAV = "".join(
-    f'<a href="{h}">{t}</a>'
-    for h, t in [
-        ("index.html", "Executive summary"),
-        ("submit.html", "How to submit"),
-        ("method.html", "Method"),
-        ("hypotheses.html", "Hypotheses"),
-        ("evidence.html", "Evidence"),
-        ("sources.html", "Sources"),
-        ("irregularities.html", "Irregularities"),
-        ("anchor-0.2778.html", "The 0.2778 anchor"),
-    ]
-) + '<span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> ' + "".join(
-    f'<a href="{h}" style="font-size:13px">{t}</a>'
-    for h, t in [
-        ("executive-summary.html", "Exec summary (v1)"),
-        ("results.html", "Results (v1)"),
-        ("data_dictionary.html", "Data dictionary"),
-        ("leaderboard-analysis.html", "Leaderboard analysis"),
-    ]
-)
-
-
 def page(title: str, body: str) -> str:
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(title)} · 55GEMSDOE</title><style>{CSS}</style></head>
-<body><header><div style="max-width:1080px;margin:0 auto">
-<h1>55GEMSDOE — tensor-dimensionality lane</h1>
-<p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN, northwestern Great Basin</p>
-<nav>{NAV}</nav></div></header><main>{body}</main>
-<footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.
-Every figure on these pages is read from a measured artifact; none is hand-transcribed.</footer>
-</body></html>"""
+    nav = " ".join(f'<a href="{h}">{t}</a>' for h, t in NAV)
+    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · 55GEMSDOE</title><style>{CSS}</style></head><body><header class="top"><div class="wrap topin"><a class="brand" href="index.html">55GEMSDOE · tensor lane</a><nav class="nav">{nav}</nav></div></header>{body}<footer class="footer"><div class="wrap"><p>Generated by <code>scripts/build_site.py</code> from the committed run card and evidence JSON.</p><p>Every scientific number is labelled HOLDOUT-DTI or ORGANIZER-CONFIRMED; this run has no organizer-confirmed score.</p></div></footer></body></html>'''
+
+
+def hero(title: str, subtitle: str, body: str = "") -> str:
+    return f'<section class="hero"><div class="wrap"><div class="eyebrow">DOE GEMS · competition 306</div><h1>{title}</h1><p class="lead">{subtitle}</p>{body}</div></section>'
+
+
+def status_banner() -> str:
+    return '''<div class="banner"><div aria-hidden="true">⛔</div><div><strong>NOT CLEARED TO SUBMIT — DUPLICATE-STOP</strong><p>The TIF below is format-valid and downloadable for audit, but the literal final-dot uniqueness gate failed. Do not spend a DrivenData slot on it.</p></div></div>'''
+
+
+def download_box() -> str:
+    return f'''<div class="audit"><strong>Audit artifact generated — download only for review</strong><p><code>{TIF}</code></p><div class="actions"><a class="button warn" href="downloads/{TIF}" download>Download audit .tif</a><a class="button secondary" href="downloads/{ZIP}" download>Download .zip</a><a class="button secondary" href="downloads/{NAN}" download>NaN-outside twin</a></div><p class="small">SHA-256: <code>43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f</code><br>Portal note: <code>{NOTE}</code></p></div>'''
 
 
 def main() -> None:
-    DOCS.mkdir(exist_ok=True)
-    grid, _ = io55.read_template()
-    lab = io55.read_labels()
-    uniq = load("uniqueness.json")
-    _subs = sorted(EVID.glob("submission_*.json"))
-    sub = json.loads(_subs[-1].read_text()) if _subs else {}
-    e1 = load("holdout_v1_n40000.json")
-    e4 = load("exp4_arrangement_n40000.json")
-    strip = load("striping_diagnostic.json")
-    meta = json.loads((ROOT / "data" / "cache" / "lane_v1.meta.json").read_text())
+    status = json.loads((DOCS / "status.json").read_text())
+    card = json.loads((DOCS / "run-card.json").read_text())
+    base = load("holdout_baseline_segment_n40000.json")
+    h56 = load("holdout_h56_ms300_900_n40000.json")
+    grav = load("holdout_h56_gravity_only_n40000.json")
+    uniq = load("uniqueness_h56_strict.json")
+    out = load("submission_h56-multiscale-tensor-persistence-40000dots-20261009T162812Z.json")
 
-    tifs = sorted(DL.glob("*-zeros.tif"))
-    primary = tifs[-1]
-    twin = Path(str(primary).replace("-zeros.tif", "-nan.tif"))
-    zpath = Path(str(primary).replace("-zeros.tif", "-zeros.zip"))
-    with rasterio.open(primary) as s:
-        arr = s.read(1)
-    npos = int((arr > 0).sum())
-    h_prim, h_twin, h_zip = sha256(primary), sha256(twin), sha256(zpath)
+    bbest = base["ridge_x_agree"]; hfull = h56["tensor_full"]; hrandom = h56["random"]
+    body = hero("A transparent fault-discovery experiment — not a cleared upload", "Tensor dimensionality tests whether strike-extended potential-field responses can be separated from compact bodies. The current H56 artifact failed the strict registry gate and is explicitly marked DO NOT SUBMIT.")
+    body += '<main class="wrap">' + status_banner() + download_box()
+    body += f'''<section class="section"><h2>Executive summary</h2><p>The H56 hypothesis was scale persistence: a fault-related response should remain near-2-D and strike-concordant at 300 m and 900 m Gaussian low-pass scales. RTP magnetic band 2 and isostatic gravity band 13 were differentiated by FFT, decomposed into traceless symmetric tensors, and combined by a geometric mean across scales.</p><p>The scientific result is negative for promotion. <b>HOLDOUT-DTI</b> full H56 tensor = <b>{hfull['pooled']['dti']:.5f}</b> with 95% CI [{hfull['fold_ci95'][0]:.5f}, {hfull['fold_ci95'][1]:.5f}], below the one-scale ridge × strike-agreement comparator <b>{bbest['pooled']['dti']:.5f}</b> with 95% CI [{bbest['fold_ci95'][0]:.5f}, {bbest['fold_ci95'][1]:.5f}]. Withheld positives: <b>{hfull['pooled']['n_truth']:,}</b>. The matched random control was {hrandom['pooled']['dti']:.5f}; H56 beats random but not the current same-evaluator best.</p></section>'''
+    body += f'''<section class="section"><h2>Four decisions at a glance</h2><div class="grid"><div class="card"><div class="label">Format</div><div class="value"><span class="tag">12/12 PASS</span></div><p>All-finite float32 GeoTIFF, [0,1], template geometry.</p></div><div class="card"><div class="label">Science</div><div class="value"><span class="tag red">NEGATIVE</span></div><p>H56 full lane did not beat the one-scale comparator.</p></div><div class="card"><div class="label">Uniqueness</div><div class="value"><span class="tag red">STOP</span></div><p>2 registry rows exceed the literal 70% dot-overlap rule.</p></div><div class="card"><div class="label">Organizer score</div><div class="value">None</div><p>No submission-page receipt is present.</p></div></div></section>'''
+    body += f'''<section class="section"><div class="two"><div><h2>What the metric rewards</h2><p>The official distance-weighted Tversky metric uses alpha 0.2, beta 0.8, and a 300 m triangular kernel. False negatives cost more than false positives, but a local holdout on mapped faults is only a proxy for the organizer's hidden new-fault labels.</p><pre>DTI = TP_w / (TP_w + 0.2 FP_w + 0.8 FN_w)</pre></div><div class="card"><h3>Grid contract</h3><p>{GRID}</p><p class="small">5,167,373 valid footprint pixels · 60,988 mapped catalogue pixels · 40,000 candidate dots.</p></div></div></section>'''
+    body += '</main>'
+    (DOCS / "index.html").write_text(page("Executive summary", body))
 
-    note = sub.get("portal_note", "")
-    name = primary.stem.replace("-zeros", "")
+    submit = hero("How to enter a submission", "The workflow is documented here so a future cleared artifact is easy to upload. This H56 file is currently blocked; the steps below are not an instruction to submit it.")
+    submit += '<main class="wrap">' + status_banner() + download_box() + f'''<section class="section"><h2>Current gate checklist</h2><div class="tablewrap"><table class="table"><tr><th>Gate</th><th>Measured state</th></tr><tr><td>Format validator</td><td><span class="tag">PASS</span> 12/12; values are finite and in [0,1].</td></tr><tr><td>Continuous surface uniqueness</td><td><span class="tag">PASS</span> max absolute Spearman {uniq.get('max_abs_surface_spearman')} vs 56 rasters.</td></tr><tr><td>Final-dot uniqueness</td><td><span class="tag red">FAIL / STOP</span> max overlap {uniq.get('max_final_dot_overlap_within_3px')}; threshold 0.70.</td></tr><tr><td>Holdout promotion</td><td><span class="tag red">FAIL</span> H56 full lane {hfull['pooled']['dti']:.5f} below one-scale comparator {bbest['pooled']['dti']:.5f}.</td></tr><tr><td>Organizer receipt</td><td>None. A local validator is not an organizer receipt.</td></tr></table></div></section><section class="section"><h2>When a future file is cleared</h2><ol class="list"><li>Download the file explicitly marked <b>OK TO SUBMIT</b>; use the all-finite <code>-zeros.tif</code> only if the current portal range validator requires it.</li><li>Optionally verify the published SHA-256 and run <code>scripts/validate_submission.py</code> against the authenticated template.</li><li>Sign in to <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DrivenData competition 306</a>; this repository never stores credentials.</li><li>Upload one single-band GeoTIFF or a zip containing one GeoTIFF. Confirm CRS EPSG:32611, 100 m resolution, bounds, float32 values [0,1], and null/NaN outside as required by the official page.</li><li>Paste the short note recorded in the run card, check the weekly cap, and submit only after the site says the uniqueness and holdout gates passed.</li></ol></section>'''
+    submit += '</main>'
+    (DOCS / "submit.html").write_text(page("Submission steps", submit))
 
-    tf = e1.get("tensor_full", {})
-    rnd = e1.get("random", {})
-    st = e1.get("strike_test", {})
-    can = e1.get("leakage_canary", {})
+    results = hero("Results and evidence", "Three preregistered experiment families were run within the session budget. Every score below is HOLDOUT-DTI, not a leaderboard result.")
+    results += '<main class="wrap">' + status_banner() + f'''<section class="section"><h2>HOLDOUT-DTI results</h2><p>Evaluator <code>src/gems55/dti55.py</code>; alpha=0.2, beta=0.8, 300 m kernel; 5 whole-segment/lattice folds with a 3 px buffer; 60,988 withheld positives; 4,000 resamples of fold DTI for the 95% CI.</p><div class="tablewrap"><table class="table"><tr><th>Arm</th><th>HOLDOUT-DTI</th><th>95% CI</th><th>Interpretation</th></tr>'''
+    rows = [("Uniform random control", hrandom, "matched null"), ("One-scale ridge × strike agreement", base["ridge_x_agree"], "current comparator"), ("One-scale full tensor", base["tensor_full"], "baseline lane"), ("H56 multiscale full tensor", hfull, "candidate; negative"), ("H56 multiscale ridge-only ablation", h56["ridge_only"], "ablation only"), ("Gravity-only tensor", grav["tensor_full"], "third experiment; negative")]
+    for name, row, interp in rows:
+        results += f"<tr><td>{name}</td><td><b>{row['pooled']['dti']:.5f}</b></td><td>[{row['fold_ci95'][0]:.5f}, {row['fold_ci95'][1]:.5f}]</td><td>{interp}</td></tr>"
+    results += f'''</table></div></section><section class="section"><h2>Leakage canary</h2><p>H56 maximum single-feature AUC was <b>{card['leakage_canary']['max_auc']:.4f}</b>, below the preregistered 0.90 leakage threshold. This is a diagnostic, not a performance score.</p><h2>Strike diagnostic</h2><p>On the H56 catalogue proxy, 273 withheld segments had a 26.0% within-20° match versus 22.4% for sampled random ridges. The mean angular-difference CI was [−12.50°, −7.21°]. Because the ridge/tensor orientation comparison can be geometrically coupled, this is not a promotion gate.</p><h2>Artifacts</h2><ul><li><a href="../evidence/holdout_baseline_segment_n40000.json">baseline evidence JSON</a></li><li><a href="../evidence/holdout_h56_ms300_900_n40000.json">H56 evidence JSON</a></li><li><a href="../evidence/holdout_h56_gravity_only_n40000.json">gravity-only evidence JSON</a></li><li><a href="../evidence/uniqueness_h56_strict.json">strict uniqueness evidence JSON</a></li><li><a href="run-card.json">run card</a> · <a href="status.json">status JSON</a></li></ul></section>'''
+    results += '</main>'
+    (DOCS / "results.html").write_text(page("Results", results))
+    (DOCS / "executive-summary.html").write_text(page("Executive summary", body))
 
-    # ---------------- index -------------------------------------------------
-    idx = f"""
-<div class="dl">
-<h2>DOWNLOAD THE SUBMISSION</h2>
-<p style="margin:4px 0 12px"><b>{html.escape(name)}</b></p>
-<a class="btn" href="downloads/{primary.name}" download>⬇ Download the .tif to submit</a>
-<a class="btn sec" href="downloads/{zpath.name}" download>⬇ Download .zip</a>
-<a class="btn sec" href="downloads/{twin.name}" download>NaN-outside twin</a>
-<p style="margin:12px 0 4px"><b>Upload the first file (<code>{html.escape(primary.name)}</code>).</b>
-It is the all-finite encoding, which is the one the portal's
-<code>[0,1]</code> range check accepts.</p>
-<p class="small">Portal “Note” field (optional, {len(note)}/140 chars):
-<code>{html.escape(note)}</code></p>
-</div>
+    hypotheses_md = (DOCS / "hypotheses.md").read_text()
+    hyp = hero("Hypotheses before implementation", "Five candidates were preregistered inside the tensor-dimensionality lane. H56 was the top candidate and was tested without new external data.")
+    hyp += '<main class="wrap"><section class="section"><h2>Preregistered shortlist</h2><div class="md">' + html.escape(hypotheses_md) + '</div></section></main>'
+    (DOCS / "hypotheses.html").write_text(page("Hypotheses", hyp))
 
-<div class="card">
-<h3 style="margin-top:0">Is it OK to download and submit this file?</h3>
-<table>
-<tr><th>Question</th><th>Answer</th><th>Evidence</th></tr>
-<tr><td>Does it meet the official format contract?</td>
-<td><span class="pill ok">YES — 12/12 checks</span></td>
-<td>single band, float32, EPSG:32611, 3730×3292, transform
-(100,0,243350,0,−100,4508550), every value in [0,1], no NaN, no dot on a mapped
-catalogue pixel. Re-read from the written bytes by
-<code>scripts/validate_submission.py</code>.</td></tr>
-<tr><td>Will it trip “Predicted values must be in range [0, 1]”?</td>
-<td><span class="pill ok">NO</span></td>
-<td>min 0.0, max 1.0, NaN count 0 across all {grid.width*grid.height:,} cells.</td></tr>
-<tr><td>Is it unique vs every earlier scored raster?</td>
-<td><span class="pill ok">YES</span></td>
-<td>max |Spearman| {uniq.get('max_spearman_dense')} vs {uniq.get('n_registry')} prior
-rasters (threshold 0.90); max Jaccard {uniq.get('max_jaccard')}; density-matched
-3-px overlap {uniq.get('max_frac_within_3px_density_matched')} (threshold 0.70).</td></tr>
-<tr><td>Is it <i>expected</i> to beat the current best score?</td>
-<td><span class="pill bad">NO — negative result</span></td>
-<td>On the leakage-free spatial holdout this surface scores
-{tf.get('pooled',{}).get('dti',0):.4f} pooled DTI versus
-{rnd.get('pooled',{}).get('dti',0):.4f} for a uniform-random control at the same
-mass. It has not beaten the control, so it must not be promoted into a weekly
-slot on the strength of this evidence.</td></tr>
-</table>
-<p><b>Bottom line:</b> the file is <i>format-safe and legal to upload</i>, and it is
-<i>scientifically a negative result</i>. Upload it only if you want the negative
-result on the board; do not expect it to beat 0.3195.</p>
-</div>
+    method = hero("Method and reproducibility", "A single canonical stack feeds the evaluator, writer, validator, and registry checker. The method is designed to fail closed when evidence is missing.")
+    method += f'''<main class="wrap"><section class="section"><h2>H56 pipeline</h2><ol class="list"><li>Read official bands 2 (RTP magnetic) and 13 (isostatic gravity) and the sample footprint.</li><li>Nearest-valid fill only for derivative preparation; robust along-track levelling; mirror-padded FFT derivatives after 300 m and 900 m low-pass filters.</li><li>Build the six-component symmetric traceless potential-field tensor, eigenvalues, dimensionality invariant, intermediate-eigenvector strike, ridge tangent, plunge, and coherence-based line mask.</li><li>Geometric-mean the two scale scores; mask mapped catalogue pixels only during holdout/submission emission, never as a feature of the continuous geophysical surface.</li><li>Hold out whole catalogue segments with a buffer, mask visible faults per fold, pool DTI components, and run the leakage canary.</li><li>Write all-finite and NaN-outside comparison GeoTIFFs, re-read bytes, and check surface and final-dot uniqueness.</li></ol><h2>Official geometry</h2><p>{GRID}</p><h2>Key commands</h2><pre>python scripts/prepare_data.py
+python scripts/build_lane.py --tag h56_ms300_900 --scales-m 300,900
+python scripts/evaluate_holdout.py --tag h56_ms300_900 --n-dots 40000
+python scripts/submission_writer.py --tag h56_ms300_900 --n-dots 40000 --seed 5609
+python scripts/validate_submission.py docs/downloads/*h56*-zeros.tif
+python scripts/verify_unique.py &lt;tif&gt; --surface data/cache/lane_h56_ms300_900.npz</pre><h2>Important boundary</h2><p>The USGS release documents four acquisition blocks, but verified block polygons are not locally aligned to the competition grid. The current implementation must not claim true per-block FFT processing. Likewise, direct RTP tensor differentiation is not silently described as a fully magnetization-assumption-aware pseudogravity transform.</p></section></main>'''
+    (DOCS / "method.html").write_text(page("Method", method))
 
-<h2>Executive summary</h2>
-<p>This session ran one lane of the parallel-run protocol: <b>tensor
-dimensionality</b>. The claim under test is that the gradient tensor of a
-potential field separates <i>strike-extended</i> structures (faults, contacts)
-from <i>compact</i> ones (intrusions, vents), which ordinary gradient-ridge
-detectors cannot do, because both produce ridges.</p>
-<p>The lane was implemented end to end on the official 19-layer feature grid:
-FFT horizontal and vertical derivatives of the reduced-to-pole magnetic (band 2)
-and isostatic gravity (band 13) grids, per-pixel eigen-decomposition of the
-resulting 3×3 tensor, a scale-free dimensionality index, and a strike azimuth
-from the intermediate eigenvector. Ridges were then gated on being near-2-D
-<i>and</i> on the eigenvector strike agreeing with the ridge's own orientation.</p>
-<p><b>Two findings.</b></p>
-<ol>
-<li><b>The strike prediction is confirmed.</b> Withheld faults' strikes agree with
-the tensor strike more often than random ridges' do:
-{st.get('frac_within_20deg_withheld',0):.3f} of withheld segments within 20°
-versus {st.get('frac_within_20deg_random',0):.3f} for random ridge pixels
-(+{st.get('lift_fraction_points',0)*100:.1f} percentage points). Mean |Δθ|
-{st.get('mean_abs_dtheta_withheld_deg',0):.2f}° versus
-{st.get('mean_abs_dtheta_random_deg',0):.2f}° — and 45.0° is exactly the
-expected mean for uniformly random undirected angles, so the null is calibrated.
-The 95% bootstrap CI on the difference is
-[{st.get('mean_diff_ci95',[0,0])[0]:.2f}, {st.get('mean_diff_ci95',[0,0])[1]:.2f}]°,
-which excludes zero.</li>
-<li><b>The locator claim fails.</b> Emitted as a prediction surface, the lane does
-not beat uniform placement. That is a negative result and it is reported as one.</li>
-</ol>
+    sources = hero("Verified sources", "Primary sources are separated from local measurements and user-reported leaderboard claims.")
+    sources += '''<main class="wrap"><section class="section"><div class="tablewrap"><table class="table"><tr><th>Source</th><th>What was verified</th><th>Boundary</th></tr><tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a></td><td>Task, provided features, DTI formula, alpha/beta, 300 m kernel, and GeoTIFF contract.</td><td>Does not confirm a score for a named artifact.</td></tr><tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">DrivenData leaderboard</a></td><td>URL is official; this review fetch returned client-side “Loading…”.</td><td>No current row/receipt is claimed.</td></tr><tr><td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">Official reference solution</a></td><td>GitHub repository and baseline notebook exist.</td><td>It is a reference, not our holdout evaluator.</td></tr><tr><td><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">USGS GeoDAWN overview</a> · <a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">ScienceBase release</a></td><td>Survey purpose, four acquisition blocks, flight paths and processing context; DOI 10.5066/P93LGLVQ.</td><td>Exact block polygons are not yet aligned locally.</td></tr><tr><td><a href="https://doi.org/10.1190/1.1442807">Pedersen &amp; Rasmussen 1990</a> · <a href="https://doi.org/10.1190/1.3484098">Beiki &amp; Pedersen 2010</a> · <a href="https://doi.org/10.1190/1.3555343">Beiki et al. 2011</a></td><td>Peer-reviewed tensor dimensionality/eigenvector/pseudogravity references.</td><td>Method literature does not establish fault presence without geological validation.</td></tr><tr><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11333590/">Open-access Scientific Reports discussion</a></td><td>Explains dimensionality indicator context and its 0–1 interpretation.</td><td>Secondary explanation, not organizer data.</td></tr></table></div></section></main>'''
+    (DOCS / "sources.html").write_text(page("Sources", sources))
 
-<h2>Why the locator failed — the metric algebra</h2>
-<p>The official metric decomposes exactly. Because
-<code>TP_w = Σ<sub>g</sub> m<sub>g</sub></code> and
-<code>FN_w = Σ<sub>g</sub> (1 − m<sub>g</sub>)</code> over the same truth pixels,
-<code>TP_w + FN_w = |G|</code> identically, so</p>
-<pre>DTI = TP_w / (0.2·N + 0.8·|G|)      where N = number of predicted pixels</pre>
-<p>This was verified numerically: an empty prediction gives TP_w = 0 and
-FN_w = {int((lab==1).sum()):,} = |G| exactly, and the closed form reproduces the
-measured DTI to four decimals at eight different dot budgets. The consequence is
-that <b>coverage</b>, not per-pixel precision, is what pays: a false positive
-costs 0.2 while an uncovered truth pixel costs 0.8. Measured over the official
-footprint, uniform placement peaks at DTI ≈ 0.198 near N ≈ 258,000 on the
-catalogue proxy, and the mean kernel credit per pixel there is only
-0.029–0.041. Any ranking surface has to beat that average, and this one does not.</p>
+    irr = hero("Irregularities and review flags", "These are explicit blockers or caveats, not hidden assumptions.")
+    irr += '''<main class="wrap"><section class="section"><ol class="list"><li><b>Leaderboard receipt unavailable.</b> The official leaderboard fetch returned only “Loading…”. Values in the owner prompt and sibling pages are user/sibling claims until a submission-page receipt is available.</li><li><b>Strict registry gate is saturated.</b> The new surface is weakly correlated with the registry (max absolute Spearman 0.0223), but the final-dot overlap rule stops on the spacing-5 lattice (1.000) and another raster (0.736). Chance-adjusted overlap is diagnostic only.</li><li><b>Holdout correction.</b> The historical quadrant evaluator was not the required whole-segment hide-and-recover design. H56 uses five seeded whole-segment/lattice folds, a 3 px buffer, per-fold visible-fault masking, and pooled components.</li><li><b>Data provenance.</b> The local payload hashes match a sibling GitHub bridge manifest. The DrivenData data tab is login-gated in this environment; organizer-authenticated bytes are not claimed. Do not redistribute the payload.</li><li><b>Acquisition blocks.</b> USGS documents four blocks and flight paths, but the exact official polygons are not in the local 19-band stack. True block-separated FFT processing is a next-session task, not a current result.</li><li><b>Pseudogravity wording.</b> The current direct RTP tensor is a constrained proxy. A complete magnetic-to-pseudogravity transform requires an explicit magnetization-direction convention; candidate H5 remains unimplemented.</li><li><b>Portal range error.</b> The all-finite `-zeros.tif` removes NaN from the range check and passes the local validator. The official format page still says outside data should be null or NaN; there is no organizer receipt for this artifact, so it is not asserted to be accepted.</li><li><b>Three-experiment cap reached.</b> Baseline, H56 multiscale, and gravity-only arms were run. No further tuning should be done in this session.</li></ol></section></main>'''
+    (DOCS / "irregularities.html").write_text(page("Irregularities", irr))
 
-<h2>Numbers</h2>
-<table>
-<tr><th>Item</th><th>Value</th></tr>
-<tr><td>Grid</td><td class="mono">{grid.width} × {grid.height} (w×h), EPSG:{grid.crs},
-100 m, transform (100, 0, 243350, 0, −100, 4508550)</td></tr>
-<tr><td>Footprint / catalogue</td><td class="mono">{int(grid.footprint.sum()):,} valid px /
-{int((lab==1).sum()):,} mapped fault px</td></tr>
-<tr><td>Submission</td><td class="mono">{npos:,} unit dots, 0 on catalogue px,
-0 outside footprint</td></tr>
-<tr><td>SHA-256 (.tif)</td><td class="mono small">{h_prim}</td></tr>
-<tr><td>SHA-256 (.zip)</td><td class="mono small">{h_zip}</td></tr>
-<tr><td>SHA-256 (NaN twin)</td><td class="mono small">{h_twin}</td></tr>
-<tr><td>Lane surface</td><td class="mono">mean dim {meta['dim_stats']['mean']:.3f},
-p10 {meta['dim_stats']['p10']:.3f}, p90 {meta['dim_stats']['p90']:.3f};
-{meta['n_striping_masked']:,} px survey-line masked</td></tr>
-<tr><td>Tests</td><td class="mono">16 passed (metric exactness vs brute force, analytic
-harmonic solution, eigen-decomposition vs numpy, dimensionality endpoints,
-grid contract)</td></tr>
-</table>
+    leader = hero("Leaderboard claims and the 0.2778 anchor", "A score shown in a sibling report is not an organizer-confirmed receipt.")
+    leader += '''<main class="wrap"><section class="section"><p>The named H33 entry and the values 0.2778, 0.3195, 0.3774, and later sibling values were supplied in the owner brief or sibling repositories. The official leaderboard page was not machine-readable in this review, so none is copied into the run card as ORGANIZER-CONFIRMED. The useful local conclusion is metric algebra: sparse unit dots can exploit the lower false-positive weight only when they are actually near hidden faults; a local mapped-fault holdout cannot prove that.</p><p>See the <a href="anchor-0.2778.html">historical 0.2778 analysis</a> for the evidence classification and the official <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">metric definition</a>.</p></section></main>'''
+    (DOCS / "leaderboard-analysis.html").write_text(page("Leaderboard analysis", leader))
 
-<h2>Run card</h2>
-<pre>{html.escape(json.dumps(load("runcard.json") or {}, indent=2))}</pre>
-"""
+    evidence = hero("Evidence index", "Machine-readable artifacts are kept beside the code so every claim can be rerun or challenged.")
+    evidence += '<main class="wrap"><section class="section"><h2>Current H56 review</h2><ul class="list">'
+    legacy = []
+    for p in sorted(EVID.glob("*.json")):
+        if "h55" in p.name or p.name in {"holdout_v1_n40000.json"}:
+            legacy.append(p)
+            continue
+        evidence += f'<li><a href="../evidence/{html.escape(p.name)}"><code>{html.escape(p.name)}</code></a></li>'
+    evidence += '</ul><h2>Historical / retired artifacts</h2><p class="small">These files are retained for audit provenance only. They are not the current candidate, are not submission receipts, and must not be read as current H56 results.</p><ul class="list">'
+    for p in legacy:
+        evidence += f'<li><span class="tag amber">ARCHIVED</span> <a href="../evidence/{html.escape(p.name)}"><code>{html.escape(p.name)}</code></a></li>'
+    evidence += '</ul></section></main>'
+    (DOCS / "evidence.html").write_text(page("Evidence", evidence))
 
-    # ---------------- submit ------------------------------------------------
-    sub_body = f"""
-<h2>How to submit this file to the competition</h2>
-<div class="dl">
-<h2>STEP 1 — download</h2>
-<a class="btn" href="downloads/{primary.name}" download>⬇ {html.escape(primary.name)}</a>
-<p class="small">SHA-256 <code>{h_prim}</code></p>
-</div>
-<ol>
-<li><b>Download</b> the file above. Use the <code>-zeros</code> encoding, not the
-<code>-nan</code> twin.</li>
-<li><b>Optionally verify</b> the bytes:
-<pre>sha256sum {primary.name}
-# expect {h_prim}</pre></li>
-<li><b>Sign in</b> to DrivenData and open
-<a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS
-Prize Challenge → Submit</a>. Uploads need a human login; this project holds no
-credentials.</li>
-<li><b>Choose the file</b> under “File to submit”. A single-band GeoTIFF or a zip
-containing one GeoTIFF is accepted.</li>
-<li><b>Paste the note</b> ({len(note)} characters, the field is optional):
-<pre>{html.escape(note)}</pre></li>
-<li><b>Submit.</b> Check the weekly submission cap on the submission page first —
-promotion into a real slot is a separate decision from generating a file.</li>
-</ol>
-
-<h2>Why the <code>-zeros</code> file and not the <code>-nan</code> twin</h2>
-<p>The official rules allow either encoding — “data outside the bounds is null or
-nan”. But the portal also enforces <code>Predicted values must be in range
-[0, 1]</code>. A NaN outside the footprint can fail that check depending on how
-the validator folds NaN into its min/max. The <code>-zeros</code> file has
-<b>zero</b> NaN cells and every value in [0, 1], so it cannot trip the range
-check. The NaN twin is provided only for comparison.</p>
-
-<h2>Format contract, measured from the organiser template</h2>
-<table>
-<tr><th>Requirement (official problem description)</th><th>This file</th></tr>
-<tr><td>Same projected CRS as the training data (EPSG:32611)</td><td>EPSG:32611</td></tr>
-<tr><td>Same resolution as the training data (100 m)</td><td>100 m × 100 m</td></tr>
-<tr><td>Same bounds as the training data</td>
-<td>{grid.width}×{grid.height}, transform (100, 0, 243350, 0, −100, 4508550)</td></tr>
-<tr><td>Data outside the bounds null or NaN</td><td>0.0 outside (all-finite encoding)</td></tr>
-<tr><td>Single layer, float32, values in [0, 1]</td><td>1 band, float32, min 0.0 max 1.0</td></tr>
-</table>
-<p class="small">The template <code>sample_submission.tif</code> was cross-verified
-by git blob SHA <code>7d865a9921a40ed2ea4c742a6a25b1fa2f357c5a</code> (1,599,597
-bytes) across five independently built prior repositories — an identical
-content-addressed SHA means identical bytes.</p>
-"""
-
-    # ---------------- method ------------------------------------------------
-    meth = f"""
-<h2>Method</h2>
-<h3>1. Inputs</h3>
-<p>The official 19-layer GeoTIFF (<code>gems-geodawn-numerical-features.tif</code>,
-418,912,844 bytes, 19 bands, float32, EPSG:32611, 100 m). Band 2 is the
-reduced-to-pole magnetic anomaly; band 13 is the isostatic gravity anomaly. Both
-carry 5,165,852 valid cells (sentinel −3.4e38 elsewhere).</p>
-<h3>2. Levelling and filtering</h3>
-<p>NaN cells are filled by exact nearest-neighbour. Each grid is then levelled
-inside its acquisition blocks by subtracting the robust along-track profile
-(the standard micro-levelling step) and band-passed to the 400 m – 6 km
-structural band. Derivative operators amplify noise by |k| and |k|², so the
-low-pass precedes differentiation.</p>
-<h3>3. FFT gradient tensor</h3>
-<p>With angular wavenumbers (kx, ky), |k| = hypot(kx, ky), z positive downward
-and sources beneath the observation plane:</p>
-<pre>Txx ↔ −kx²·F      Tyy ↔ −ky²·F      Txy ↔ −kx·ky·F
-Tzz ↔ +|k|²·F  = −(Txx+Tyy)         (trace T = 0, Laplace, by construction)
-Txz ↔ +i·kx·|k|·F                   Tyz ↔ +i·ky·|k|·F</pre>
-<p>For the magnetic grid this is the pseudo-gravity gradient tensor: the field is
-already reduced to pole and the vertical derivative is the |k| operator. The
-sign convention was checked against an analytic harmonic solution
-(V = e^{{+kz}} sin(kx·x)) in <code>tests/test_core.py</code> — that test caught a
-unit error (radians per pixel versus per metre) during development.</p>
-<h3>4. Dimensionality and strike</h3>
-<p>Eigenvalues come from the closed-form trigonometric solution for a symmetric
-3×3 matrix (checked against <code>numpy.linalg.eigh</code>). The dimensionality
-indicator is the scale-free invariant form</p>
-<pre>I = 27·(λ1λ2λ3)² / (4·(−(λ1λ2+λ1λ3+λ2λ3))³)</pre>
-<p>with the two documented endpoints exact and unit-tested: I = 0 for a
-strike-extended 2-D source (λ = a, 0, −a) and I = 1 for an equidimensional 3-D
-source (λ = 2a, −a, −a). The eigenvalue ratio D = −λ2/λ1 (0 for 2-D, ½ for a
-point mass) is computed alongside it. Strike is the geographic azimuth of the
-intermediate eigenvector, weighted by how horizontal that eigenvector is.</p>
-<h3>5. Gating</h3>
-<pre>score = ridge × (1 − I) × exp(−(Δθ/25°)²) × plunge-weight × 0.25·[not survey line]</pre>
-<p>where <code>ridge</code> is the corroborated horizontal-gradient rank of the two
-fields (geometric mean, so a ridge must appear in both magnetics and gravity),
-and Δθ is the angle between the eigenvector strike and the ridge's own tangent
-(gradient azimuth + 90°).</p>
-<h3>6. Survey-line masking</h3>
-<p>The lane brief asserts east–west flight-line striping. Three independent
-measurements on these two grids contradict that: the 1–20 km spectral annulus
-carries more power with its wavevector along east–west (0.104 and 0.222) than
-along north–south (0.089 and 0.166), and the 6 km-lag coherence is higher along
-north–south for both fields. The azimuth convention was itself verified on a
-synthetic field before the decision. The <b>measured</b> direction (north–south)
-is masked, not the assumed one. A test documents why the mask cannot come from
-the tensor: a field varying only across the flight lines has eigenvalues
-(|f″|, 0, −|f″|) — indistinguishable from a 2-D source with strike along the
-lines.</p>
-<h3>7. Emission</h3>
-<p>{npos:,} unit dots at non-maximum-suppressed peaks of the score with 3 px
-separation, never on a mapped catalogue pixel (expected credit 0, guaranteed
-false-positive cost) and never outside the footprint.</p>
-"""
-
-    # ---------------- hypotheses --------------------------------------------
-    hyp = """
-<h2>Candidate hypotheses, ranked</h2>
-<p>Five candidates were ranked by expected DTI improvement against implementation
-cost before any code was written. Only the top one was built. The ranking is
-reproduced here with the outcome, because the outcome changes the ranking.</p>
-<table>
-<tr><th>#</th><th>Hypothesis</th><th>Layer(s)</th><th>Signature targeted</th>
-<th>Why it should catch an unmapped fault</th><th>New vs this repo</th><th>Rank</th></tr>
-<tr><td>1</td><td><b>Tensor dimensionality</b> — a fault is strike-extended, an
-intrusion or vent is compact; the gradient tensor's eigenvalues tell them apart
-and the intermediate eigenvector gives strike.</td>
-<td>2 (RTP mag), 13 (isostatic gravity)</td>
-<td>FFT gradient tensor → eigenvalues + eigenvectors; dimensionality index;
-strike-agreement gate on gradient ridges</td>
-<td>Gradient-ridge detectors fire on both faults and intrusions, so ridge maps
-are dominated by compact bodies that experts have already mapped. Removing
-compact signatures should leave the elongated, less conspicuous traces that
-mapping effort skipped.</td>
-<td>Nothing in this repo (the repo was empty apart from a stub README)</td>
-<td><b>1</b> — built and validated</td></tr>
-<tr><td>2</td><td><b>Coverage-optimal emission</b> — the metric's own algebra, not
-geology, sets the score.</td><td>none (metric-only)</td>
-<td>DTI = TP_w/(0.2N + 0.8|G|); greedy maximum-expected-credit placement</td>
-<td>Not a discovery hypothesis: it says the placement problem, not the ranking
-problem, dominates.</td><td>new</td>
-<td><b>2</b> — validated as the dominant term; see evidence</td></tr>
-<tr><td>3</td><td><b>Strain-rate dilatation corridors</b> — unmapped faults sit in
-dilating crust.</td><td>8 (dilatation rate), 7 (shear rate), 4 (second invariant)</td>
-<td>Local maxima of dilatation aligned with low second-invariant corridors</td>
-<td>Geodetic strain accumulates on structures whether or not they are mapped, and
-the strain grid is independent of the imagery that drove the original mapping.</td>
-<td>new</td><td>3 — not built (budget)</td></tr>
-<tr><td>4</td><td><b>Conductivity–gravity discordance</b> — a fault zone is
-conductive but not density-contrasting.</td><td>17 (surface conductivity),
-15 (depth to conductive base), 13 (isostatic gravity)</td>
-<td>Signed residual of conductivity regressed on gravity, band-passed</td>
-<td>Hydrothermal alteration raises conductivity without a gravity signature, so
-the residual isolates altered damage zones that neither field shows alone.</td>
-<td>new</td><td>4 — not built (budget)</td></tr>
-<tr><td>5</td><td><b>Top-of-magnetic-source depth steps</b> — faults offset the
-magnetic basement.</td><td>15 (depth to basement), 2 (RTP mag)</td>
-<td>Laplacian of the depth surface co-located with RTP ridges</td>
-<td>A mapped fault need not offset the basement; an unmapped one that does is
-visible only in the depth surface.</td><td>new</td><td>5 — not built (budget)</td></tr>
-</table>
-<div class="card">
-<h3 style="margin-top:0">Outcome, and what it does to the ranking</h3>
-<p>Candidate 1 was built and validated. Its strike prediction held; its locator
-did not. Candidate 2 — which is not geology at all — turned out to dominate the
-score, and that is the most useful thing this session produced. Candidates 3–5
-are untouched and are the natural next lanes, but on this evidence they should be
-evaluated <i>as a ranking inside a coverage-optimal emitter</i>, not as standalone
-ridge maps, because a standalone ridge map is beaten by uniform placement.</p>
-</div>
-"""
-
-    # ---------------- evidence ----------------------------------------------
-    arms = "".join(
-        f"<tr><td>{html.escape(a)}</td>"
-        f"<td class='num'>{e1[a]['pooled']['dti']:.4f}</td>"
-        f"<td class='num'>{e1[a]['fold_mean']:.4f}</td>"
-        f"<td class='num'>{e1[a]['fold_sd']:.4f}</td>"
-        f"<td class='num'>[{e1[a]['fold_ci95'][0]:.4f}, {e1[a]['fold_ci95'][1]:.4f}]</td>"
-        f"<td class='num'>{e1[a]['pooled']['tp_w']:.1f}</td></tr>"
-        for a in ("random", "ridge_only", "ridge_x_dim", "ridge_x_agree", "tensor_full")
-    )
-    _rows = []
-    for k, v in can.items():
-        badge = ('<span class="pill bad">FLAGGED</span>' if v["auc_mean"] > 0.9
-                 else '<span class="pill ok">ok</span>')
-        folds = [round(x, 3) for x in v["auc_per_fold"]]
-        _rows.append(f"<tr><td>{html.escape(k)}</td><td class='num'>{v['auc_mean']:.4f}</td>"
-                     f"<td class='small'>{folds}</td><td>{badge}</td></tr>")
-    canary = "".join(_rows)
-    arr = "".join(
-        f"<tr><td>{html.escape(k)}</td><td class='num'>{v['dti']:.4f}</td>"
-        f"<td class='num'>{v['n_pred_pos']:,}</td><td class='num'>{v['wbar']:.4f}</td></tr>"
-        for k, v in e4.get("runs", {}).items()
-    )
-    ev = f"""
-<h2>Evidence</h2>
-<h3>1. Spatially-blocked holdout (leakage-free), 4 contiguous quadrants, N = 40,000</h3>
-<p>Label: <b>HOLDOUT-DTI</b>. This is a local instrument, not an organiser score.
-Each fold's quadrant catalogue is hidden, buffered 3 px, and excluded from that
-fold's visible set; emission is masked from visible faults pixel-exactly. No
-catalogue-derived feature can reach a withheld quadrant, so the catalogue-annulus
-prior is structurally unavailable here — that is what makes this the honest test
-of the geophysics.</p>
-<table><tr><th>Arm</th><th>Pooled DTI</th><th>Fold mean</th><th>Fold SD</th>
-<th>Fold 95% CI</th><th>TP_w</th></tr>{arms}</table>
-<p>The uniform-random control is the best arm. Every tensor-gated variant is
-below it.</p>
-
-<h3>2. Strike test — the lane's own prediction</h3>
-<table>
-<tr><th>Quantity</th><th>Value</th></tr>
-<tr><td>Withheld segments tested (≥25 px)</td><td class="num">{st.get('n_withheld_segments')}</td></tr>
-<tr><td>Random ridge pixels (null)</td><td class="num">{st.get('n_random_ridge'):,}</td></tr>
-<tr><td>Mean |Δθ|, withheld segments</td><td class="num">{st.get('mean_abs_dtheta_withheld_deg'):.2f}°</td></tr>
-<tr><td>Mean |Δθ|, random ridges</td><td class="num">{st.get('mean_abs_dtheta_random_deg'):.2f}°</td></tr>
-<tr><td>Within 20°, withheld / random</td>
-<td class="num">{st.get('frac_within_20deg_withheld'):.3f} / {st.get('frac_within_20deg_random'):.3f}</td></tr>
-<tr><td>Lift in percentage points</td><td class="num">+{st.get('lift_fraction_points',0)*100:.1f}</td></tr>
-<tr><td>95% bootstrap CI of the mean difference</td>
-<td class="num">[{st.get('mean_diff_ci95',[0,0])[0]:.2f}, {st.get('mean_diff_ci95',[0,0])[1]:.2f}]°</td></tr>
-</table>
-<p class="small">45.0° is the exact expected mean |Δθ| for two independent
-undirected azimuths, so the null column confirms the comparison is calibrated.</p>
-
-<h3>3. Leakage canary (single-feature AUC against hidden truth)</h3>
-<table><tr><th>Feature</th><th>Mean AUC</th><th>Per fold</th><th>Verdict</th></tr>{canary}</table>
-<p class="small">No lane feature exceeds 0.90. The catalogue-distance control is
-reported for reference: its AUC of 1.000 in folds 1–3 is a <i>definitional</i>
-artefact of measuring it against fold 0's visible set (those pixels are inside
-fold 0's visible catalogue), not a leak in a lane feature. See irregularities
-IR-55-06.</p>
-
-<h3>4. Arrangement sweep (same holdout, N = 40,000)</h3>
-<table><tr><th>Arm</th><th>Pooled DTI</th><th>Dots</th><th>Mean credit / dot</th></tr>{arr}</table>
-<p>Increasing the NMS separation makes every arm monotonically worse, so the
-arrangement knob does not rescue the ranking. Uniform placement stays on top.</p>
-
-<h3>5. Metric algebra, verified</h3>
-<p><code>TP_w + FN_w = |G|</code> exactly (measured: 0 + {int((lab==1).sum()):,}
-on an empty prediction), so <code>DTI = TP_w/(0.2N + 0.8|G|)</code>. The closed
-form reproduces the measured DTI to four decimals at N from 25,836 to 5,167,373,
-and uniform placement over the footprint peaks near 0.198 at N ≈ 258,000 on the
-catalogue proxy.</p>
-
-<h3>6. Segment-level holdout — measured but NOT usable as a forecast</h3>
-<p>A second holdout that withholds <i>whole fault segments</i> rather than whole
-quadrants produced much larger numbers (up to 0.4982 pooled DTI for a
-catalogue-annulus prior at 29,843 dots). Those numbers are reported for
-completeness and are <b>flagged as leakage</b>: splitting a mapped trace on a
-20-px lattice leaves the visible continuation of the same trace flanking every
-withheld piece, so the task degenerates into gap-filling. See IR-55-05. No
-submission was built from that holdout.</p>
-
-<h3>7. Survey-line diagnostic</h3>
-<pre>{html.escape(json.dumps(strip.get("decision", {}), indent=2))}</pre>
-"""
-
-    # ---------------- sources -----------------------------------------------
-    src = """
-<h2>Sources</h2>
-<p>Every claim on this site traces to one of these. Links are given for manual
-review; each was retrieved on 2026-10-09.</p>
-<table>
-<tr><th>Source</th><th>What it was used for</th><th>Link</th></tr>
-<tr><td>Official problem description</td>
-<td>Task, the 19 provided layers, the distance-weighted Tversky definition
-(α=0.2, β=0.8, 300 m triangular kernel), and the four-point submission contract</td>
-<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">drivendata.org/competitions/306/.../page/967/</a></td></tr>
-<tr><td>Competition landing page</td><td>Structure and rules entry point</td>
-<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">drivendata.org/competitions/306/competition-doe-gems/</a></td></tr>
-<tr><td>Organiser reference solution</td>
-<td>Band naming convention, the <code>X &lt; −1e38 → NaN</code> sentinel rule, and the
-Tversky loss parameters. Reviewed in full; it does not implement the scoring
-evaluator, so the problem-description page remains the scoring authority.</td>
-<td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">github.com/drivendataorg/gems-prize-reference-solution</a></td></tr>
-<tr><td>Pedersen &amp; Rasmussen (1990), <i>Geophysics</i> 55(12) 1558–1566</td>
-<td>Gradient tensor of potential-field anomalies; the dimensionality concept</td>
-<td><a href="https://doi.org/10.1190/1.1442807">doi.org/10.1190/1.1442807</a></td></tr>
-<tr><td>Beiki &amp; Pedersen (2010), <i>Geophysics</i> 75(6) I37–I49</td>
-<td>Eigenvector analysis: largest-eigenvalue eigenvector points at the causative
-body; an eigenvector gives the strike of quasi-2-D bodies</td>
-<td><a href="https://doi.org/10.1190/1.3484098">doi.org/10.1190/1.3484098</a></td></tr>
-<tr><td>Karimi &amp; Kletetschka (2024), <i>Sci. Rep.</i> 14:2440 (open access)</td>
-<td>Restates the Pedersen–Rasmussen dimensionality indicator with I = 0 for pure
-2-D and I = 1 for pure 3-D; used to pin the invariant form and its endpoints</td>
-<td><a href="https://doi.org/10.1038/s41598-024-52843-5">doi.org/10.1038/s41598-024-52843-5</a>
-· <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11333590/">PMC11333590</a></td></tr>
-<tr><td>Beiki et al. (2011), ASEG Extended Abstracts</td>
-<td>Pseudo-gravity gradient tensor from gridded magnetic anomalies; 0.5 threshold
-between 2-D and 3-D</td>
-<td><a href="https://doi.org/10.1071/ASEG2012ab057">doi.org/10.1071/ASEG2012ab057</a></td></tr>
-<tr><td>USGS GeoDAWN data release</td>
-<td>Provenance of the airborne magnetic and radiometric surveys behind the
-magnetic layers</td>
-<td><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">usgs.gov/data/geodawn-…</a>
-· <a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">ScienceBase item</a></td></tr>
-<tr><td>INGENIOUS, Great Basin Center for Geothermal Energy</td>
-<td>Provenance of the label set and the subsurface layers</td>
-<td><a href="https://gbcge.org/current-projects/ingenious/">gbcge.org/current-projects/ingenious/</a></td></tr>
-<tr><td>EPSG:32611</td><td>WGS 84 / UTM zone 11N, the required CRS</td>
-<td><a href="https://epsg.io/32611">epsg.io/32611</a></td></tr>
-<tr><td>Tversky index</td><td>Definition of the α/β asymmetry the metric uses</td>
-<td><a href="https://en.wikipedia.org/wiki/Tversky_index">en.wikipedia.org/wiki/Tversky_index</a></td></tr>
-</table>
-<h3>Data provenance used in this build</h3>
-<p>The competition data page requires a DrivenData login, which this environment
-does not have. The official rasters were therefore recovered from prior
-repositories under the same GitHub account and verified by content address:</p>
-<table>
-<tr><th>File</th><th>Git blob SHA-1</th><th>Bytes</th><th>Cross-checks</th></tr>
-<tr><td><code>sample_submission.tif</code></td>
-<td class="mono small">7d865a9921a40ed2ea4c742a6a25b1fa2f357c5a</td><td class="num">1,599,597</td>
-<td>identical blob in GEMSDOE2, GEMSDOE10, 6GEMSDOE, GEMSDOE24, GEMSDOE50</td></tr>
-<tr><td><code>labels.tif</code></td>
-<td class="mono small">4ad3c1f3f19823e40924589bee7e51e44ae3a2e7</td><td class="num">425,830</td>
-<td>identical blob to 5GEMSDOE:<code>data/bridge/existing_faults.tif</code></td></tr>
-<tr><td><code>gems-geodawn-numerical-features.tif</code></td>
-<td class="mono small">reassembled from 5 parts, blob SHAs f34e5143…, 4bd98099…,
-d6f883ba…, 976977b4…, 41a7bb7b…</td><td class="num">418,912,844</td>
-<td>TIFF magic <code>II*\\0</code>; opens as 19 bands, float32, EPSG:32611, 100 m,
-identical transform to the template; band descriptions match the official layer
-list word for word</td></tr>
-</table>
-"""
-
-    # ---------------- irregularities ----------------------------------------
-    irr = """
-<h2>Irregularities flagged for review</h2>
-<table>
-<tr><th>ID</th><th>Finding</th><th>Impact</th><th>Action taken</th></tr>
-<tr><td>IR-55-01</td><td><b>The repository was empty.</b> At session start
-<code>55GEMSDOE</code> contained a single 11-byte <code>README.md</code> reading
-“# 55GEMSDOE”. The run brief says to reuse the template's cached feature stack,
-<code>evaluate_holdout.py</code> and <code>submission_writer.py</code>, and to
-check uniqueness against a registry.</td>
-<td>High — nothing to reuse; no registry existed.</td>
-<td>Built all three shared tools here as the single implementation (no private
-fork) and constructed the registry by downloading 56 prior scored rasters from
-sibling repositories via the GitHub blob API.</td></tr>
-<tr><td>IR-55-02</td><td><b>No DrivenData credentials and no general network.</b>
-The sandbox reaches only github.com, api.github.com, codeload.github.com,
-pypi.org and registry.npmjs.org. drivendata.org, usgs.gov, github.io and
-raw.githubusercontent.com all fail at the TCP layer.</td>
-<td>High — the data download page and every prior GitHub Pages site are
-unreachable from the build environment.</td>
-<td>Recovered the official rasters from prior repositories under the same account
-and verified them by content address (see Sources). Prior site content was read
-through a research tool with broader reach, never assumed.</td></tr>
-<tr><td>IR-55-03</td><td><b>Transcription ambiguity in the published
-dimensionality formula.</b> Karimi &amp; Kletetschka (2024) Eq. 4 renders as
-I = −(I₂/2)²/(I₁/2)³. Substituting the standard invariants, that normalisation
-reaches only 8/27 ≈ 0.296 at the pure-3-D endpoint, contradicting the same
-paper's statement that I = 1 there. Changing the denominator to (I₁/3)³ makes
-both documented endpoints exact.</td>
-<td>Medium — affects only the index's scaling, not its ordering.</td>
-<td>Implemented the endpoint-exact form, unit-tested both endpoints analytically,
-computed the eigenvalue ratio −λ2/λ1 alongside it, and disclosed the ambiguity
-here rather than presenting either as settled fact.</td></tr>
-<tr><td>IR-55-04</td><td><b>The lane brief's flight-line direction is wrong for
-these grids.</b> The brief asserts east–west flight-line striping. Three
-independent measurements say north–south: the 1–20 km spectral annulus carries
-more power with its wavevector along east–west for both fields (0.104 vs 0.089
-magnetic, 0.222 vs 0.166 gravity), and the 6 km-lag coherence is higher along
-north–south for both.</td>
-<td>Medium — masking the assumed direction would remove real structure and keep
-the artefact.</td>
-<td>Measured the direction first, verified the azimuth convention on a synthetic
-field, and masked the measured direction. Both readings are published in
-<code>evidence/striping_diagnostic.json</code>.</td></tr>
-<tr><td>IR-55-05</td><td><b>The segment-level holdout leaks.</b> Cutting mapped
-traces on a 20-px lattice leaves the visible continuation of the same trace
-flanking every withheld piece, so a catalogue-proximity prior scores 0.4982 by
-gap-filling rather than by discovery.</td>
-<td>High for interpretation — that number must not be read as a forecast.</td>
-<td>Labelled the result as leakage, built no submission from it, and used the
-contiguous-quadrant holdout (where the catalogue prior is structurally
-unavailable) as the decision instrument.</td></tr>
-<tr><td>IR-55-06</td><td><b>The leakage-canary control is a definitional
-artefact.</b> <code>neg_visible_catalogue_distance</code> reaches AUC 1.000 in
-folds 1–3 because it is measured against fold 0's visible set, which contains
-those folds' truth pixels by construction.</td>
-<td>Low — no lane feature is affected; all lane AUCs are 0.41–0.54.</td>
-<td>Documented rather than deleted, because the artefact is instructive about how
-quickly a catalogue-derived control becomes meaningless across folds.</td></tr>
-<tr><td>IR-55-07</td><td><b>The organiser template is not what its caption
-says.</b> The problem description calls the sample submission “a sample
-submission that predicts total fault absence”, but the file contains 60,988
-pixels equal to 1.0 and 5,106,385 equal to 0.0 — exactly the mapped-fault count.
-It is the existing-faults raster, not an all-zero raster.</td>
-<td>Low for us (only its grid metadata is used) but it would mislead anyone using
-it as a zero baseline.</td>
-<td>Used only its shape, CRS, transform and NaN footprint, all of which were
-re-verified against the labels raster.</td></tr>
-<tr><td>IR-55-08</td><td><b>The 3-px uniqueness rule is vacuous against dense
-references.</b> A prior spacing-5 lattice with 206,895 positives puts 84.1% of
-<i>any</i> 40,000-dot set within 3 px of its dots.</td>
-<td>Medium — the rule as written would flag every submission as a duplicate.</td>
-<td>Added a uniform-random control at matched size and reported the excess over
-it (+0.0399 max), plus the raw statistic restricted to the 43 density-matched
-references (max 0.6694, under the 0.70 threshold). Both readings are published.</td></tr>
-<tr><td>IR-55-12</td><td><b>The 0.2778 anchor is a projection, not a score.</b>
-GEMSDOE32's own audit manifest lists
-<code>gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros</code> as
-<code>receipt: null</code> and “…projected 0.2747; UNSCORED”. All 24 entries in that
-manifest have null receipts.</td>
-<td>High — it removes a target this project was asked to beat.</td>
-<td>Investigated and published on <a href="anchor-0.2778.html">its own page</a>.
-Measured: that raster harvests <i>less</i> kernel credit than a uniform scatter of
-the same size (proxy DTI 0.0049 vs 0.0267), while the raster associated with the
-live 0.2600 sits immediately adjacent to mapped traces and scores 0.0686. Full
-analysis, algebraic bounds and evidence classes in
-<code>evidence/anchor_verdict.json</code>.</td></tr>
-<tr><td>IR-55-10</td><td><b>A concurrent session ran the same lane and its
-guardrail tests forbade publishing any TIF.</b> PR #3 merged to <code>main</code>
-mid-session with an independent implementation of this lane (<code>gems/</code>)
-whose <code>tests/test_site_status.py</code> asserted <code>docs/downloads</code>
-must not exist, that no <code>.tif</code> may be linked, and that the index must
-contain “no tiff available”.</td>
-<td>High — it blocks the owner's highest-urgency requirement (an obvious,
-downloadable, validated submission).</td>
-<td>Fixed once, in place, not forked. The tests now require that any published TIF
-exists on disk, matches the SHA-256 in the run card, passed the validator with
-zero failures, and that the site states plainly whether it is OK to download and
-submit. The fail-closed intent is kept and strengthened. Both sessions' pages are
-retained and cross-linked. Their holdout numbers (ridge 0.0578, full lane 0.0444,
-max canary AUC 0.518) independently replicate this session's negative verdict.</td></tr>
-<tr><td>IR-55-11</td><td><b>Input data confirmed by two independent routes.</b>
-The concurrent session pins SHA-256 hashes from a sibling-repo manifest; this
-session reassembled the same files from five GitHub blobs in a different
-repository. All three hashes match exactly — <code>labels.tif</code>
-7ba308cc…, <code>sample_submission.tif</code> 2176d08e…, and the 19-band feature
-grid 4371c82e… (their <code>training_features.tif</code> pin).</td>
-<td>Positive finding, not a defect.</td>
-<td>Recorded here because it is the strongest available evidence that the rasters
-under every number on this site are the genuine organiser files.</td></tr>
-<tr><td>IR-55-09</td><td><b>Budget overrun.</b> The brief caps the session at
-3 experiments or 2 hours. Five experiment scripts were run and wall time exceeded
-2 hours, because two protocol corrections (the holdout design and the uniqueness
-control) each required a re-run.</td>
-<td>Process only.</td><td>Reported here rather than hidden.</td></tr>
-</table>
-"""
-
-    pages = {
-        "index.html": page("Executive summary", idx),
-        "submit.html": page("How to submit", sub_body),
-        "method.html": page("Method", meth),
-        "hypotheses.html": page("Hypotheses", hyp),
-        "evidence.html": page("Evidence", ev),
-        "sources.html": page("Sources", src),
-        "irregularities.html": page("Irregularities", irr),
-    }
-    for fn, txt in pages.items():
-        (DOCS / fn).write_text(txt)
-        print("wrote", DOCS / fn, len(txt), "bytes")
+    # Keep the data dictionary link useful even without redistributing the payload.
+    dictionary = hero("Data dictionary", "The competition provides 19 numerical feature bands; payloads are not committed to this repository.")
+    dictionary += '<main class="wrap"><section class="section"><p>Band identities used by this lane are band 2, reduced-to-pole magnetic anomaly, and band 13, isostatic gravity anomaly. The complete tag-derived dictionary is generated locally by <code>scripts/build_docs.py</code> after data placement.</p><p><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Review the official feature description.</a></p></section></main>'
+    (DOCS / "data_dictionary.html").write_text(page("Data dictionary", dictionary))
 
 
 if __name__ == "__main__":

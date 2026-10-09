@@ -26,11 +26,11 @@ blob() { # repo path dest
 
 [ -f data/sample_submission.tif ] || blob GEMSDOE10 data/sample_submission.tif data/sample_submission.tif
 [ -f data/labels.tif ]            || blob GEMSDOE10 data/labels.tif            data/labels.tif
-if [ ! -f data/gems-geodawn-numerical-features.tif ]; then
+if [ ! -f data/training_features.tif ] && [ ! -f data/gems-geodawn-numerical-features.tif ]; then
   for p in 000 001 002 003 004; do
     blob GEMSDOE2 "data/bridge/gems-geodawn-numerical-features.tif.part-$p" "data/parts/part-$p"
   done
-  cat data/parts/part-00{0,1,2,3,4} > data/gems-geodawn-numerical-features.tif
+  cat data/parts/part-00{0,1,2,3,4} > data/training_features.tif
 fi
 python3 - <<'PY'
 import sys

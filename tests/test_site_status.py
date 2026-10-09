@@ -37,12 +37,14 @@ class SiteStatusTests(unittest.TestCase):
         status = json.loads((DOCS / "status.json").read_text())
         card = json.loads((DOCS / "run-card.json").read_text())
 
-        self.assertEqual(status["overall_status"], "format_cleared_science_negative")
+        self.assertEqual(status["overall_status"], "format_valid_uniqueness_blocked_negative")
         self.assertEqual(card["verdict"], "negative")
         self.assertFalse(card["submission"]["weekly_slot_used"])
-        # honest: format-cleared is not the same as recommended
+        self.assertFalse(card["submission"]["submit_allowed"])
+        # An audit download is allowed, but format validity is not submit clearance.
         self.assertTrue(status["download_allowed"])
         self.assertFalse(status["submit_recommended"])
+        self.assertFalse(status["submit_allowed"])
         self.assertIsNone(status["organizer_confirmed_score"])
 
         rel = status["submission_tif"]
@@ -86,13 +88,14 @@ class SiteStatusTests(unittest.TestCase):
     def test_site_states_plainly_whether_it_is_ok_to_submit(self) -> None:
         """The owner's requirement: it must be OBVIOUS whether the file may be submitted."""
         index = (DOCS / "index.html").read_text()
-        self.assertIn("Is it OK to download and submit this file?", index)
         low = index.lower()
-        self.assertIn("download the submission", low)
-        self.assertIn("negative result", low)
-        # the format verdict and the science verdict must both appear, not one alone
-        self.assertIn("12/12 checks", index)
-        self.assertIn("must not be promoted into a weekly slot", low)
+        self.assertIn("not cleared to submit", low)
+        self.assertIn("do not spend a drivendata slot", low)
+        self.assertIn("download audit .tif", low)
+        self.assertIn("negative", low)
+        # the format verdict and the strict uniqueness/science verdict must both appear
+        self.assertIn("12/12 pass", low)
+        self.assertIn("duplicate-stop", low)
 
     def test_every_local_html_link_resolves(self) -> None:
         pages = list(DOCS.glob("*.html")) + [ROOT / "index.html"]

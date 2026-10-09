@@ -9,7 +9,7 @@ import rasterio
 from gems55 import io55
 
 def main() -> None:
-    for f in (io55.TEMPLATE_TIF, io55.LABELS_TIF, io55.FEATURES_TIF):
+    for f in (io55.TEMPLATE_TIF, io55.LABELS_TIF, io55.feature_path()):
         if not f.exists():
             sys.exit(f"missing {f}; run scripts/download_competition_data.sh first")
     grid, tmpl = io55.read_template()
