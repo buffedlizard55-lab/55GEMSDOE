@@ -1,0 +1,190 @@
+{
+  "grid": {
+    "footprint_px": 5167373,
+    "catalogue_px": 60988,
+    "sum_kernel_credit": 211157.84092758718
+  },
+  "rasters": {
+    "h33_2_b2": {
+      "n_dots": 37654,
+      "TP_w_vs_visible_catalogue": 277.93795319758345,
+      "credit_per_dot": 0.007381365942465168,
+      "catalogue_proxy_DTI": 0.0049348727157372966,
+      "dots_on_visible_fault_px": 0,
+      "min_distance_to_mapped_fault_px": 2.23606797749979,
+      "median_distance_to_mapped_fault_px": 19.6468827043885,
+      "frac_dots_within_300m_of_a_mapped_fault": 0.057656557072289796,
+      "nn_px_mean": 3.7350977393055036,
+      "nn_px_p10": 2.8284271247461903,
+      "top_band_correlates": [
+        {
+          "band": 19,
+          "spearman": 0.0469
+        },
+        {
+          "band": 6,
+          "spearman": -0.0394
+        },
+        {
+          "band": 3,
+          "spearman": 0.0214
+        },
+        {
+          "band": 12,
+          "spearman": 0.0161
+        }
+      ],
+      "max_abs_band_spearman": 0.046893081340802965
+    },
+    "d28_0.2600_anchor": {
+      "n_dots": 44090,
+      "TP_w_vs_visible_catalogue": 3954.7811237275546,
+      "credit_per_dot": 0.08969791616528815,
+      "catalogue_proxy_DTI": 0.06864938314078424,
+      "dots_on_visible_fault_px": 0,
+      "min_distance_to_mapped_fault_px": 1.0,
+      "median_distance_to_mapped_fault_px": 15.0,
+      "frac_dots_within_300m_of_a_mapped_fault": 0.19521433431617147,
+      "nn_px_mean": 3.579145441517588,
+      "nn_px_p10": 2.8284271247461903,
+      "top_band_correlates": [
+        {
+          "band": 19,
+          "spearman": 0.0503
+        },
+        {
+          "band": 6,
+          "spearman": -0.0417
+        },
+        {
+          "band": 3,
+          "spearman": 0.0192
+        },
+        {
+          "band": 12,
+          "spearman": 0.0169
+        }
+      ],
+      "max_abs_band_spearman": 0.05026238285731797
+    },
+    "ours_h55": {
+      "n_dots": 40000,
+      "TP_w_vs_visible_catalogue": 1526.6077796889729,
+      "credit_per_dot": 0.03816519449222432,
+      "catalogue_proxy_DTI": 0.026881440871854623,
+      "dots_on_visible_fault_px": 0,
+      "min_distance_to_mapped_fault_px": 1.0,
+      "median_distance_to_mapped_fault_px": 23.021728866442675,
+      "frac_dots_within_300m_of_a_mapped_fault": 0.0911,
+      "nn_px_mean": 6.792832767544515,
+      "nn_px_p10": 4.0,
+      "top_band_correlates": [
+        {
+          "band": 3,
+          "spearman": 0.0112
+        },
+        {
+          "band": 10,
+          "spearman": 0.0087
+        },
+        {
+          "band": 4,
+          "spearman": 0.0078
+        },
+        {
+          "band": 8,
+          "spearman": 0.0048
+        }
+      ],
+      "max_abs_band_spearman": 0.011190210686876824
+    }
+  },
+  "random_controls_footprint_restricted": {
+    "37654": {
+      "TP_w": 1504.09669774474,
+      "credit_per_dot": 0.039945203636924095,
+      "catalogue_proxy_DTI": 0.026705693375580417
+    },
+    "40000": {
+      "TP_w": 1624.176422277245,
+      "credit_per_dot": 0.04060441055693112,
+      "catalogue_proxy_DTI": 0.028599489038239646
+    },
+    "44090": {
+      "TP_w": 1762.9778510182377,
+      "credit_per_dot": 0.03998588911359124,
+      "catalogue_proxy_DTI": 0.03060279145086893
+    }
+  },
+  "manifest_facts": {
+    "h33-2-b2": {
+      "proxy_DTI_author": 0.0067,
+      "credit_per_dot_author": 0.01,
+      "dots": 37654,
+      "dots_on_catalogue": 0,
+      "receipt": null,
+      "author_note": "flank B=2 prune on the 0.2708 base: 37,654 dots, 0 within 200 m of the catalogue; live-mirror +0.00487 in 4/4 folds, safety 2.08, projected 0.2747; UNSCORED"
+    },
+    "d28/0.2600-anchor": {
+      "proxy_DTI_author": 0.1618,
+      "credit_per_dot_author": 0.2154,
+      "dots": 44090,
+      "dots_on_catalogue": 0,
+      "receipt": null
+    }
+  },
+  "algebra": {
+    "identity": "TP_w + FN_w = |G|  =>  DTI = TP_w/(0.2N + 0.8|G|)",
+    "upper_bound": "DTI <= |G| / (0.2N + 0.8|G|) since each truth pixel can contribute at most 1.0"
+  },
+  "what_a_target_score_requires": {
+    "0.26@N=37654": {
+      "min_abs_G_for_any_placement": 2472.2,
+      "required_TP_w_per_dot_at_that_G": 0.0171
+    },
+    "0.26@N=44090": {
+      "min_abs_G_for_any_placement": 2894.8,
+      "required_TP_w_per_dot_at_that_G": 0.0171
+    },
+    "0.2708@N=37654": {
+      "min_abs_G_for_any_placement": 2603.3,
+      "required_TP_w_per_dot_at_that_G": 0.0187
+    },
+    "0.2708@N=44090": {
+      "min_abs_G_for_any_placement": 3048.3,
+      "required_TP_w_per_dot_at_that_G": 0.0187
+    },
+    "0.2747@N=37654": {
+      "min_abs_G_for_any_placement": 2651.4,
+      "required_TP_w_per_dot_at_that_G": 0.0193
+    },
+    "0.2747@N=44090": {
+      "min_abs_G_for_any_placement": 3104.6,
+      "required_TP_w_per_dot_at_that_G": 0.0193
+    },
+    "0.2778@N=37654": {
+      "min_abs_G_for_any_placement": 2689.8,
+      "required_TP_w_per_dot_at_that_G": 0.0198
+    },
+    "0.2778@N=44090": {
+      "min_abs_G_for_any_placement": 3149.6,
+      "required_TP_w_per_dot_at_that_G": 0.0198
+    },
+    "0.3195@N=37654": {
+      "min_abs_G_for_any_placement": 3232.3,
+      "required_TP_w_per_dot_at_that_G": 0.0274
+    },
+    "0.3195@N=44090": {
+      "min_abs_G_for_any_placement": 3784.7,
+      "required_TP_w_per_dot_at_that_G": 0.0274
+    },
+    "0.3774@N=37654": {
+      "min_abs_G_for_any_placement": 4071.3,
+      "required_TP_w_per_dot_at_that_G": 0.0408
+    },
+    "0.3774@N=44090": {
+      "min_abs_G_for_any_placement": 4767.2,
+      "required_TP_w_per_dot_at_that_G": 0.0408
+    }
+  }
+}

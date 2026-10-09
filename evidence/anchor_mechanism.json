@@ -1,0 +1,190 @@
+{
+  "grid": {
+    "footprint": 5167373,
+    "catalogue_px": 60988,
+    "frac_footprint_within_3px_of_fault": 0.10994909792654797
+  },
+  "rasters": {
+    "uniform_random_44090": {
+      "n_dots": 44090,
+      "catalogue_proxy_DTI": 0.032107853840905025,
+      "frac_dots_within_3px_of_visible_fault": 0.11281469721025175,
+      "random_expectation_of_that_fraction": 0.10994909792654797,
+      "anti_catalogue_index": 0.9745990606315843,
+      "nn_px_mean": 19.72308349609375,
+      "n_dots_on_visible_fault_px": 548
+    },
+    "h33_2_b2_SCORED_0.2778": {
+      "n_dots": 37654,
+      "catalogue_proxy_DTI": 0.0049348727157372966,
+      "frac_dots_within_3px_of_visible_fault": 0.10206087002708876,
+      "random_expectation_of_that_fraction": 0.10994909792654797,
+      "anti_catalogue_index": 1.077289444008909,
+      "nn_px_mean": 12.083045959472656,
+      "n_dots_on_visible_fault_px": 0
+    },
+    "ours_h55_40000": {
+      "n_dots": 40000,
+      "catalogue_proxy_DTI": 0.026881440871854623,
+      "frac_dots_within_3px_of_visible_fault": 0.1157,
+      "random_expectation_of_that_fraction": 0.10994909792654797,
+      "anti_catalogue_index": 0.9502947098232323,
+      "nn_px_mean": 19.235383987426758,
+      "n_dots_on_visible_fault_px": 0
+    }
+  },
+  "h33_vs_bands": [
+    {
+      "band": 19,
+      "name": "Detrended elevation slope - gradient of elevation after detrending",
+      "mean_on_dot": 8.57107162475586,
+      "mean_off_dot": 7.4022626876831055,
+      "lift": 1.1578989028930664,
+      "spearman": 0.04575839565608567
+    },
+    {
+      "band": 6,
+      "name": "Tilt angle or total curvature - magnetic field derivative for edge detection",
+      "mean_on_dot": 16.782669067382812,
+      "mean_off_dot": 18.475643157958984,
+      "lift": 0.9083672165870667,
+      "spearman": -0.037290972906296765
+    },
+    {
+      "band": 3,
+      "name": "Total magnetic intensity horizontal gradient - rate of change in horizontal direction",
+      "mean_on_dot": 33.22340393066406,
+      "mean_off_dot": 26.44063377380371,
+      "lift": 1.2565282583236694,
+      "spearman": 0.02246854511053861
+    },
+    {
+      "band": 12,
+      "name": "Detrended elevation - topography with regional trends removed",
+      "mean_on_dot": 7.288405418395996,
+      "mean_off_dot": -17.440597534179688,
+      "lift": -0.41789883375167847,
+      "spearman": 0.019362781168083182
+    },
+    {
+      "band": 13,
+      "name": "Isostatic gravity anomaly - gravity after compensating for topographic mass",
+      "mean_on_dot": -6.300167083740234,
+      "mean_off_dot": -8.218589782714844,
+      "lift": 0.7665752172470093,
+      "spearman": 0.015083610834620427
+    },
+    {
+      "band": 15,
+      "name": "Depth to basement surface - thickness of sedimentary cover",
+      "mean_on_dot": 402.354736328125,
+      "mean_off_dot": 533.203125,
+      "lift": 0.7545993328094482,
+      "spearman": -0.010440945450086687
+    },
+    {
+      "band": 8,
+      "name": "Geodetic dilatation rate - rate of volumetric strain (expansion/contraction)",
+      "mean_on_dot": 6.9214677810668945,
+      "mean_off_dot": 6.357784748077393,
+      "lift": 1.0886602401733398,
+      "spearman": 0.009870946286299809
+    },
+    {
+      "band": 10,
+      "name": "Distance to earthquake (n=100km radius, a=15\u00b0 azimuth parameters)",
+      "mean_on_dot": 14206.353515625,
+      "mean_off_dot": 9606.244140625,
+      "lift": 1.4788665771484375,
+      "spearman": 0.009281179851515067
+    },
+    {
+      "band": 11,
+      "name": "Isostatic gravity anomaly vertical gradient - vertical rate of change",
+      "mean_on_dot": 0.029319610446691513,
+      "mean_off_dot": -0.06058827042579651,
+      "lift": -0.48391562700271606,
+      "spearman": 0.008781074617570219
+    },
+    {
+      "band": 9,
+      "name": "Total magnetic intensity vertical gradient - rate of change in vertical direction",
+      "mean_on_dot": -0.010185692459344864,
+      "mean_off_dot": 0.001250584376975894,
+      "lift": -8.144745826721191,
+      "spearman": -0.008435309817592888
+    },
+    {
+      "band": 4,
+      "name": "Geodetic second invariant - measure of strain rate tensor magnitude",
+      "mean_on_dot": 22.704776763916016,
+      "mean_off_dot": 21.235881805419922,
+      "lift": 1.0691704750061035,
+      "spearman": 0.007839432066410457
+    },
+    {
+      "band": 1,
+      "name": "Magnetic anomaly - deviation from expected Earth's magnetic field",
+      "mean_on_dot": -35.54715347290039,
+      "mean_off_dot": -43.0492057800293,
+      "lift": 0.8257330656051636,
+      "spearman": 0.007508592390100451
+    },
+    {
+      "band": 17,
+      "name": "Conductivity surface - electrical conductivity of subsurface",
+      "mean_on_dot": 2.8021905422210693,
+      "mean_off_dot": 2.855234384536743,
+      "lift": 0.9814222455024719,
+      "spearman": -0.005379009819337953
+    },
+    {
+      "band": 18,
+      "name": "Isostatic gravity anomaly horizontal gradient - horizontal rate of change",
+      "mean_on_dot": -0.1242077574133873,
+      "mean_off_dot": 0.0020325034856796265,
+      "lift": -61.110721588134766,
+      "spearman": -0.005183614032988753
+    },
+    {
+      "band": 7,
+      "name": "Geodetic shear rate - rate of angular deformation from GPS/InSAR",
+      "mean_on_dot": 11.496417999267578,
+      "mean_off_dot": 10.788846015930176,
+      "lift": 1.0655837059020996,
+      "spearman": 0.005115243588280095
+    },
+    {
+      "band": 16,
+      "name": "Earthquake intensity or density (n=100km radius, a=15\u00b0 parameters)",
+      "mean_on_dot": 1198.1102294921875,
+      "mean_off_dot": 1117.627197265625,
+      "lift": 1.0720124244689941,
+      "spearman": 0.005082875753095451
+    },
+    {
+      "band": 5,
+      "name": "Isostatic gravity anomaly slope - gradient of gravity after isostatic correction",
+      "mean_on_dot": 0.1234440878033638,
+      "mean_off_dot": 0.12015558034181595,
+      "lift": 1.0273687839508057,
+      "spearman": 0.0048053897174662715
+    },
+    {
+      "band": 14,
+      "name": "Total magnetic intensity - total strength of magnetic field",
+      "mean_on_dot": -102.17620849609375,
+      "mean_off_dot": -107.66632843017578,
+      "lift": 0.9490079879760742,
+      "spearman": 0.002973306450939456
+    },
+    {
+      "band": 2,
+      "name": "Reduced to pole magnetic data - magnetic anomaly corrected for latitude effects",
+      "mean_on_dot": -114.94895935058594,
+      "mean_off_dot": -119.56257629394531,
+      "lift": 0.9614125490188599,
+      "spearman": 0.001448327266309924
+    }
+  ]
+}
