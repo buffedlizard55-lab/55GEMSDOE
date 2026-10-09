@@ -1,0 +1,82 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hypotheses</title><style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
+table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid #d7dce5;padding:.35rem .5rem;vertical-align:top;text-align:left}
+code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}a{color:#0b5cad}
+</style></head><body><p><a href="index.html">← Overview</a></p><h1>Candidate hypotheses (ranked) — not yet all validated</h1>
+<p>Gate for every candidate (protocol): validate on the spatially blocked holdout first. Do not spend a
+submission slot on an idea that does not beat the current holdout best. <strong>Current holdout bar in this repo:
+E1 ridge baseline, HOLDOUT-DTI 0.0578, 95% CI [0.0499, 0.0652], 60,594 withheld positive px</strong> (evaluator
+<code>gems.metric v1</code>). Band names below are from the GeoTIFF band tags (full list: <a href="data_dictionary.html">data dictionary</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Hypothesis</th>
+<th>Layer(s) (band #)</th>
+<th>Physical signature targeted</th>
+<th>Why it should catch a <em>missing</em> fault</th>
+<th>Named non-fault mimic</th>
+<th>Cost</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Tilt-angle zero-contours</strong> pick out buried, low-contrast faults that amplitude gradients miss</td>
+<td><code>tc</code> tilt/total curvature (6); RTP (2)</td>
+<td>Zero-crossing of the tilt angle marks the edge of a source regardless of amplitude</td>
+<td>Amplitude-normalised: weak but sharp faults show a clean zero-contour, while a strong sediment-hosted anomaly does not swamp it. Uses a layer we have not used</td>
+<td>Lithologic contacts and basalt flow edges (2-D, non-fault)</td>
+<td>Low (one FFT pass)</td>
+<td><strong>Not tested</strong> — next experiment</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Geodetic strain-rate localisation</strong></td>
+<td>shear rate (7), second invariant (4), dilatation (8)</td>
+<td>Ridges of shear-rate magnitude where deformation localises</td>
+<td>Active faults localise strain; faults with no surface expression can still show a shear-rate ridge</td>
+<td>GPS/InSAR processing artefacts and broad plate-boundary strain</td>
+<td>Low (layers present)</td>
+<td><strong>Not tested</strong>. Check the native resolution of the geodetic layers before use</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Seismicity alignment</strong></td>
+<td>earthquake intensity (16), distance to earthquake (10)</td>
+<td>Linear alignments of hypocentres and minima of distance-to-event</td>
+<td>Microseismicity clusters along unmapped faults</td>
+<td>Induced seismicity, mine blasts, and population-density clustering</td>
+<td>Low</td>
+<td><strong>Not tested</strong>. The meaning of the n=100 km, a=15° parameters must be confirmed from the official data dictionary</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Topographic scarp detection at 1 m</strong></td>
+<td>detrended elevation slope (19); 1 m DEM (external)</td>
+<td>Sharp linear scarps in high-resolution topography</td>
+<td>Scarps are direct evidence of young faulting and are absent from the USGS catalogue for many faults</td>
+<td>Erosion lines, roads, canals, and field boundaries</td>
+<td>High: needs the USGS 1 m DEM tiles</td>
+<td><strong>Blocked here.</strong> The official host (<code>prd-tnm.s3.amazonaws.com</code>), the National Map downloader, and ScienceBase all failed to connect from this sandbox (2026-10-09, curl HTTP 000). Free and official, but must be fetched from a machine with open egress</td>
+</tr>
+<tr>
+<td>—</td>
+<td><strong>Tensor dimensionality + strike gating</strong> (this session)</td>
+<td>RTP (2), iso gravity (13)</td>
+<td>2-D ridges with strike agreeing with ridge orientation; down-weighted 3-D bodies</td>
+<td>Targets strike-extended structures</td>
+<td>E-W flight-line striping (masked); 2-D contacts and dykes</td>
+<td>Medium</td>
+<td><strong>Tested, negative.</strong> E1 0.0578 &gt; E2 0.0463 &gt; E3 0.0444. Strike test failed (see caveat, irregularity #8). Canary AUC ≈0.5 (no leakage, but weak signal)</td>
+</tr>
+</tbody>
+</table>
+<h2>Notes on the ranking</h2>
+<ul>
+<li>Ranking is judgement: expected DTI gain × (1 / implementation cost). None of ranks 1–4 is yet validated, so no expected gain is claimed as a number.</li>
+<li>The tensor lane (row "—") is kept as a reference result. Its negative holdout result argues that 2-D-ness alone does not separate catalogue faults from other ridges in this area.</li>
+<li>Anything that gets to submission must pass: holdout beats E1's CI lower bound (or a pre-registered margin), canary AUC ≤ 0.90, and the chance-corrected uniqueness check (irregularity #7).</li>
+</ul></body></html>

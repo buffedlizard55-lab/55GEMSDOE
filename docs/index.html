@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEMS Prize (DOE) — fault prediction workbench</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
+h1{font-size:1.7rem}h2{font-size:1.2rem;margin-top:2rem;border-bottom:1px solid #d7dce5;padding-bottom:.3rem}
+.box{background:#fff7e6;border:1px solid #f0c36d;border-radius:8px;padding:1rem 1.2rem}
+.ok{background:#eefbf1;border:1px solid #9fd8ad;border-radius:8px;padding:1rem 1.2rem}
+code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #d7dce5;padding:.4rem .5rem;text-align:left;vertical-align:top}
+a{color:#0b5cad}.muted{color:#5b6475}
+</style></head><body>
+<h1>GEMS Prize (DOE) — fault prediction workbench</h1>
+<p class="muted">Competition: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DrivenData #306</a> · Repo: <a href="https://github.com/buffedlizard55-lab/55GEMSDOE">buffedlizard55-lab/55GEMSDOE</a> · Updated 2026-10-09</p>
+
+<div class="box"><strong>Executive summary.</strong> We built a verified scoring, validation and uniqueness pipeline,
+and tested one new method. The method (tensor dimensionality with strike gating) <strong>lost</strong> to a plain ridge
+baseline on our holdout, and its strike test failed. <strong>No file is recommended for upload today.</strong>
+Next steps are in <a href="hypotheses.html">hypotheses</a> and <a href="#next">next steps</a>.
+<br><br><a href="executive-summary.html"><strong>→ How to make a submission (step by step)</strong></a></div>
+
+<h2>Current results (HOLDOUT-DTI only — not organiser-confirmed)</h2>
+<p class="muted">Evaluator <code>gems.metric v1</code> (DTI α=0.2, β=0.8, R=300 m). Holdout = quadrant folds of catalogue fault segments; visible faults masked pixel-exactly. CI = 1,000-rep block bootstrap (10 km blocks).</p>
+<table>
+<tr><th>Variant</th><th>HOLDOUT-DTI</th><th>95% CI</th><th>Withheld positive px</th></tr>
+<tr><td>E1 ridge baseline (RTP gradient ridges, stripes masked)</td><td>0.0578</td><td>0.0499 – 0.0652</td><td>60,594</td></tr>
+<tr><td>E2 + dimensionality down-weight</td><td>0.0463</td><td>0.0398 – 0.0523</td><td>60,594</td></tr>
+<tr><td>E3 full tensor lane (+ strike gate)</td><td>0.0444</td><td>0.0383 – 0.0502</td><td>60,594</td></tr>
+</table>
+<p>Leakage canary: every single feature has AUC between 0.48 and 0.52 on ridge pixels, so no leakage is detected (threshold 0.90).
+Strike test (withheld fault strikes vs random ridges): <strong>failed</strong>, 43.2% vs 87.6%, with a caveat (<a href="irregularities.html">irregularity #8</a>).</p>
+
+<h2>Uniqueness</h2>
+<p>Checked against <strong>630 same-grid GEMSDOE rasters</strong> from 63 repos. Maximum rank correlation was 0.165 (E1), well below 0.90.
+Dot overlap is saturated by dense registry rasters, so the literal 70% rule flags 70 rasters. A chance-corrected rule is needed (<a href="irregularities.html">#7</a>).
+Files: <a href="results/registry_check_tensor_lane_E1.json">E1</a>, <a href="results/registry_check_E3.json">E3</a>.</p>
+
+<h2>Leaderboard: why 0.2778 scored high</h2>
+<p>See <a href="leaderboard-analysis.html">the analysis</a> (HTML) or the same text in <a href="leaderboard-analysis.md">Markdown</a>. Short version: asymmetric DTI weights reward sparse, confident dots near real faults, and the entry pruned dots on the known catalogue.</p>
+
+<h2>Irregularities (flagged for review)</h2>
+<p>Thirteen items are logged in <a href="irregularities.html">irregularities</a>. The most important: the competition's "sample submission" is identical to the training labels, even though the rules call it a fault-absence sample. Also, the competition rasters are committed in a sibling public repo, which needs legal review.</p>
+
+<h2>Sources</h2>
+<p>Every external claim links to a verified or blocked source: <a href="sources.html">sources</a>.</p>
+
+<h2 id="next">Next steps (ranked)</h2>
+<ol>
+<li>Test the tilt-angle zero-contour hypothesis (rank 1) on the same holdout, with the same gates.</li>
+<li>Fix the strike test with a pixel-matched design (irregularity #8).</li>
+<li>Add a chance-corrected overlap to the registry check (irregularity #7).</li>
+<li>Resolve the leaderboard figure conflict (0.3774 vs 0.3195) and the template-label identity with the organisers (#1, #6).</li>
+<li>Get the USGS 1 m DEM tiles from a machine with open egress (rank 4).</li>
+</ol>
+<p class="muted">Negative results are deliverables. The run card is at <a href="results/run_card_tensor_lane.json">results/run_card_tensor_lane.json</a>.</p>
+</body></html>

@@ -1,0 +1,133 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data dictionary</title><style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
+table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid #d7dce5;padding:.35rem .5rem;vertical-align:top;text-align:left}
+code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}a{color:#0b5cad}
+</style></head><body><p><a href="index.html">← Overview</a></p><h1>Feature band dictionary</h1>
+<p>Generated from <code>data/training_features.tif</code> band tags by <code>scripts/build_docs.py</code>.</p>
+<table>
+<thead>
+<tr>
+<th>band</th>
+<th>description (from tag)</th>
+<th>category</th>
+<th>short name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Magnetic anomaly - deviation from expected Earth's magnetic field</td>
+<td>magnetic_data</td>
+<td><code>mag_anom - Magnetic anomaly - deviation from expected Earth's magnetic field</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Reduced to pole magnetic data - magnetic anomaly corrected for latitude effects</td>
+<td>magnetic_data</td>
+<td><code>rtp - Reduced to pole magnetic data - magnetic anomaly corrected for latitude effects</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Total magnetic intensity horizontal gradient - rate of change in horizontal direction</td>
+<td>magnetic_data</td>
+<td><code>tmi_hg - Total magnetic intensity horizontal gradient - rate of change in horizontal direction</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Geodetic second invariant - measure of strain rate tensor magnitude</td>
+<td>geodetic_strain</td>
+<td><code>geod_2ndinv - Geodetic second invariant - measure of strain rate tensor magnitude</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Isostatic gravity anomaly slope - gradient of gravity after isostatic correction</td>
+<td>gravity_data</td>
+<td><code>iso_grav_anom_slope - Isostatic gravity anomaly slope - gradient of gravity after isostatic correction</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Tilt angle or total curvature - magnetic field derivative for edge detection</td>
+<td>magnetic_data</td>
+<td><code>tc - Tilt angle or total curvature - magnetic field derivative for edge detection</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Geodetic shear rate - rate of angular deformation from GPS/InSAR</td>
+<td>geodetic_strain</td>
+<td><code>geod_shearrate - Geodetic shear rate - rate of angular deformation from GPS/InSAR</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Geodetic dilatation rate - rate of volumetric strain (expansion/contraction)</td>
+<td>geodetic_strain</td>
+<td><code>geod_dilaterate - Geodetic dilatation rate - rate of volumetric strain (expansion/contraction)</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Total magnetic intensity vertical gradient - rate of change in vertical direction</td>
+<td>magnetic_data</td>
+<td><code>tmi_vg - Total magnetic intensity vertical gradient - rate of change in vertical direction</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Distance to earthquake (n=100km radius, a=15° azimuth parameters)</td>
+<td>seismic</td>
+<td><code>deq_n100a15 - Distance to earthquake (n=100km radius, a=15° azimuth parameters)</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>Isostatic gravity anomaly vertical gradient - vertical rate of change</td>
+<td>gravity_data</td>
+<td><code>iso_grav_anom_vg - Isostatic gravity anomaly vertical gradient - vertical rate of change</code></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Detrended elevation - topography with regional trends removed</td>
+<td>topographic</td>
+<td><code>det_elev - Detrended elevation - topography with regional trends removed</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td>Isostatic gravity anomaly - gravity after compensating for topographic mass</td>
+<td>gravity_data</td>
+<td><code>iso_grav_anom - Isostatic gravity anomaly - gravity after compensating for topographic mass</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Total magnetic intensity - total strength of magnetic field</td>
+<td>magnetic_data</td>
+<td><code>tmi - Total magnetic intensity - total strength of magnetic field</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td>Depth to basement surface - thickness of sedimentary cover</td>
+<td>subsurface</td>
+<td><code>depth_to_base_surf - Depth to basement surface - thickness of sedimentary cover</code></td>
+</tr>
+<tr>
+<td>16</td>
+<td>Earthquake intensity or density (n=100km radius, a=15° parameters)</td>
+<td>seismic</td>
+<td><code>ieq_n100a15 - Earthquake intensity or density (n=100km radius, a=15° parameters)</code></td>
+</tr>
+<tr>
+<td>17</td>
+<td>Conductivity surface - electrical conductivity of subsurface</td>
+<td>subsurface</td>
+<td><code>cond_surf - Conductivity surface - electrical conductivity of subsurface</code></td>
+</tr>
+<tr>
+<td>18</td>
+<td>Isostatic gravity anomaly horizontal gradient - horizontal rate of change</td>
+<td>gravity_data</td>
+<td><code>iso_grav_anom_hg - Isostatic gravity anomaly horizontal gradient - horizontal rate of change</code></td>
+</tr>
+<tr>
+<td>19</td>
+<td>Detrended elevation slope - gradient of elevation after detrending</td>
+<td>topographic</td>
+<td><code>det_elev_slope - Detrended elevation slope - gradient of elevation after detrending</code></td>
+</tr>
+</tbody>
+</table></body></html>

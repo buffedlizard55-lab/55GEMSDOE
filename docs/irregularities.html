@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Irregularities</title><style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
+table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid #d7dce5;padding:.35rem .5rem;vertical-align:top;text-align:left}
+code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}a{color:#0b5cad}
+</style></head><body><p><a href="index.html">← Overview</a></p><h1>Irregularities log (flagged for manual review)</h1>
+<p>Each row: what was found, the evidence (reproducible command or link), and the status.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Irregularity</th>
+<th>Evidence</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>The competition's <code>sample_submission.tif</code> is not a fault-absence file.</strong> The rules page says the sample "predicts total fault absence", but its 60,988 positive cells are <em>identical</em> to the training labels.</td>
+<td><code>np.array_equal(sample==1, labels==1)</code> → True; 60,988 positives in both. Rules text: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description</a> ("A sample submission that predicts total fault absence…").</td>
+<td><strong>Flag.</strong> Do not use the template's 1-values as a baseline. We use it only for footprint, CRS, transform and shape.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Feature rasters carry <strong>real values outside the official footprint</strong> (label/template invalid mask).</td>
+<td>RTP band 2: 1,540 finite cells outside footprint (range −342 to 514). <code>scripts/run_tensor_lane.py</code> JSON field <code>feature_values_outside_footprint</code>.</td>
+<td>Masked to NaN in our pipeline. Rules say data outside bounds must be null/NaN.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Feature nodata sentinel −3.4028e38 appears inside the footprint</strong> in RTP and isostatic bands (3,061 cells).</td>
+<td><code>feature_gaps_inside_footprint</code> in <code>docs/results/tensor_lane_results.json</code>. The GeoTIFF nodata tag is −3.4028234663852886e+38.</td>
+<td>Treated as missing and filled by footprint mean before low-pass. Flag for the organisers.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Competition rasters are committed in a public sibling repo</strong> (<code>buffedlizard55-lab/GEMSDOE</code>, folder <code>data/bridge/</code>, ~420 MB in parts). The rules grant the data to registered competitors; I did not find a clause permitting redistribution. Rules §A.5 require third-party content to be properly licensed.</td>
+<td><code>gh api repos/buffedlizard55-lab/GEMSDOE/contents/data/bridge/manifest.json</code>. Rules: <a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">PDF §3.1, §A.5</a>.</td>
+<td><strong>Legal review needed.</strong> We pulled the files <strong>locally only</strong> (gitignored) and did not copy them into this repository.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Sibling repo "audit" JSON labels projections as leaderboard values</strong> (e.g. <code>predicted_leaderboard_dti: 0.2747</code> for the GEMSDOE32 H33-2-B2 file; the file records <code>UNSCORED</code>).</td>
+<td><code>docs/downloads/gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-audit.json</code> in <code>buffedlizard55-lab/GEMSDOE32</code>.</td>
+<td>Treated as a projection, not a score.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Score figures in the brief disagree.</strong> The brief lists "Current competition leaderboard GEMSDOE high score: 0.3774" and also "0.3195 is the highest score right now".</td>
+<td>Brief text (user-supplied).</td>
+<td>Unresolved. Neither value is organiser-confirmed in this sandbox.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>The registry overlap rule is saturated.</strong> Many registry rasters have ~5.1–5.2 million positive cells (≈ the whole 5.17 M footprint), so almost any dot lies within 3 px of one. Literal application flags 70 of 630 same-grid rasters for <em>any</em> candidate.</td>
+<td><code>docs/results/registry_check_E3.json</code>, <code>docs/results/registry_check_tensor_lane_E1.json</code>.</td>
+<td>The protocol needs a chance-corrected overlap (observed vs expected by registry positive density). Not yet implemented.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>The strike-prediction test is not a fair comparison as implemented.</strong> A ridge is perpendicular to the gradient, and the strike of a 2-D source is also perpendicular to the gradient, so ridge-vs-field agreement is nearly built in.</td>
+<td><code>docs/results/tensor_lane_results.json</code> → <code>strike_test</code> (withheld 43.2% vs random ridges 87.6%).</td>
+<td>Reported as a failed prediction, with this caveat. A pixel-matched redesign is needed.</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Sign-convention bug found and fixed in this session.</strong> Grid rows increase south; azimuths were initially computed as if y were north, mirroring every strike (135° → 45°).</td>
+<td>Synthetic test <code>tests/test_tensor.py::test_strike_is_north_convention_and_not_mirrored</code>. The fix is in <code>gems/tensor.py</code>.</td>
+<td>Fixed; regression test added. Earlier numbers in this session were recomputed after the fix.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Exact Pedersen &amp; Rasmussen (1990) normalisation not verified.</strong> Sources give the endpoints (0 = 2-D, 1 = 3-D) and the smallest/intermediate eigenvalue ratio, not the full formula.</td>
+<td><a href="https://www.sciencedirect.com/science/article/abs/pii/S0926985113000062">ScienceDirect abstract (Beiki TSVD)</a>; <a href="https://www.tandfonline.com/doi/pdf/10.1071/ASEG2012ab057">ASEG 2012 abstract</a>. The 1990 paper was not retrievable.</td>
+<td>Index used =</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Only the RTP/iso bands were used for the tensor lane.</strong> The protocol asks for derivatives of the RTP magnetic and isostatic gravity grids; the provided derivative bands (<code>tmi_hg</code>, <code>tmi_vg</code>, <code>iso_grav_anom_hg</code>, <code>iso_grav_anom_vg</code>) were not used.</td>
+<td>Band list from <code>gdal</code> tags.</td>
+<td>Intentional (recomputed from FFT per the protocol).</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>"Acquisition blocks" are not in the data.</strong> The protocol says to work within each acquisition block; no block ID band exists in the 19-band stack.</td>
+<td>Band tags, <code>data/README.md</code>.</td>
+<td>Whole-grid processing; a limitation. Needs block IDs from the organisers or USGS GeoDAWN metadata.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>The sibling <code>data/README.md</code> says the stack was verified "by sha256 against the pinned inventory" but the pinning run used a GitHub runner whose own egress is not independently documented.</td>
+<td><code>buffedlizard55-lab/GEMSDOE/data/README.md</code>.</td>
+<td>Our check only confirms the bytes match the sibling's pins.</td>
+</tr>
+</tbody>
+</table></body></html>

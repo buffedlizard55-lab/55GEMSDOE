@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sources</title><style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
+table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid #d7dce5;padding:.35rem .5rem;vertical-align:top;text-align:left}
+code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}a{color:#0b5cad}
+</style></head><body><p><a href="index.html">← Overview</a></p><h1>Source verification log (2026-10-09)</h1>
+<p>"Fetched" = read in this session with the fetch tool or the GitHub API. "Blocked" = not reachable from this sandbox.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>URL</th>
+<th>Status</th>
+<th>What it supports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DrivenData problem description</td>
+<td>https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/</td>
+<td>Fetched (2 chunks)</td>
+<td>Metric (DTI, α=0.2, β=0.8, R=300 m), format (EPSG:32611, 100 m, float32, [0,1], NaN outside bounds), data description</td>
+</tr>
+<tr>
+<td>Official rules (NLR)</td>
+<td>https://docs.nlr.gov/docs/fy26osti/96647.pdf</td>
+<td>Fetched (chunks 0–4 of 7; §A.5 read; chunks 5–6 not read)</td>
+<td>Submission process, 3/week limit, one final submission, GenAI disclosure, data source citations</td>
+</tr>
+<tr>
+<td>DrivenData data tab</td>
+<td>https://www.drivendata.org/competitions/306/competition-doe-gems/data/</td>
+<td><strong>Blocked</strong> (login)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Reference solution</td>
+<td>https://github.com/drivendataorg/gems-prize-reference-solution</td>
+<td>Cloned (<code>git clone --depth 1</code>)</td>
+<td>Notebook: submission written with the fault-label CRS/transform; Tversky loss α=0.2, β=0.8</td>
+</tr>
+<tr>
+<td>INGENIOUS label source (cited by rules)</td>
+<td>https://doi.org/10.15121/1881483</td>
+<td>Cited in rules; not fetched</td>
+<td>Label provenance</td>
+</tr>
+<tr>
+<td>GeoDAWN (cited by rules)</td>
+<td>https://doi.org/10.5066/P93LGLVQ</td>
+<td>Cited in rules; not fetched</td>
+<td>Feature provenance</td>
+</tr>
+<tr>
+<td>USGS GeoDAWN catalogue page</td>
+<td>https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and</td>
+<td><strong>Blocked</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>EPSG:32611</td>
+<td>https://epsg.io/32611</td>
+<td>Cited in brief; not fetched</td>
+<td>CRS definition</td>
+</tr>
+<tr>
+<td>Beiki &amp; Pedersen (2010) abstract (eigenvector analysis; strike from min-eigenvector)</td>
+<td>https://www.researchgate.net/publication/228794726_Eigenvector_analysis_of_gravity_gradient_tensor_to_locate_geologic_bodies</td>
+<td>Search snippet read</td>
+<td>Method basis; not the full paper</td>
+</tr>
+<tr>
+<td>Beiki TSVD / dimensionality ratio</td>
+<td>https://www.sciencedirect.com/science/article/abs/pii/S0926985113000062</td>
+<td>Search snippet read</td>
+<td>Index form: smallest/intermediate eigenvalue ratio</td>
+</tr>
+<tr>
+<td>ASEG 2012 extended abstract</td>
+<td>https://www.tandfonline.com/doi/pdf/10.1071/ASEG2012ab057</td>
+<td>Search snippet read</td>
+<td>Dimensionality indicator 0 (2-D) to 1 (3-D); 0.5 threshold; PGGT strike</td>
+</tr>
+<tr>
+<td>Pedersen &amp; Rasmussen (1990)</td>
+<td>—</td>
+<td><strong>Not retrieved</strong></td>
+<td>Original indicator definition — flagged</td>
+</tr>
+<tr>
+<td>Sibling repo GEMSDOE (data bridge, audits, data README)</td>
+<td>https://github.com/buffedlizard55-lab/GEMSDOE</td>
+<td>Fetched via GitHub API / sparse clone</td>
+<td>Data bytes and pins; provenance statements</td>
+</tr>
+<tr>
+<td>Sibling repo GEMSDOE32 (0.2778 entry)</td>
+<td>https://github.com/buffedlizard55-lab/GEMSDOE32</td>
+<td>Fetched via GitHub API</td>
+<td>Audit JSON, submission manifest, method notes</td>
+</tr>
+<tr>
+<td>Public GEMSDOE submission site (user-provided list)</td>
+<td>https://buffedlizard55-lab.github.io/GEMSDOE32/docs/index.html</td>
+<td><strong>Blocked</strong> (github.io not reachable)</td>
+<td>Only via the user's list and the sibling repo copy</td>
+</tr>
+</tbody>
+</table>
+<h2>Manual-review links</h2>
+<ul>
+<li>Metric and format: https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/</li>
+<li>Rules: https://docs.nlr.gov/docs/fy26osti/96647.pdf</li>
+<li>0.2778 audit file: https://github.com/buffedlizard55-lab/GEMSDOE32/blob/main/docs/downloads/gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-audit.json</li>
+</ul></body></html>
