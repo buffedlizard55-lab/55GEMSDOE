@@ -1,11 +1,15 @@
-# Uncleared historical raster artifacts
+# Historical raster artifacts — not cleared
 
-These files were moved out of the published `docs/` tree during the 2026-10-09 review so they cannot be mistaken for cleared downloads. **None is approved for download or submission.** Their presence is for audit traceability only; every scientific, leakage, uniqueness, and organizer-format gate remains uncleared.
+**Status: NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT.** These files are retained for audit traceability only. They are outside the published `docs/` site, are not linked from any download page, and are not approved for competition use. No artifact has an organizer receipt in this checkout.
 
-| File | SHA-256 | Status |
-|---|---|---|
-| `h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif` | `b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368` | Uncleared historical artifact; zero-filled outside footprint not validated against the authentic organizer template; literal uniqueness stop |
-| `h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif` | `847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679` | Uncleared historical variant; not validated against the authentic organizer template; literal uniqueness stop |
-| `h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip` | `b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9` | Uncleared archive of the zero-filled variant; not a cleared submission package |
+| Candidate record | Archived variants | Recorded SHA-256 (primary zeros encoding) | Disposition |
+|---|---|---|---|
+| H55 tensor/strike, 40,000 dots | `h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif`, `h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif`, `h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip` | NaN twin `847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679`; primary `b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368`; ZIP `b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9` | Historical; literal raw 3-pixel overlap report exceeds 70%; no valid promotion HOLDOUT-DTI or organizer format clearance. |
+| H56 multiscale tensor persistence, 40,000 dots | `h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-nan.tif`, `h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif`, `h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.zip` | NaN twin `2d288ebc99218fd14bfab6b0d700fda579e65ba304f806b3ca4b2a88b6b7d7c9`; primary `43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f`; ZIP `6df14fa3fb8eb035cae06fa3c3bb441e34c0486848e129f0fe3045b54b8793e1` | Historical local HOLDOUT-DTI did not beat its one-scale comparator; the stored fold-bootstrap interval and local evaluator are not promotion-grade; uniqueness report is DUPLICATE-STOP. |
+| H55 tensor/strike, 160,000 dots | `audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-nan.tif`, `audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif`, `audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip` | Primary `ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273`; NaN twin `c3185ec459f84c5fd9a9c117f4611c25ec754e1a113c12139baca60e29501d74`; ZIP `3c0cc3f4efd858716c9b4c6fe8568f1bc9aa324d54ca7a6fd932831f5a14d9a6` | Historical Q4 quadrant holdout; interval is fold-level, evaluator is local/unreconciled, and raw overlap is above the literal threshold; DO NOT SUBMIT. |
 
-The current machine-readable decision is [`../../docs/run-card.json`](../../docs/run-card.json). Do not link, upload, or derive a new score from these artifacts.
+## Provenance and limitations
+
+- These are previously generated project artifacts, not files created or revalidated in this review. SHA-256 values are recorded for integrity, not organizer provenance, uniqueness, format approval, or permission to redistribute.
+- The repository contains neither the authorized competition feature stack/template nor the complete registry rasters and continuous-score cache. This review did not rerun the validator, holdout, or uniqueness scans.
+- Do not treat a repository path or the presence of a file as approval to download, submit, or spend a competition slot. See [`docs/status.json`](../../docs/status.json), [`docs/run-card.json`](../../docs/run-card.json), and [`docs/irregularities.md`](../../docs/irregularities.md).

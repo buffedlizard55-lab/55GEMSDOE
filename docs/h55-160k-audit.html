@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Historical H55 audit — not cleared · 55GEMSDOE</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body><main>
+<p><a href="index.html">← Executive summary</a></p>
+<h1>H55 tensor-lane 160k record — historical audit only</h1>
+<div class="callout bad"><h2>NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT</h2>
+<p>This page is an audit record, not a deliverable. The historical TIFF variants are stored under <code>evidence/historical_artifacts/</code>, outside the published site, and are deliberately not linked. No experiment was rerun and no submission slot was used in this review.</p></div>
+
+<h2>Historical HOLDOUT-DTI (not promotion-grade)</h2>
+<p><strong>HOLDOUT-DTI (historical; invalid for promotion).</strong> The recorded evaluator was <code>src/gems55/dti55.py</code>; the original run did not record an explicit evaluator version, and the local implementation was not reconciled with the authorized shared evaluator. The historical record reports <strong>60,988 withheld positives</strong> and a tensor-full Q4 result of <strong>0.1019</strong>, with a stored 95% interval of <strong>[0.0877, 0.1185]</strong>. The interval is a fold-level t interval over four quadrant-fold DTI values (df=3), not pooled-score contribution uncertainty.</p>
+<p>The Q4 quadrant split can divide a connected mapped fault between visible and withheld data. A separate B=15 px analysis is not a substitute for the required whole-segment protocol. These records cannot clear a candidate or support submission-slot promotion. The control value is not reproduced here because the final run card did not record an accompanying 95% CI.</p>
+
+<h2>Historical registry finding</h2>
+<p>The archived report says <strong>56 registry rasters</strong> were checked and reports raw within-3-pixel final-dot overlap of <strong>0.8401</strong>, above the literal <strong>0.70</strong> stop limit. Its verdict under the standing rule is <strong>DUPLICATE-STOP</strong>. A chance-adjusted statistic does not override the literal threshold. The registry raster corpus and continuous surface cache are absent, so this review did not repeat the comparison.</p>
+
+<h2>Historical format note</h2>
+<p>The source run card records 12/12 local structural checks after re-reading the file bytes. That local result was not rerun here, the authentic organizer template is absent, and no organizer format validation is established. Format inspection alone would not clear scientific, leakage, or uniqueness gates.</p>
+
+<h2>Score attribution</h2>
+<p>No organizer submission receipt ties this artifact to any competition score. The values 0.2778, 0.3195, and 0.3774 remain user-reported, not organizer-confirmed; this project cannot claim to beat them.</p>
+
+<h2>What would be required before any future submission</h2>
+<p>Only after explicit authorization and a reopened experiment budget: use the authorized shared cached feature stack, evaluator, writer, and uniqueness checker; run buffered whole-segment hide-and-recover with exact visible-fault masking and pooled DTI at α=0.2, β=0.8, and a 300 m triangular kernel; run each leakage canary alone; establish a same-evaluator holdout win with a justified 95% CI; check the continuous surface before placement and final dots afterward; then validate against the authentic organizer template. No weekly slot may be used without that holdout win.</p>
+<p>If all gates eventually pass, a human competitor signs in to the official <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DrivenData DOE GEMS competition</a>, uploads the exact cleared GeoTIFF, enters the run-card note (≤140 characters), submits, and preserves the organizer receipt. This project is not at that stage.</p>
+
+<p><a href="run-card-h55-160k.json">Historical H55 run card</a> · <a href="status-h55-160k.json">Historical H55 status</a> · <a href="run-card.json">Current fail-closed run card</a> · <a href="sources.html">Source register</a> · <a href="irregularities.html">Irregularities</a></p>
+</main></body></html>

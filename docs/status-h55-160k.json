@@ -1,0 +1,42 @@
+{
+  "project": "55GEMSDOE",
+  "reviewed_utc": "2026-10-09",
+  "overall_status": "NOT_CLEARED_DUPLICATE_STOP_AND_HOLDOUT_INVALID",
+  "label": "NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT",
+  "historical_artifact": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
+  "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
+  "download_allowed": false,
+  "submit_allowed": false,
+  "submit_recommended": false,
+  "download_link_published": false,
+  "uniqueness_status": {
+    "evidence_class": "HISTORICAL_REGISTRY-CHECK; NOT RE-RUN",
+    "reported_rasters_scanned": 56,
+    "raw_fraction_candidate_dots_within_3px": 0.8401,
+    "literal_overlap_limit": 0.70,
+    "verdict": "DUPLICATE_STOP",
+    "reason": "Raw historical overlap exceeds the literal threshold; chance-adjusted statistics do not override the stop rule. Registry rasters and surface cache are absent, so this was not rechecked."
+  },
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "status": "INVALID_FOR_PROMOTION",
+    "evaluator_version": "src/gems55/dti55.py; explicit version identifier absent in the original run record; local implementation not reconciled with the authorized shared evaluator",
+    "withheld_positive_count": 60988,
+    "candidate_value": 0.1019,
+    "ci95": [0.0877, 0.1185],
+    "ci95_method": "fold-level t interval over four quadrant-fold DTI values (df=3), not pooled-score contribution uncertainty",
+    "protocol": "Q4 quadrant primary; 3-pixel buffer; per-fold visible-only labels. B=15 px was secondary.",
+    "invalid_reasons": [
+      "quadrant folds can split connected mapped faults",
+      "local evaluator is not reconciled with the authorized shared evaluator",
+      "fold-level interval is not a pooled-score 95% CI"
+    ]
+  },
+  "format_status": {
+    "status": "NOT_ORGANIZER_VALIDATED",
+    "historically_reported_local_checks": "12/12 local structural checks in the source run card; not rerun in this review",
+    "official_template_present": false
+  },
+  "organizer_confirmed_score": null,
+  "reason": "The artifact is an uncleared historical record. No promotion-grade HOLDOUT-DTI, literal uniqueness pass, organizer format validation, or organizer receipt is available. No download, experiment, or submission is authorized. See docs/run-card-h55-160k.json and docs/run-card.json."
+}

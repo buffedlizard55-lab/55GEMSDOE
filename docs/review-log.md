@@ -19,10 +19,14 @@
 ## Pass 3 — final requirement and line audit
 
 - Reviewed the final changed paths for formula/source/status consistency and ran `git diff --check`.
-- `./.venv/bin/python -m pytest -q`: **37 passed, 2 skipped** (data-dependent raster tests skipped because the authorized feature/label/template rasters are absent). Three non-failing Rasterio affine deprecation warnings occurred in synthetic writer tests.
+- Audited the merged lane-code claims line by line: corrected fixed 64-pixel normalization tiles versus actual acquisition-block polygons and clarified direct-RTP tensor processing as a proxy, not a known-direction pseudogravity transform. Updated the published evidence/irregularities pages to match the reconciled historical records.
+- Reconciled PR #10 with the updated `main` history without rerunning any data-dependent work. Preserved the previously committed H56 and H55 evidence records, moved every historical raster/archive outside the published `docs/` tree, and corrected current and historical status cards to forbid download and submission.
+- Retired the merged `exp8`–`exp10` entry points and the unsafe H55 audit-page/run-card generators. The committed result JSON is retained as historical evidence; no experiment was executed.
+- `./.venv/bin/python -m pytest -q`: **39 passed, 2 skipped** (data-dependent raster tests skipped because the authorized feature/label/template rasters are absent). Three non-failing Rasterio affine warnings occurred in synthetic writer tests.
+- `./.venv/bin/python -m unittest discover -s tests -v`: **9 passed**.
 - `scripts/make_runcard.py`: all run-card field, note-length, no-receipt, null-holdout, and uncleared-artifact checks passed.
-- `scripts/build_site.py`: status gates passed and all 12 HTML pages had no GeoTIFF/ZIP download links.
-- `compileall` for source, scripts, and tests passed; all checked-in JSON under `docs/` and `evidence/` parsed successfully.
+- `scripts/build_site.py`: status gates passed and all 13 HTML pages had no GeoTIFF/ZIP download links; no raster/archive file is physically under `docs/`.
+- `compileall`, shell syntax check, `git diff --check`, and JSON parsing (31 files under `docs/` and `evidence/`) passed.
 - No competition data were downloaded, no geological experiment was run, no candidate TIFF was generated, and no weekly slot was used.
 
 ## Remaining blockers

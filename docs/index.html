@@ -21,7 +21,9 @@ alpha=0.2, beta=0.8: DTI = TP_w / (0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps)</pre>
 <ul>
 <li>Stored canonical-local <strong>HOLDOUT-DTI (historical; invalid for promotion)</strong>: evaluator was an unversioned local <code>src/gems55/dti55.py</code> transcription; withheld-positive count 60,988; tensor value 0.0667012 with stored interval [0.0560079, 0.0893459]. The folds were quadrants, and the purported random control was score-conditioned. The interval is not a pooled-DTI CI.</li>
 <li>A separate <strong>HOLDOUT-DTI (historical; private evaluator, not comparable)</strong> record used <code>gems.metric v1</code> and 60,594 withheld positives. It must not be compared to the canonical-local record.</li>
-<li>The historical final-dot scan reports 56 registry rasters and 84.13% within-3-pixel overlap for one reference, above the literal 70% stop threshold. The prior chance-adjusted exception is not permitted by the standing rule; disposition is <strong>DUPLICATE-STOP</strong>.</li>
+<li><strong>HOLDOUT-DTI (historical H56 multiscale; not promotion-grade):</strong> <code>src/gems55/dti55.py</code> (explicit version absent; local/unreconciled evaluator), 60,988 withheld positives; candidate value 0.0172779, stored 95% CI [0.0161283, 0.0184686]. The interval resamples five fold ratios, not pooled-score contributions; the candidate did not beat the stored one-scale comparator.</li>
+<li><strong>HOLDOUT-DTI (historical H55 160k Q4; not promotion-grade):</strong> <code>src/gems55/dti55.py</code> (explicit version absent; local/unreconciled evaluator), 60,988 withheld positives; candidate value 0.1019, stored 95% CI [0.0877, 0.1185]. This is a four-quadrant fold-level t interval; quadrant folds can split connected faults.</li>
+<li>Separate historical final-dot reports each exceed the literal 70% threshold: H55 40k raw overlap 84.13%; H55 160k raw overlap 84.01%; H56 40k maximum overlap 100% (a second row 73.6%). The scans are not current; disposition under the rule is <strong>DUPLICATE-STOP</strong>.</li>
 </ul>
 <h2>Before an experiment or submission</h2>
 <p>Read the <a href="hypotheses.html">ranked tensor-lane hypotheses</a>, with required layers, physical signatures, non-fault mimics, costs, and official data sources. The highest-ranked idea requires authorized band 2 and band 13 inputs plus validated acquisition/line masks. Any future authorized shared pipeline must use whole-segment hide-and-recover with a Euclidean buffer, exact visible-fault masking, per-feature leakage canaries, pooled DTI at α=0.2/β=0.8/300 m, pre-placement surface uniqueness, and final-dot uniqueness. The repository-local code is not a substitute for the authorized shared evaluator. A same-evaluator holdout win is required before any submission-slot promotion. The budget is recorded as used; do not run another experiment to bypass it.</p>
@@ -34,6 +36,7 @@ alpha=0.2, beta=0.8: DTI = TP_w / (0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps)</pre>
 <li><a href="results.html">Metric algebra, historical holdouts, and attribution limits</a></li>
 <li><a href="irregularities.html">Irregularity and source-provenance log</a></li>
 <li><a href="sources.html">Official and secondary source register</a></li>
+<li><a href="h55-160k-audit.html">Historical H55 160k audit record (DO NOT DOWNLOAD OR SUBMIT)</a></li>
 <li><a href="review-log.md">Three-pass review log and remaining blockers</a></li>
 </ul>
 </main></body></html>
