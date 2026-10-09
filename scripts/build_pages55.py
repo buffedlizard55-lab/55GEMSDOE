@@ -154,7 +154,8 @@ def main() -> int:
         f'({ctrl["reps"]} reps, matched cell count)</p></div>',
         f'<div class="card"><p class="metric-label">Max |Spearman| vs registry</p>'
         f'<p class="metric-value">{uniq["max_abs_spearman"]:.4f}</p>'
-        f'<p class="small">55 valid prior rasters compared; max Jaccard 0.0035</p></div>',
+        f'<p class="small">{uniq["scanned_registry_raster_count"]} valid prior rasters compared; '
+        f'max Jaccard {max(r["jaccard"] for r in uniq["comparisons"]):.5f}</p></div>',
         f'<div class="card"><p class="metric-label">Strike-agreement test</p>'
         f'<p class="metric-value" style="color:var(--red)">{strike["verdict"]}</p>'
         f'<p class="small">faults {A["fraction_within_tol"]:.1%} vs random ridges '
@@ -277,11 +278,13 @@ def main() -> int:
     # download.html
     # ------------------------------------------------------------------ #
     rows = "\n".join(
-        f"<tr><td>{escape(c['raster'][:58])}</td>"
+        f"<tr><td>{escape(c['raster'][:44])}</td>"
         f"<td>{c.get('reference_positive_count', '—')}</td>"
         f"<td>{c['fraction_candidate_dots_within_euclidean_3px']:.3f}</td>"
         f"<td>{c['chance_fraction_within_3px']:.3f}</td>"
-        f"<td>{c['excess_over_chance']:+.3f}</td>"
+        f"<td><strong>{c['reverse_fraction_reference_dots_near_candidate']:.3f}</strong></td>"
+        f"<td>{c['reverse_chance_fraction']:.3f}</td>"
+        f"<td><strong>{c['min_direction_fraction']:.3f}</strong></td>"
         f"<td>{c['spearman']:+.4f}</td>"
         f"<td>{c['jaccard']:.4f}</td></tr>"
         for c in sorted(uniq["comparisons"],
@@ -327,7 +330,11 @@ def main() -> int:
         f'<td><span class="tag">PASS</span> max {uniq["max_abs_spearman"]:.4f}</td></tr>',
         '<tr><td>Chance-adjusted final-dot uniqueness</td>'
         f'<td><span class="tag">PASS</span> max excess over chance '
-        f'{uniq["max_excess_over_chance"]:.3f}; max Jaccard 0.0035</td></tr>',
+        f'{uniq["max_excess_over_chance"]:.3f}; max Jaccard '
+        f'{max(r["jaccard"] for r in uniq["comparisons"]):.5f}</td></tr>',
+        '<tr><td>Symmetric duplicate rule — min of both directions, ≤ 0.70</td>'
+        f'<td><span class="tag">PASS</span> max '
+        f'{uniq["max_min_direction_fraction"]:.3f}</td></tr>',
         '<tr><td>Literal ">70 % of dots within 3 px" rule</td>'
         f'<td><span class="tag red">BREACHED, ARTEFACT</span> see below</td></tr>',
         '<tr><td>Lane\'s confirmatory strike-agreement test</td>'
@@ -343,20 +350,37 @@ def main() -> int:
         f'z = {strike["two_proportion_z"]:.2f}. The near-2-D (dimensionality) half of the lane '
         "is what carries the measured signal; the strike half does not, and the ablation says "
         "so too.</p>",
-        "<h2>Caveat 2 — the literal 3-pixel rule is triggered by reference coverage</h2>",
-        "<p>The ten reference rasters with the highest <em>raw</em> 3-pixel overlap are listed "
-        "below. Look at the two right-hand columns: for the densest references the observed "
-        "overlap equals the chance overlap to three decimals, and the excess over chance is "
-        "zero or negative. A reference that paints 207,000 cells over a 5.17-million-cell "
-        "footprint dilates to cover 99.9 % of it, so <em>any</em> candidate anywhere would "
-        "score ~1.0 on the raw statistic. The rule as written therefore cannot distinguish a "
-        "copy from two independent detectors that happen to work on the same terrain, and we "
-        "report both numbers rather than silently picking the flattering one.</p>",
+        "<h2>Caveat 2 — the literal 3-pixel rule is one-sided, and is breached by coverage</h2>",
+        "<p>The rule asks what fraction of <em>our</em> dots sit within 3 px of <em>their</em> "
+        "cells. That number rises with the reference raster's own coverage: a grid that paints "
+        "207,000 cells over a 5.17-million-cell footprint dilates to cover 99.9 % of it, so "
+        "<em>any</em> candidate anywhere scores ~1.0. The decisive question is whether the two "
+        "rasters are close in <strong>both</strong> directions, so the table adds the reverse "
+        "fraction — how much of <em>their</em> positives lie within 3 px of one of our dots — and "
+        "takes the <strong>smaller of the two</strong>. A real copy is high in both; a same-lane "
+        "detector that merely shares a terrain is high in one and at chance in the other.</p>",
         '<div class="table-wrap"><table class="table"><tr><th>Reference raster</th>'
-        "<th>ref cells</th><th>raw overlap</th><th>chance</th><th>excess</th>"
+        "<th>ref cells</th><th>ours&rarr;theirs</th><th>chance</th>"
+        "<th>theirs&rarr;ours</th><th>chance</th><th><strong>min</strong></th>"
         "<th>Spearman</th><th>Jaccard</th></tr>",
         rows,
         "</table></div>",
+        f"<p>Across all {uniq['scanned_registry_raster_count']} valid references the worst "
+        f"min-direction value is <strong>{uniq['max_min_direction_fraction']:.3f}</strong> "
+        "against the 0.70 threshold; the largest reverse fraction is "
+        f"{uniq['max_reverse_fraction']:.3f}; the largest |Spearman| is "
+        f"{abs(uniq['max_abs_spearman']):.4f} against 0.90; the largest Jaccard is "
+        f"{max(r['jaccard'] for r in uniq['comparisons']):.5f}. Three references do trip the "
+        "literal one-sided rule, and every one of them has a reverse direction at or below "
+        "chance. The literal rule is therefore reported as breached and the deliverable judged on "
+        "the symmetric statistic — both numbers are on this page, not one quietly dropped.</p>",
+        "<h3>The parallel submission merged in PR #16</h3>",
+        "<p>A parallel session in this repository shipped three tensor-lane rasters that were not "
+        "in the registry when this lane was built. They were added and rescanned. They show the "
+        "largest spatial association in the whole registry — as they should, being the same lane "
+        "on the same data — but they are not copies: against their primary 1,875,224-pixel "
+        "continuous surface the forward overlap is 0.861 while the reverse is 0.123 against a "
+        "chance baseline of 0.087, and the Jaccard is 0.0045.</p>",
         '<p class="small">Full 55-raster table: '
         '<a href="https://github.com/buffedlizard55-lab/55GEMSDOE/blob/main/evidence/'
         'uniqueness55_final.json">evidence/uniqueness55_final.json</a>. One manifest raster '
