@@ -43,7 +43,7 @@ These historical values are reported with evaluator/source, withheld-positive co
 
 ## Score attribution and leaderboard
 
-A saved **PUBLIC-LEADERBOARD snapshot (not a submission-page receipt, not ORGANIZER-CONFIRMED)** lists **0.2778** at rank 16 under `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1; see `evidence/leaderboard_snapshot_20261009.json`. The snapshot does not identify raster hashes. A read-only check of the owner-maintained GEMSDOE32 artifact manifest reports `receipt: null` for H33, labels it `UNSCORED`, and describes **0.2747** as projected. The mapping from `extradr19` to H33 is unverified; the owner manifest is secondary evidence, not an organizer receipt. Accordingly, this repository cannot establish that H33 received the public rank-16 entry, explain why that entry received its value, or claim that any current candidate beats a leaderboard value.
+A saved **PUBLIC-LEADERBOARD snapshot (not a submission-page receipt, not ORGANIZER-CONFIRMED)** lists **0.2778** at rank 17 under `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1; see `evidence/leaderboard_snapshot_20261009.json`. The snapshot does not identify raster hashes. A read-only check of the owner-maintained GEMSDOE32 artifact manifest reports `receipt: null` for H33, labels it `UNSCORED`, and describes **0.2747** as projected. The mapping from `extradr19` to H33 is unverified; the owner manifest is secondary evidence, not an organizer receipt. Accordingly, this repository cannot establish that H33 received the public rank-17 entry, explain why that entry received its value, or claim that any current candidate beats a leaderboard value.
 
 ## Geological and submission conclusions
 
