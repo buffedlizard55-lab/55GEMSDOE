@@ -41,7 +41,10 @@ the first thing on `docs/index.html`.
 * **Grid contract, measured from the organiser template:** 3292 × 3730 (w × h),
   EPSG:32611, 100 m, transform `(100, 0, 243350, 0, −100, 4508550)`,
   5,167,373 valid px, 7,111,787 NaN, 60,988 mapped catalogue px.
-* **Tests:** `16 passed`. They cover exactness of the DTI evaluator against a
+* **Tests:** `36 passed` (16 in this session's `tests_numeric/test_core.py` + 14
+  from the concurrent session's numeric tests), plus `6 passed` stdlib-only site
+  guardrails in `tests/test_site_status.py`. Both suites run in CI. The numeric
+  tests cover exactness of the DTI evaluator against a They cover exactness of the DTI evaluator against a
   brute-force transcription, the official worked example ratio, the FFT gradient
   tensor against an analytic harmonic solution, the closed-form eigen-decomposition
   against `numpy.linalg.eigh`, both dimensionality endpoints, the survey-line
@@ -67,7 +70,9 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 bash scripts/download_competition_data.sh   # needs `gh` auth; or log in at DrivenData
 .venv/bin/python scripts/prepare_and_cache.py  # verifies data/, builds data/cache/lane_v1.npz
 .venv/bin/python scripts/prepare_data.py        # concurrent session's sha256 pin check
-.venv/bin/python -m pytest -q
+.venv/bin/python -m pytest -q                     # everything: 36 tests
+python3 -m unittest discover -s tests -v          # site guardrails, stdlib only
+.venv/bin/python -m pytest tests_numeric -q       # maths, 30 tests
 .venv/bin/python scripts/diagnose_striping.py
 .venv/bin/python scripts/evaluate_holdout.py --tag v1 --n-dots 40000
 .venv/bin/python scripts/exp2_placement.py 40000 v1
