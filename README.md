@@ -5,6 +5,14 @@ Prize Challenge*, GeoDAWN region, northwestern Great Basin. Read this file first
 at the start of every session. The current evidence is in `docs/run-card.json` and
 `docs/status.json`; numbers in this README are labelled by evidence class.
 
+## Session 2026-10-09 (leaderboard review) — read first
+
+- **Submission status: still DO NOT SUBMIT.** No new raster was generated. The competition feature rasters are not on this machine (`data/` is empty), and the sandbox cannot reach the DrivenData data tab. Only the sibling-repo copy is available, and its provenance is unresolved (IR-55-034). **Decision needed from the owner:** see [`docs/leaderboard-review-20261009.md` §7](docs/leaderboard-review-20261009.md).
+- **Leaderboard correction.** The public DrivenData leaderboard shows **0.3774** at rank 1 (not 0.3195). 0.3195 is rank 7. 0.2778 is rank 16 ([leaderboard](https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/); captured in `evidence/leaderboard_snapshot_20261009.json`). These are PUBLIC-LEADERBOARD values, not organizer receipts.
+- **Why 0.2778 may have scored (reasoned, not measured):** sparse, tightly clustered dots, zero dots on mapped faults, scored by the official near-miss kernel. The repo's whole-catalogue proxy scores that same raster below random (0.0049 vs 0.0321). The repo's holdout targets catalogue recovery, not the new-fault test set (IR-55-039). The anchor was not run through the hide-and-recover holdout itself. Full answer in the review document.
+- **New candidate hypotheses** T-A to T-D are in [`docs/hypotheses.md`](docs/hypotheses.md). Four are proposals only. T-D (a dated official "new faults" holdout from USGS QFFD) is an enabler and needs its download, which the sandbox cannot reach.
+- **Verified this session:** the audit TIFs re-read with rasterio (format fields pass; sha256 matches the run card); `pytest tests_numeric tests` gives 34 passed, 2 skipped. The validator and uniqueness scripts were **not** re-run because they need the missing template raster.
+
 ## Current decision: audit artifact generated, submission blocked
 
 A new raster was generated from this checkout and is **not a copy of the earlier

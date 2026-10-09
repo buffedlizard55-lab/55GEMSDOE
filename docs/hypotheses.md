@@ -104,3 +104,35 @@ Evaluator `src/gems55/dti55.py` (exact official DTI). Protocols: Q4 quadrant hid
 - Secondary B = 15 px: tensor beats random at 40k (+0.0015, p = 0.008) and 160k (+0.0026, p = 0.004), not at 80k (p = 0.20). The sign depends on the protocol (IR-55-031). The primary governs under the rule.
 - Audit file: `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 ffd2a892…). Validator 12/12. Uniqueness BLOCKED under the literal 70% rule (IR-55-030). **DO NOT SUBMIT.** Download for audit only.
 - Budget: 3 of 3 experiments used.
+
+## Session 2026-10-09 (leaderboard review) — new candidates T-A to T-D
+
+**Status: proposals only. Nothing below is implemented, scored, or submitted.** The
+feature stack is not on disk, so none of these can be validated in this session. Layer
+names are taken from the official problem page
+(https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/, section
+"Provided features"). Band numbers are **not** verified here, because the band-order
+metadata lives in the data file that is missing. Each candidate names its band by
+description only.
+
+Ranking is by expected DTI improvement, then implementation cost. T-D is an enabler (a
+validation fix), not a candidate, so it is ranked separately.
+
+| Rank | Candidate; layers | Physical signature | Why it can find an omitted fault | Difference from this repo | Expected opportunity / cost |
+|---|---|---|---|---|---|
+| **T-A** | **Source-depth step across tensor ridges.** Layer: "Magnetics … top-of-crustal magnetic source depth estimate" (band number to be read from tags). Gated by the existing tensor ridge and strike. | A fault offsets the magnetic source depth, so a lateral **step** in source depth should lie along the ridge and parallel its strike. A compact intrusion gives a closed depth **minimum**, not a line-parallel step. | The depth step comes from the field itself, not from the catalogue, so it can flag an uncatalogued trace. | The repo uses bands 2, 12, 13, 14, 9 and 18 (`src/gems55/io55.py`). It does not use the depth layer, and it has no step-vs-minimum test. | Moderate opportunity, moderate cost. **Mimic to test:** basin-margin or lithologic depth contacts, and depth-estimate artefacts at flight-line edges. |
+| **T-B** | **Seismicity-density consensus on tensor ridges.** Layer: "Density of earthquakes". Keep a tensor-gated ridge only when the seismicity-density ridge agrees in position and strike. | Active faults concentrate epicentres along strike. This signal is independent of the fault catalogue. | Seismicity is a separate, active-structure signal. It can support a new trace that is not yet mapped. | No current use of the seismicity layer in `src/` or `scripts/`. | Moderate opportunity, low cost. **Mimic:** injection or quarry seismicity, and network-coverage bias in the density layer. Overlaps H2 only partly (H2 uses magnetics and gravity). |
+| **T-C** | **Tight-packed chain placement along the top tensor ridges.** No new layer; changes the emitter. | Under the official kernel a dot 1–2 px from a true trace costs little FP and earns TP. A sparse, tightly packed chain along the most probable trace should beat the repo's 3 px-spaced placement. Derived from the anchor forensics, not yet measured. | Chains can sit on an uncatalogued continuation of a strong ridge, which the catalogue holdout cannot test. | `scripts/submission_writer.py` and `src/gems55/holdout55.py` `emit_dots` enforce `min_sep_px = 3.0`. The anchor's own evidence reports dot spacing below 3 px in one computation (IR-55-036). | High opportunity if the reasoning holds, low cost. **Mimic:** any linear artefact (striping, levelling seams, FFT ringing) that is also strongly ridged. **Must not be scored with the catalogue holdout alone** (see T-D). |
+| **T-D** | **Enabler: a dated, official "new faults" holdout.** Use the USGS Quaternary Fault and Fold Database (DOI 10.5066/P9BCVRCK; ScienceBase item 589097b1e4b072a7ac0cae23, last update 2020-09-02, change log and GIS zip listed) to define faults that appear in a later release but are absent from the competition's label snapshot. | Not a physical signature. This makes the holdout target match the leaderboard's target (new faults). | The current holdout asks whether a method recovers catalogue faults. The official target is new faults. T-D tests whether the ranking holds on the right target. | The repo's holdout (`scripts/evaluate_holdout.py`) uses hide-and-recover on the competition catalogue only. | Enabler, not a DTI gain. Low/moderate cost. **Needs:** the competition label snapshot date (not verified), and a download of the ScienceBase GIS zip, which the sandbox cannot reach. |
+
+**Validation plan (applies to every candidate; no holdout tuning allowed).** 1) Leakage
+canary: test each new feature alone; AUC above 0.90 means leakage until proven otherwise.
+2) Score on the existing hide-and-recover holdout with the existing evaluator and
+the pinned seeds, with HOLDOUT-DTI and a 95% CI. 3) Score on the T-D new-fault holdout
+once it exists, and report any disagreement between the two. 4) Registry check
+(correlation and overlap) before placement and on final dots. 5) Only then consider a
+weekly slot (three per week, rules §3.2).
+
+**Do not promote any candidate on the current holdout alone.** The anchor scores 0.2778
+on the leaderboard while scoring worse than random on the whole-catalogue proxy (see
+`docs/leaderboard-review-20261009.md`).
