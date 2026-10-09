@@ -1,0 +1,36 @@
+{
+  "schema": "55gemsdoe.leaderboard-snapshot.v1",
+  "evidence_class": "PUBLIC-LEADERBOARD (organizer platform page, fetched; not a submission-page receipt, so NOT ORGANIZER-CONFIRMED)",
+  "source_url": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+  "fetched_with": "fetch_page tool, 2026-10-09 (UTC session date)",
+  "capture": "ranks 1-22 of the 'Best public DW-Tversky' column; later rows were not captured in this review",
+  "metric_note": "Public-leaderboard score; private and final-round scores are different (rules section 3.6.1).",
+  "rows": [
+    {"rank": 1,  "participant": "xiaofanhu",         "best_public_dw_tversky": 0.3774, "submissions": 14},
+    {"rank": 2,  "participant": "alexoktaba",        "best_public_dw_tversky": 0.3361, "submissions": 26},
+    {"rank": 3,  "participant": "nchuzhoy",          "best_public_dw_tversky": 0.3262, "submissions": 6},
+    {"rank": 4,  "participant": "joeyfezster",       "best_public_dw_tversky": 0.3260, "submissions": 25},
+    {"rank": 5,  "participant": "kinghorton42",      "best_public_dw_tversky": 0.3222, "submissions": 9},
+    {"rank": 6,  "participant": "Batik Shirt Brothers", "best_public_dw_tversky": 0.3221, "submissions": 24},
+    {"rank": 7,  "participant": "DARD",              "best_public_dw_tversky": 0.3195, "submissions": 17},
+    {"rank": 8,  "participant": "ohyeah",            "best_public_dw_tversky": 0.2960, "submissions": 4},
+    {"rank": 9,  "participant": "JerryDataWorks",    "best_public_dw_tversky": 0.2948, "submissions": 17},
+    {"rank": 10, "participant": "mzoorob",           "best_public_dw_tversky": 0.2902, "submissions": 28},
+    {"rank": 11, "participant": "notmyfault",        "best_public_dw_tversky": 0.2901, "submissions": 18},
+    {"rank": 12, "participant": "ndavis7",           "best_public_dw_tversky": 0.2888, "submissions": 10},
+    {"rank": 13, "participant": "GrigorSargsyan",    "best_public_dw_tversky": 0.2876, "submissions": 15},
+    {"rank": 14, "participant": "HardcoreTechGod",   "best_public_dw_tversky": 0.2854, "submissions": 6},
+    {"rank": 15, "participant": "op01",              "best_public_dw_tversky": 0.2797, "submissions": 8},
+    {"rank": 16, "participant": "extradr19",         "best_public_dw_tversky": 0.2778, "submissions": 13},
+    {"rank": 17, "participant": "arnofault",         "best_public_dw_tversky": 0.2764, "submissions": 2},
+    {"rank": 18, "participant": "faultsofthy",       "best_public_dw_tversky": 0.2764, "submissions": 3},
+    {"rank": 19, "participant": "wonderfulbig12",    "best_public_dw_tversky": 0.2761, "submissions": 4},
+    {"rank": 20, "participant": "No Fault of Our Own", "best_public_dw_tversky": 0.2761, "submissions": 25},
+    {"rank": 21, "participant": "newway",            "best_public_dw_tversky": 0.2752, "submissions": 6},
+    {"rank": 22, "participant": "wbg1",              "best_public_dw_tversky": 0.2750, "submissions": 15}
+  ],
+  "irregularities": [
+    "The owner brief says 0.3195 is the highest score. The page shows 0.3195 at rank 7; rank 1 is 0.3774.",
+    "The owner brief's 0.2778 entry is labelled by a site name (GEMSDOE32, h33-...). The page lists it under the participant 'extradr19'. The mapping from the site name to this participant is NOT verified."
+  ]
+}

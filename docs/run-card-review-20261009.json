@@ -1,0 +1,36 @@
+{
+  "schema": "55gemsdoe.run-card.v3",
+  "run_id": "55GEMSDOE-REVIEW-2026-10-09",
+  "hypothesis": "none tested this session; review of why the 0.2778 public entry scored and whether the repo can beat it",
+  "mechanism": "not tested; reasoned from the official DTI kernel: near-miss dots cost little FP and earn TP",
+  "named_non_fault_mimic": "linear artefacts (flight-line striping, levelling seams, FFT ringing) and lithologic contacts or dikes, which are also long and 2-D",
+  "holdout_dti": {
+    "status": "NOT RUN",
+    "evidence_class": "none"
+  },
+  "leakage_canary": {
+    "status": "NOT RUN"
+  },
+  "correlation_overlap_vs_registry": {
+    "status": "NOT RUN",
+    "reason": "no feature stack or candidate surface on disk"
+  },
+  "raster_sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
+  "raster_sha256_note": "existing audit file, unchanged; re-read this session",
+  "validator_output": {
+    "status": "NOT RE-RUN (template raster missing)",
+    "independent_reread": "PASS for format fields"
+  },
+  "submission": {
+    "name": null,
+    "note": null,
+    "submit_allowed": false
+  },
+  "public_leaderboard": {
+    "evidence_class": "PUBLIC-LEADERBOARD",
+    "rank_of_0_2778": 16,
+    "top": 0.3774,
+    "rank_of_0_3195": 7
+  },
+  "verdict": "negative (no new candidate); data blocker"
+}
