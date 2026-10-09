@@ -3,7 +3,7 @@
 ## Pass 1 — implementation and scope
 
 - Re-derived the DTI denominator from `TP_w + FN_w = |G|`; replaced the false count-only identity throughout the current results narrative and added a synthetic regression case.
-- Reclassified the leaderboard values as user-reported, withdrew the H33 score attribution and any causal/beating claim, and kept the owner-maintained manifest as secondary evidence only.
+- Distinguished the dated PUBLIC-LEADERBOARD snapshot from ORGANIZER-CONFIRMED receipts, recorded the unverified account-to-H33 mapping, and kept the owner-maintained manifest as secondary evidence only. Withdrew the H33 score attribution and any causal/beating claim.
 - Preserved four ranked tensor-dimensionality hypotheses with required layers, physical signatures, rationales, method differences, costs, non-fault mimics, and official references.
 - Removed the duplicate `gems/` evaluator/writer package and retired data-dependent local runners, private/unsafe page and run-card generators, status mutator, mirror-registry downloader, and submission writer. Moved uncleared raster/archive variants out of the published `docs/` tree into an explicitly labeled evidence archive.
 - Made site and run-card status fail closed: no valid promotion HOLDOUT-DTI, no organizer receipt, no uniqueness pass, and no download or submission clearance.
@@ -14,19 +14,19 @@
 - Audited fold/random/uniqueness/format language against actual local code. `src/gems55/` is the sole repository-local implementation, **not certified as the authorized shared or organizer evaluator**; no local results may clear promotion.
 - Checked data preparation uses the canonical filenames in `src/gems55/io55.py` and mirror-derived hash pins are not labeled as official provenance.
 - Reconciled `status.json`, `run-card.json`, artifact SHA-256, and download-link policy. Flagged the distinct 56-raster vs older 632-raster registry snapshots as non-comparable. Fixed a stale site-status test that still required a downloadable, positive file.
-- Kept the user-reported 0.2778, 0.3195, and 0.3774 distinct from `ORGANIZER-CONFIRMED`; no receipt or score attribution was invented.
+- Audited the captured public leaderboard rows and manifest separately; no submission receipt, raster hash, or verified mapping to H33 was invented. The public-page values are labeled `PUBLIC-LEADERBOARD`, not `ORGANIZER-CONFIRMED`.
 
 ## Pass 3 — final requirement and line audit
 
 - Reviewed the final changed paths for formula/source/status consistency and ran `git diff --check`.
 - Audited the merged lane-code claims line by line: corrected fixed 64-pixel normalization tiles versus actual acquisition-block polygons and clarified direct-RTP tensor processing as a proxy, not a known-direction pseudogravity transform. Updated the published evidence/irregularities pages to match the reconciled historical records.
-- Reconciled PR #10 with the updated `main` history without rerunning any data-dependent work. Preserved the previously committed H56 and H55 evidence records, moved every historical raster/archive outside the published `docs/` tree, and corrected current and historical status cards to forbid download and submission.
+- Reconciled PR #10 with updated `main` history through `aa783f5`, including the dated public-leaderboard snapshot, without rerunning any data-dependent work. Preserved H56/H55 evidence as historical, moved every raster/archive outside the published `docs/` tree, and corrected status cards to forbid download and submission. Rewrote the incoming leaderboard analysis to withdraw invalid anchor-proxy DTI values and avoid unsupported attribution.
 - Retired the merged `exp8`–`exp10` entry points and the unsafe H55 audit-page/run-card generators. The committed result JSON is retained as historical evidence; no experiment was executed.
 - `./.venv/bin/python -m pytest -q`: **39 passed, 2 skipped** (data-dependent raster tests skipped because the authorized feature/label/template rasters are absent). Three non-failing Rasterio affine warnings occurred in synthetic writer tests.
 - `./.venv/bin/python -m unittest discover -s tests -v`: **9 passed**.
 - `scripts/make_runcard.py`: all run-card field, note-length, no-receipt, null-holdout, and uncleared-artifact checks passed.
 - `scripts/build_site.py`: status gates passed and all 13 HTML pages had no GeoTIFF/ZIP download links; no raster/archive file is physically under `docs/`.
-- `compileall`, shell syntax check, `git diff --check`, and JSON parsing (31 files under `docs/` and `evidence/`) passed.
+- `compileall`, shell syntax check, `git diff --cached --check`, and JSON parsing (33 files under `docs/` and `evidence/`) passed. Archived primary TIFF SHA-256 values match the status manifest; both current and review run cards forbid download/submission.
 - No competition data were downloaded, no geological experiment was run, no candidate TIFF was generated, and no weekly slot was used.
 
 ## Remaining blockers

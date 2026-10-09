@@ -6,7 +6,7 @@
 <h2>Competition and official sources</h2><table><tr><th>Source</th><th>Use</th><th>Limit</th></tr>
 <tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a></td><td>Primary task, feature, metric, and output-format reference.</td><td>Does not tie any raster to a score; consult live page before submission.</td></tr>
 <tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData data tab</a></td><td>Authorized competition raster source, subject to login and terms.</td><td>No data were downloaded or authenticated in this review.</td></tr>
-<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">Official public leaderboard</a></td><td>Current public ranking source.</td><td>Earlier read showed a loading shell; no file/hash attribution established.</td></tr>
+<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">Official public leaderboard</a></td><td>A 2026-10-09 fetch captured ranks 1–22 in the local snapshot; see <a href="leaderboard-analysis.html">attribution summary</a>.</td><td>Dated page capture, not a submission receipt; it does not identify a raster/hash or establish H33/account mapping.</td></tr>
 <tr><td><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">Official NLR rules PDF</a></td><td>Eligibility, submission, and use terms.</td><td>Read the complete current rules before submitting; no legal determination here.</td></tr>
 <tr><td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">Official reference solution</a></td><td>Read-only API inspection found standard PyTorch Tversky training loss.</td><td>Not the distance-weighted scoring evaluator and not a score source.</td></tr>
 <tr><td><a href="https://doi.org/10.5066/P93LGLVQ">USGS GeoDAWN release</a></td><td>Survey context and potential acquisition/flight metadata.</td><td>No external block/line file was downloaded or aligned in this review.</td></tr>
@@ -21,9 +21,10 @@
 <p>The <a href="https://github.com/buffedlizard55-lab/GEMSDOE">GEMSDOE sibling repository</a> documents owner-maintained feature/label/template mirrors and SHA-256 pins. The mirrors are not authenticated organizer downloads; no raster was fetched in this review. The downloader requires explicit opt-in and is not run.</p>
 <h2>Local data state</h2><p>Canonical paths are defined in <code>src/gems55/io55.py</code>. Feature stack, labels, organizer template, cache, and registry rasters are absent. SHA-256 values recorded in <a href="../data/README.md">data/README.md</a> are mirror-derived integrity pins only. Git blob SHA-1 and SHA-256 are different algorithms.</p>
 <h2>Evidence classes</h2><ul>
-<li><strong>ORGANIZER-CONFIRMED:</strong> actual organizer receipt tied to artifact; none for values in this checkout.</li>
+<li><strong>ORGANIZER-CONFIRMED:</strong> actual organizer receipt tied to artifact; none for H33 or the comparison entries in this checkout.</li>
+<li><strong>PUBLIC-LEADERBOARD:</strong> value transcribed from the dated public-page snapshot; not a submission receipt and not an artifact attribution.</li>
 <li><strong>HOLDOUT-DTI:</strong> local validation with evaluator version, withheld-positive count, and 95% CI. Existing records are historical and invalid for promotion.</li>
-<li><strong>USER-REPORTED / NOT ORGANIZER-CONFIRMED:</strong> includes reported 0.2778, 0.3195, and 0.3774.</li>
+<li><strong>USER-REPORTED / NOT ORGANIZER-CONFIRMED:</strong> owner claims lacking a corresponding receipt or public-page capture; a public row still does not identify a local artifact.</li>
 <li><strong>PROJECTION:</strong> estimate, never a score; the secondary manifest calls 0.2747 projected.</li>
 </ul>
 <p><a href="sources.md">Full source register and retrieval status</a> · <a href="results.html">Results and audit</a>.</p>

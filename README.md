@@ -6,7 +6,7 @@
 
 ## Current answer on the reported leaderboard values
 
-The values **0.2778**, **0.3195**, and **0.3774** are **USER-REPORTED / NOT ORGANIZER-CONFIRMED** in this checkout. No organizer submission-page receipt ties any of them to a raster/hash. A read-only GitHub API check of the owner-maintained GEMSDOE32 manifest reports `receipt: null` for the H33 artifact, labels it `UNSCORED`, and describes **0.2747** as projected. That is secondary owner-generated evidence, not an organizer receipt. Therefore this project cannot establish why H33 “scored 0.2778,” explain a causal mechanism for that value, or claim to beat a reported leaderboard score.
+A saved **PUBLIC-LEADERBOARD snapshot (not a submission-page receipt and not ORGANIZER-CONFIRMED)** lists **0.2778** at rank 16 under `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1; see [`evidence/leaderboard_snapshot_20261009.json`](evidence/leaderboard_snapshot_20261009.json). The mapping from `extradr19` to the owner-maintained H33 artifact is unverified. A read-only GitHub API check of the owner's GEMSDOE32 manifest reports `receipt: null` for H33, labels it `UNSCORED`, and describes **0.2747** as projected. That is secondary owner-generated evidence, not an organizer receipt. Therefore this project cannot establish that H33 produced the public rank-16 entry, why that entry received its value, or that any repository candidate beats it. The previous anchor-proxy DTI and causal conclusions that depended on the invalid count-only formula are withdrawn and were not recomputed. Any near-miss/clustered-dot explanation is only a hypothesis, not an established mechanism. See the [2026-10-09 leaderboard review](docs/leaderboard-review-20261009.md).
 
 ## Critical metric correction — prior conclusions withdrawn
 
@@ -95,4 +95,4 @@ When a future file has passed every scientific, leakage, uniqueness, and format 
 - [Official problem description and metric](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)
 - [Official GEMS rules (NLR PDF)](https://docs.nlr.gov/docs/fy26osti/96647.pdf)
 - [USGS GeoDAWN release, DOI 10.5066/P93LGLVQ](https://doi.org/10.5066/P93LGLVQ)
-- [Results and metric correction](docs/results.md) · [Leaderboard attribution](docs/leaderboard-analysis.md) · [Irregularities](docs/irregularities.md) · [Source register](docs/sources.md) · [Three-pass review log](docs/review-log.md)
+- [Results and metric correction](docs/results.md) · [Leaderboard attribution](docs/leaderboard-analysis.md) · [2026-10-09 public-leaderboard audit](docs/leaderboard-review-20261009.md) · [Irregularities](docs/irregularities.md) · [Source register](docs/sources.md) · [Three-pass review log](docs/review-log.md)
