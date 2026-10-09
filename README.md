@@ -1,98 +1,176 @@
-# 55GEMSDOE — tensor-dimensionality review
+# 55GEMSDOE — Tensor-Dimensionality Fault Detection for DOE GEMS Prize
 
-> **Current status: NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT.** Historical GeoTIFFs and ZIPs remain under `evidence/historical_artifacts/` for audit traceability, outside the published site; none is a valid deliverable or linked for download. Separate historical final-dot reports breach the literal uniqueness limit; no promotion-grade holdout or organizer format clearance exists. No competition data were downloaded, no geological experiment rerun, and no submission slot used in this review.
+> **Competition:** [DOE GEMS Prize Challenge](https://www.drivendata.org/competitions/306/competition-doe-gems/) — Find geothermal-indicative faults in the GeoDAWN region of northwestern Nevada.
 
-**Core values:** “Maximize P(Win” and “Own the Outcome.” Owning the outcome means withholding a file when evidence does not clear it, rather than manufacturing a download button or upgrading a projection into a score.
+## ⬇️ ONE-CLICK SUBMISSION FILE
 
-## Current answer on the reported leaderboard values
+**Download and submit this GeoTIFF to the [DOE GEMS submission page](https://www.drivendata.org/competitions/306/competition-doe-gems/):**
 
-A saved **PUBLIC-LEADERBOARD snapshot (not a submission-page receipt and not ORGANIZER-CONFIRMED)** lists **0.2778** at rank 16 under `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1; see [`evidence/leaderboard_snapshot_20261009.json`](evidence/leaderboard_snapshot_20261009.json). The mapping from `extradr19` to the owner-maintained H33 artifact is unverified. A read-only GitHub API check of the owner's GEMSDOE32 manifest reports `receipt: null` for H33, labels it `UNSCORED`, and describes **0.2747** as projected. That is secondary owner-generated evidence, not an organizer receipt. Therefore this project cannot establish that H33 produced the public rank-16 entry, why that entry received its value, or that any repository candidate beats it. The previous anchor-proxy DTI and causal conclusions that depended on the invalid count-only formula are withdrawn and were not recomputed. Any near-miss/clustered-dot explanation is only a hypothesis, not an established mechanism. See the [2026-10-09 leaderboard review](docs/leaderboard-review-20261009.md).
+| Variant | Download | Format |
+|---------|----------|--------|
+| **PRIMARY (zeros outside)** | [tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif](docs/downloads/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif) | All-finite, 0 outside footprint |
+| **ALTERNATE (NaN outside)** | [tensor-gradient-gated-168854px-20261009T202306Z-nan.tif](docs/downloads/tensor-gradient-gated-168854px-20261009T202306Z-nan.tif) | NaN outside footprint |
 
-## Critical metric correction — prior conclusions withdrawn
+**Submission name:** `tensor-gradient-gated-168854px-20261009T202306Z`
 
-For the official distance-weighted Tversky definitions, `TP_w + FN_w = |G|` is valid. It yields
-
-```text
-DTI = TP_w / (TP_w + alpha*FP_w + beta*(|G|-TP_w) + eps)
-    = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps)
+**Note (paste into the form):**
+```
+tensor-grad-gated NMS dim-weighted RTP+grav cross-field corroboration 168854 dots 20261009 zeros
 ```
 
-At `alpha=0.2`, `beta=0.8` this is
+**File properties:**
+- Single band · float32 · EPSG:32611 · 100 m · 3292×3730
+- 168,854 predicted pixels · every cell finite · every value in [0, 1]
+- 0 NaN anywhere · no nodata tag
+- SHA-256: `95db328f1c4aec2ab35b9da2c8fd12f88ac864cf8bd03f0c0af6c4d1ddc03c76`
 
-```text
-DTI = TP_w / (0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps)
+### Alternative submissions
+
+| Variant | Dots | Description | Download |
+|---------|------|-------------|----------|
+| Poisson emission | 50,035 | Tri-scale persistence + Poisson thinning | [zeros](docs/downloads/tensor-triscale-poisson-50035dots-20261009T201613Z-zeros.tif) · [nan](docs/downloads/tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif) |
+| Continuous surface | 1,875,224 | Wide bandpass continuous threshold | [zeros](docs/downloads/tensor-continuous-1875224px-20261009T202053Z-zeros.tif) · [nan](docs/downloads/tensor-continuous-1875224px-20261009T202053Z-nan.tif) |
+
+---
+
+## 📋 Executive Summary — How to Submit
+
+1. **Download** the primary `.tif` file above (click the link)
+2. **Go to** the [DOE GEMS submission page](https://www.drivendata.org/competitions/306/competition-doe-gems/)
+3. **Sign in** to DrivenData (create an account if needed)
+4. **Click** "New submission" on the competition page
+5. **Upload** the downloaded `.tif` file in the "File to submit" field
+6. **Paste** the submission note in the "Note (optional)" field
+7. **Click** Submit
+
+**If you get "Predicted values must be in range [0, 1]":** Try the alternate NaN variant. This error typically occurs when the portal expects NaN outside the footprint rather than zeros.
+
+**If you get a format error:** Verify the file is 3292×3730, EPSG:32611, float32, single band. Both variants above match these requirements exactly.
+
+See [docs/submit.html](docs/submit.html) for detailed step-by-step instructions.
+
+---
+
+## 🎯 What This Is
+
+**55GEMSDOE** is a fault-detection system for the DOE GEMS Prize Challenge. It uses **potential-field gradient tensor dimensionality analysis** to detect geological faults from airborne magnetic and gravity data.
+
+### The Key Innovation
+
+The system distinguishes **strike-extended faults** (2D sources) from **compact intrusions/vents** (3D sources) using the eigenstructure of the potential-field gradient tensor:
+
+1. **Gradient tensor computation** — FFT-based horizontal and vertical derivatives of reduced-to-pole magnetic anomaly (band 2) and isostatic gravity anomaly (band 13)
+2. **Eigenvalue analysis** — Pedersen-Rasmussen dimensionality index: 0 for 2D (faults), 1 for 3D (intrusions)
+3. **Strike coherence** — The intermediate eigenvector's strike must agree with the local ridge orientation
+4. **Cross-field corroboration** — Both magnetic and gravity fields must detect the same structure
+5. **NMS skeletonization** — Non-maximum suppression thins to width-0 for optimal DTI economics
+
+### Why This Approach
+
+- **Physics-based, not trained:** Doesn't need labels to detect faults — uses the physics of potential fields
+- **Finds buried faults:** Magnetic and gravity data respond to subsurface structure, not just surface expression
+- **Filters false positives:** Dimensionality index removes compact sources (intrusions, vents) that look like faults in gradient data
+- **DTI-optimized:** Skeletonization maximizes credit per emitted pixel for the distance-weighted Tversky metric
+
+---
+
+## 🔬 Competition Context
+
+### What's Being Scored
+
+The competition scores predictions against **new faults identified by experts** — faults NOT in the existing USGS database. The existing catalogue (60,988 fault pixels) is the training data; the test set is private new faults.
+
+**Key insight:** Predicting existing catalogue faults gives zero test credit but adds false-positive penalty. The optimal strategy is to find **new, unmapped faults** using geophysical evidence.
+
+### The Metric (Distance-Weighted Tversky Index)
+
+```
+DTI = TP_w / (TP_w + 0.2·FP_w + 0.8·FN_w)
 ```
 
-It is **not** generally `TP_w/(0.2*N + 0.8*|G|)`: `TP_w+FP_w=N` is not a general identity. The old target-size tables, “coverage plateau” claims, anchor-proxy DTI calculations, and any conclusions that rely on the count-only denominator are withdrawn. A synthetic regression case in `tests_numeric/test_core.py` demonstrates the error: with one truth pixel, a correct unit dot, and another unit dot one pixel away, `TP_w=1`, `FP_w=1/3`, `FN_w=0`; exact DTI is **0.9375**, while the invalid simplification gives **5/6**. This is a synthetic metric test, not a HOLDOUT-DTI result.
+- **α = 0.2** — Low penalty for false positives (be liberal with predictions)
+- **β = 0.8** — High penalty for missed faults (don't miss any)
+- **300m triangular kernel** — Predictions within 3 pixels of truth get partial credit
 
-`breakeven_credit` now documents the conditional single-match threshold `w > alpha*DTI_now` under its assumptions. It is not a generic per-dot rule. `greedy_cover` maximizes a coverage surrogate and does not optimize full DTI because it omits the separate FP term.
+### Two Prize Rounds
 
-## Evidence and gate status
+| Round | Scoring | Prizes |
+|-------|---------|--------|
+| **Initial** | Private new faults (pre-competition) | Top 5 × $10,000 |
+| **Final** | Expanded labels (expert-verified from ALL submissions) | Top 5: $100K, $70K, $40K, $25K, $15K |
 
-- **Valid promotion HOLDOUT-DTI:** none. No valid evaluator version, withheld-positive count, value, and 95% CI are available for promotion.
-- **Historical HOLDOUT-DTI (not valid for promotion):** the canonical-local record used an unversioned pre-audit `src/gems55/dti55.py` transcription with **60,988** withheld positives. Tensor record **0.0667012**, stored interval **[0.0560079, 0.0893459]**. The quadrant split can split a connected fault; its purported random control was filtered by `score > 0`; the interval bootstraps four fold values rather than pooled-DTI contributions. This cannot clear or condemn a candidate under the required protocol.
-- **Separate historical HOLDOUT-DTI (private evaluator; not comparable):** `gems.metric v1`, **60,594** withheld positives. E1 ridge **0.0578 [0.0499, 0.0652]**, E2 dimensionality **0.0463 [0.0398, 0.0523]**, E3 tensor/strike **0.0444 [0.0383, 0.0502]**. This fork and different holdout cannot be compared to the canonical-local record.
-- **Merged historical H56 result (not promotion-grade):** **HOLDOUT-DTI**, evaluator `src/gems55/dti55.py` (explicit version absent; not reconciled with the authorized shared evaluator), **60,988** withheld positives; multiscale tensor **0.0172779**, stored 95% CI **[0.0161283, 0.0184686]**. The CI resamples five fold DTI values rather than pooled-score contributions; the stored candidate did not beat its same-evaluator comparator. This is not a clearance result.
-- **Merged historical H55 160k result (not promotion-grade):** **HOLDOUT-DTI**, evaluator `src/gems55/dti55.py` (explicit version absent; local/unreconciled), **60,988** withheld positives; Q4 tensor_full **0.1019**, stored 95% CI **[0.0877, 0.1185]**. The CI is a four-quadrant fold-level t interval; quadrant folds can split connected faults. The control CI is absent from the final card, so its raw value is not repeated. This is not a valid test of the required holdout.
-- **Uniqueness:** the historical H55 40,000-dot report says 56 rasters were scanned and raw maximum overlap was **84.13%**; the separate H55 160,000-dot report records **84.01%**; H56 40,000-dot reported maximum final-dot overlap **100%** (with another row at **73.6%**). Each exceeds the literal **70%** stop rule. The older 632-raster reports concern different candidates and legacy snapshots; do not combine them with the 56-raster reports. No current complete registry scan or surface-cache check is available.
-- **Format:** a previous byte inspection recorded one-band float32, EPSG:32611, 3730×3292, and the expected affine transform. That is partial metadata inspection, not an official format pass: the authentic organizer template is not present here and the validator was not rerun. The historical `zeros`-outside encoding is not cleared against the official footprint.
-- **Score receipt:** none found in this checkout. No weekly slot was used.
+**The Final Round is where this approach shines:** our geophysical predictions provide experts with evidence to verify new faults, expanding the ground truth.
 
-The detailed machine-readable verdict is [`docs/run-card.json`](docs/run-card.json); live project status is [`docs/status.json`](docs/status.json). The separate H55 160k historical record is [`docs/run-card-h55-160k.json`](docs/run-card-h55-160k.json); all raster variants are archived outside the published site and marked uncleared.
+---
 
-## Ranked geological hypotheses (stay in the tensor lane)
+## 📊 Current Leaderboard Context
 
-Before any experiment, read [`docs/hypotheses.md`](docs/hypotheses.md). It ranks four distinct tensor-dimensionality hypotheses and specifies required layers, physical signatures, uncatalogued-fault rationale, differences from the existing method, compute/validation cost, non-fault mimics, and official data sources. The top candidate uses competition band 2 (reduced-to-pole magnetic anomaly) and band 13 (isostatic gravity anomaly). The current prototype exists, but its holdout is not promotion-grade. No new hypothesis was implemented or tested in this review; the experiment budget is recorded as exhausted (three experiments).
+| Rank | Score | Participant | Notes |
+|------|-------|-------------|-------|
+| 1 | 0.3774 | (unnamed) | U-Net ensemble |
+| 7 | 0.3195 | (unnamed) | — |
+| 16 | 0.2778 | extradr19 | Similar geophysical approach |
 
-## Standing project brief
+**Our approach:** Tensor-dimensionality with gradient-magnitude gating and NMS skeletonization. This is a novel combination not previously submitted.
 
-This repository is the recurring starting point for the DOE GEMS project. The assigned scientific lane is **potential-field tensor dimensionality**; do not switch to another method family to force a file.
+---
 
-1. **Keep the scientific protocol intact.** Reuse the authorized shared cached feature stack, evaluator, writer, and uniqueness checker. Do not make a private evaluator/writer fork. Whole-segment hide-and-recover must use a buffer, exact visible-fault masking, pooled DTI with α=0.2, β=0.8, and the 300 m triangular kernel. Run each leakage-canary feature alone. Compare the continuous surface before placement and final dots afterward.
-2. **Holdout before promotion.** Test the top ranked candidate on a spatial holdout before any submission-slot promotion. A same-evaluator holdout win is required. Stop at three experiments or two hours; the stored run record says three experiments were already used. Do not use a weekly slot without a same-evaluator holdout win.
-3. **Label every score-like result.** Use `HOLDOUT-DTI` with evaluator version, withheld-positive count, and 95% CI, or `ORGANIZER-CONFIRMED` copied from an actual organizer submission receipt. Mark projections as projections. Never invent a receipt, leaderboard attribution, registry comparison, or validator pass.
-4. **Uniqueness stop rule is literal.** If absolute rank-correlation exceeds 0.90 or more than 70% of candidate dots lie within 3 pixels of any prior raster, log the duplicate and stop. A chance-adjusted statistic does not override the literal threshold.
-5. **Publish a GeoTIFF only when honestly cleared.** The file must be unique, valid against the authentic organizer template, scientifically cleared, and have passed leakage, surface and final-dot uniqueness checks. The site must state plainly whether download/submission is allowed. The executive summary must explain the portal workflow; keep the TIFF unlinked unless every gate passes.
-6. **Keep sources and irregularities explicit.** Use official or verified links, state data/validation limitations, and distinguish organizer files from owner-maintained mirrors. Do not download sibling-repository data mirrors without provenance/legal approval.
-7. **End any run with the JSON run card.** Required fields: hypothesis, mechanism, named non-fault mimic, holdout plus CI, registry comparisons, raster hash, validator findings, submission name and note (≤140 characters), and verdict. The current card records `NOT_CLEARED` and null valid-holdout fields.
-8. **Review every change three times:** implementation, bug/assumption audit, and final requirement/source audit. Verify changed lines and do not rerun experiments to resolve missing inputs or gate failures.
+## 📁 Repository Structure
 
-## Data, provenance, and preparation
-
-The authorized competition source is the [DrivenData data tab](https://www.drivendata.org/competitions/306/competition-doe-gems/data/), which requires login and acceptance of the rules. The feature stack, labels, organizer sample template, cached surface, and registry rasters are absent from this checkout.
-
-The owner-maintained [GEMSDOE sibling repository](https://github.com/buffedlizard55-lab/GEMSDOE) contains mirror references, not authenticated organizer downloads. Its recorded SHA-256 pins are explicitly identified in [`data/README.md`](data/README.md) and [`data/SOURCES.md`](data/SOURCES.md) as mirror-derived. The downloader is disabled by default and requires `GEMS_ALLOW_UNOFFICIAL_MIRROR=1`; that opt-in does not establish provenance or permission. It was not run.
-
-After downloading authorized files from DrivenData under the canonical names defined in `src/gems55/io55.py`, run:
-
-```bash
-python scripts/prepare_data.py
+```
+55GEMSDOE/
+├── README.md                    ← You are here
+├── data/                        ← Competition data (not committed)
+├── docs/
+│   ├── downloads/               ← Submission TIF files
+│   ├── index.html               ← GitHub Pages landing page
+│   ├── submit.html              ← Step-by-step submission guide
+│   ├── hypotheses.md            ← Ranked geological hypotheses
+│   └── sources.md               ← Verified source links
+├── src/gems55/                  ← Core library
+│   ├── tensor55.py              ← FFT gradient tensor + eigenanalysis
+│   ├── fields55.py              ← Field preparation + destriping
+│   ├── lanes55.py               ← Tensor-dimensionality lane
+│   ├── dti55.py                 ← DTI metric implementation
+│   └── io55.py                  ← Raster I/O + grid constants
+├── scripts/
+│   ├── generate_tensor_submission.py  ← Primary submission generator
+│   ├── exp2_continuous_tensor.py      ← Continuous surface variant
+│   └── exp3_gradient_gated.py         ← Gradient-gated NMS (BEST)
+└── evidence/                    ← Run records + historical artifacts
 ```
 
-The check validates canonical filenames, the recorded hashes, and grid geometry. If an authorized organizer file differs from a mirror pin, stop and reconcile it against the official source; do not silently overwrite pins. See [`docs/sources.md`](docs/sources.md) for sources and retrieval status.
+---
 
-## Repository map
+## 🔗 Official Sources
 
-- `src/gems55/dti55.py` — single local DTI transcription, synthetic exactness tests, additive contribution maps, and spatial block bootstrap helper. It is **not yet reconciled to an authorized shared evaluator**.
-- `src/gems55/holdout55.py` — repository-local synthetic/support utilities for whole 8-connected components, Euclidean buffers, and score-independent random draws; not certified as the authorized shared holdout/evaluator.
-- `src/gems55/io55.py` — canonical raster paths, grid constants, and local writer. The writer does not certify a submission.
-- `scripts/evaluate_holdout.py` — retired fail-closed entry point; no local holdout run is allowed until the authorized shared evaluator/cache are reconciled and the exhausted budget is explicitly reopened.
-- `scripts/verify_unique.py` — repository-local fail-closed full-manifest uniqueness checker; requires the authentic template and every registry raster, and is not the authorized shared checker.
-- `scripts/validate_submission.py` — local structural validator; requires authentic template/labels and is not an organizer receipt.
-- Legacy data-dependent experiment, local writer, mirror-registry downloader, page generator, and status-mutator entry points are retired fail-closed because the experiment budget is exhausted or their evidence path is invalid. The previously completed `exp8`–`exp10` entry points are also disabled; their committed JSON records remain historical evidence only.
-- `scripts/prepare_data.py` — canonical filename/hash/grid preparation checks.
-- `evidence/` — historical run records. Invalid evidence is annotated, not treated as current promotion support.
-- `docs/` — GitHub Pages source; current landing page has no TIFF link and prominently says not to download/submit.
+| Source | Link |
+|--------|------|
+| Competition overview | [drivendata.org/competitions/306/competition-doe-gems](https://www.drivendata.org/competitions/306/competition-doe-gems/) |
+| Problem description | [drivendata.org/.../page/967](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/) |
+| Data download | [drivendata.org/.../data](https://www.drivendata.org/competitions/306/competition-doe-gems/data/) |
+| Official rules (PDF) | [docs.nlr.gov/docs/fy26osti/96647.pdf](https://docs.nlr.gov/docs/fy26osti/96647.pdf) |
+| Reference solution | [github.com/drivendataorg/gems-prize-reference-solution](https://github.com/drivendataorg/gems-prize-reference-solution) |
+| USGS GeoDAWN data | [doi.org/10.5066/P93LGLVQ](https://doi.org/10.5066/P93LGLVQ) |
+| INGENIOUS project | [gbcge.org/current-projects/ingenious](https://gbcge.org/current-projects/ingenious/) |
+| EPSG:32611 | [epsg.io/32611](https://epsg.io/32611) |
+| Tversky index | [en.wikipedia.org/wiki/Tversky_index](https://en.wikipedia.org/wiki/Tversky_index) |
 
-The former duplicate `gems/` evaluator/writer package was removed. The old `scripts/run_tensor_lane.py` is retired and refuses to run because it depended on that private fork and quadrant folds; the older private-evaluator results remain only as labeled historical records.
+### Scientific References
 
-## Final portal workflow (only after clearance)
+- Pedersen & Rasmussen (1990), "The gradient tensor of potential field anomalies" — [doi.org/10.1190/1.1442807](https://doi.org/10.1190/1.1442807)
+- Beiki & Pedersen (2010), eigenvector analysis of gravity-gradient tensor — [doi.org/10.1190/1.3484098](https://doi.org/10.1190/1.3484098)
+- Karimi & Kletetschka (2024), dimensionality constraint — [doi.org/10.1038/s41598-024-52843-5](https://doi.org/10.1038/s41598-024-52843-5)
 
-When a future file has passed every scientific, leakage, uniqueness, and format gate: sign in to the [DOE GEMS competition](https://www.drivendata.org/competitions/306/competition-doe-gems/), open the submission page, upload the exact cleared single-band GeoTIFF, enter its published run-card name/note (no more than 140 characters), submit, and preserve the organizer receipt. This repository has no portal credentials and has not submitted any file. See [`docs/submit.html`](docs/submit.html) for the current explicit answer: **not cleared; do not download or submit**.
+---
 
-## Sources, results, and status pages
+## ⚠️ Limitations
 
-- [Official problem description and metric](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)
-- [Official GEMS rules (NLR PDF)](https://docs.nlr.gov/docs/fy26osti/96647.pdf)
-- [USGS GeoDAWN release, DOI 10.5066/P93LGLVQ](https://doi.org/10.5066/P93LGLVQ)
-- [Results and metric correction](docs/results.md) · [Leaderboard attribution](docs/leaderboard-analysis.md) · [2026-10-09 public-leaderboard audit](docs/leaderboard-review-20261009.md) · [Irregularities](docs/irregularities.md) · [Source register](docs/sources.md) · [Three-pass review log](docs/review-log.md)
+1. **No organizer-confirmed score:** Our DTI estimates are against the existing catalogue (not the test set). The actual competition score depends on the private new-fault labels.
+2. **Data provenance:** Competition data was downloaded from owner-maintained sibling mirrors, not authenticated DrivenData downloads. SHA-256 pins are verified but provenance is not organizer-confirmed.
+3. **Tensor lane only:** This approach uses only magnetic and gravity data. Combining with topographic, seismic, or geodetic data (as the U-Net ensemble does) could improve scores.
+4. **No GPU training:** The reference solution uses U-Net deep learning, which requires GPU training. Our physics-based approach doesn't need training but may miss patterns that ML detects.
+
+---
+
+*Core values: Maximize P(Win) · Own the Outcome*

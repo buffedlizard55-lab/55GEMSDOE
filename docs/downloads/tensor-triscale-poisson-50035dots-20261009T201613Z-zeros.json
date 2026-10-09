@@ -1,0 +1,29 @@
+{
+  "name": "tensor-triscale-poisson-50035dots-20261009T201613Z",
+  "hypothesis": "Tri-scale tensor persistence with eigenvalue concordance",
+  "mechanism": "3-scale (300/600/1200m) FFT gradient tensor eigenvalue analysis on RTP magnetic + isostatic gravity; near-2D source geometry, strike coherence, cross-field corroboration; Poisson emission thinning",
+  "scales_m": [
+    300.0,
+    600.0,
+    1200.0
+  ],
+  "gamma": 1.5,
+  "floor": 0.05,
+  "catalogue_buffer_px": 2,
+  "n_dots": 50035,
+  "sha256_zeros": "f0c2f4251c5a60242354742102303ae635442469dc4472f87e414b6bee268586",
+  "sha256_nan": "e7533fd89de166702a482db411289f1866614800a69514f00a232d46a8514302",
+  "format": {
+    "bands": 1,
+    "dtype": "float32",
+    "crs": "EPSG:32611",
+    "resolution_m": 100.0,
+    "shape": [
+      3730,
+      3292
+    ],
+    "values": "[0, 1]",
+    "outside": "zeros (primary) / nan (secondary)"
+  },
+  "timestamp_utc": "20261009T201613Z"
+}

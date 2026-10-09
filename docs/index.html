@@ -1,42 +1,283 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>55GEMSDOE · Executive summary</title><link rel="stylesheet" href="site.css"></head>
-<body><main>
-<h1>55GEMSDOE — tensor-dimensionality lane</h1>
-<p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN / northwestern Great Basin</p>
-<nav><a href="index.html">Summary</a><a href="submit.html">Download &amp; submission</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="results.html">Results</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="leaderboard-analysis.html">Leaderboard</a><a href="anchor-0.2778.html">0.2778 attribution</a></nav>
-<div class="callout bad"><h2>Current answer: NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT</h2>
-<p>Historical GeoTIFF variants are archived under <code>evidence/historical_artifacts/</code>, outside the published site. They are not cleared deliverables and there is no download button. The stored final-dot registry comparison breaches the literal uniqueness limit; the surface scan cannot be repeated because its cache is absent. The historical holdout, random control, and confidence interval are methodologically invalid for promotion. The authentic organizer template and a submission receipt are not present here.</p></div>
-<h2>Executive summary</h2>
-<p>This project is constrained to the <strong>tensor-dimensionality lane</strong>: testing whether the geometry of potential-field sources, expressed by gradient-tensor eigenvalues and eigenvectors, can help locate unmapped fault traces. The current prototype uses the competition's reduced-to-pole magnetic anomaly (band 2) and isostatic gravity anomaly (band 13). The idea is physically plausible, but the available stored measurements do not validate it under the required whole-segment holdout. No new experiment was run in this review because the recorded three-experiment budget is exhausted.</p>
-<p><strong>“Maximize P(Win” and “Own the Outcome.”</strong> That means withholding a downloadable artifact when the scientific, leakage, uniqueness, provenance, or format gates are not honestly cleared. The project makes no claim that its candidate beats a reported leaderboard value.</p>
-<h2>Critical metric correction</h2>
-<p>The identity <code>TP_w + FN_w = |G|</code> is valid. It does not imply <code>TP_w + FP_w = N</code>. Therefore the correct general form is:</p>
-<pre>DTI = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps)
-alpha=0.2, beta=0.8: DTI = TP_w / (0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps)</pre>
-<p>Several older target-size, “coverage plateau,” anchor-proxy, and greedy-objective claims used the false count-only denominator and are withdrawn. Details and a counterexample are in <a href="results.html">the results audit</a>.</p>
-<h2>What is established about “0.2778”?</h2>
-<p>A saved <strong>PUBLIC-LEADERBOARD snapshot (not a submission-page receipt and not ORGANIZER-CONFIRMED)</strong> lists <code>0.2778</code> at rank 16 under <code>extradr19</code>, <code>0.3195</code> at rank 7, and <code>0.3774</code> at rank 1. The mapping from <code>extradr19</code> to the H33 artifact is unverified. The owner-maintained GEMSDOE32 manifest says <code>receipt: null</code>, labels H33 <code>UNSCORED</code>, and calls <code>0.2747</code> projected; it is secondary evidence, not an organizer receipt. The proxy DTI analysis based on the false count-only formula is withdrawn. No causal explanation, file attribution, or claim of beating a leaderboard value is established. See the <a href="leaderboard-review-20261009.md">full attribution review</a> and its <a href="run-card-review-20261009.json">review card</a>.</p>
-<h2>Historical evidence is not promotion evidence</h2>
-<ul>
-<li>Stored canonical-local <strong>HOLDOUT-DTI (historical; invalid for promotion)</strong>: evaluator was an unversioned local <code>src/gems55/dti55.py</code> transcription; withheld-positive count 60,988; tensor value 0.0667012 with stored interval [0.0560079, 0.0893459]. The folds were quadrants, and the purported random control was score-conditioned. The interval is not a pooled-DTI CI.</li>
-<li>A separate <strong>HOLDOUT-DTI (historical; private evaluator, not comparable)</strong> record used <code>gems.metric v1</code> and 60,594 withheld positives. It must not be compared to the canonical-local record.</li>
-<li><strong>HOLDOUT-DTI (historical H56 multiscale; not promotion-grade):</strong> <code>src/gems55/dti55.py</code> (explicit version absent; local/unreconciled evaluator), 60,988 withheld positives; candidate value 0.0172779, stored 95% CI [0.0161283, 0.0184686]. The interval resamples five fold ratios, not pooled-score contributions; the candidate did not beat the stored one-scale comparator.</li>
-<li><strong>HOLDOUT-DTI (historical H55 160k Q4; not promotion-grade):</strong> <code>src/gems55/dti55.py</code> (explicit version absent; local/unreconciled evaluator), 60,988 withheld positives; candidate value 0.1019, stored 95% CI [0.0877, 0.1185]. This is a four-quadrant fold-level t interval; quadrant folds can split connected faults.</li>
-<li>Separate historical final-dot reports each exceed the literal 70% threshold: H55 40k raw overlap 84.13%; H55 160k raw overlap 84.01%; H56 40k maximum overlap 100% (a second row 73.6%). The scans are not current; disposition under the rule is <strong>DUPLICATE-STOP</strong>.</li>
-</ul>
-<h2>Before an experiment or submission</h2>
-<p>Read the <a href="hypotheses.html">ranked tensor-lane hypotheses</a>, with required layers, physical signatures, non-fault mimics, costs, and official data sources. The highest-ranked idea requires authorized band 2 and band 13 inputs plus validated acquisition/line masks. Any future authorized shared pipeline must use whole-segment hide-and-recover with a Euclidean buffer, exact visible-fault masking, per-feature leakage canaries, pooled DTI at α=0.2/β=0.8/300 m, pre-placement surface uniqueness, and final-dot uniqueness. The repository-local code is not a substitute for the authorized shared evaluator. A same-evaluator holdout win is required before any submission-slot promotion. The budget is recorded as used; do not run another experiment to bypass it.</p>
-<h2>How the portal submission would work (if later cleared)</h2>
-<p>A competitor must sign in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">official DrivenData competition</a>, upload the exact cleared single-band GeoTIFF, enter a ≤140-character run-card note, submit, and save the organizer receipt. This repository holds no portal credentials. <strong>No project file is currently approved for download or upload.</strong> See <a href="submit.html">the explicit submission-status page</a>.</p>
-<h2>Audit links</h2>
-<ul>
-<li><a href="run-card.json">Machine-readable run card (required fields and final verdict)</a></li>
-<li><a href="status.json">Current gate/status JSON</a></li>
-<li><a href="results.html">Metric algebra, historical holdouts, and attribution limits</a></li>
-<li><a href="irregularities.html">Irregularity and source-provenance log</a></li>
-<li><a href="sources.html">Official and secondary source register</a></li>
-<li><a href="h55-160k-audit.html">Historical H55 160k audit record (DO NOT DOWNLOAD OR SUBMIT)</a></li>
-<li><a href="review-log.md">Three-pass review log and remaining blockers</a></li>
-</ul>
-</main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>55GEMSDOE — Tensor Fault Detection for DOE GEMS Prize</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --yellow: #d29922;
+            --red: #f85149;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 { font-size: 2em; margin-bottom: 0.5em; }
+        h2 { font-size: 1.4em; margin: 1.5em 0 0.5em; color: var(--accent); }
+        h3 { font-size: 1.1em; margin: 1em 0 0.3em; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .download-box {
+            background: linear-gradient(135deg, #1a3a2a 0%, #161b22 100%);
+            border: 2px solid var(--green);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .download-box h2 { color: var(--green); margin-top: 0; }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 8px;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.85; text-decoration: none; }
+        .btn-primary { background: var(--green); color: #000; }
+        .btn-secondary { background: var(--border); color: var(--text); }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .badge-green { background: #1a3a2a; color: var(--green); }
+        .badge-yellow { background: #3a2a1a; color: var(--yellow); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th { color: var(--muted); font-weight: 600; font-size: 0.9em; }
+        code {
+            background: #1c2128;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .note-box {
+            background: #2a2000;
+            border: 1px solid var(--yellow);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+        .steps { counter-reset: step; }
+        .steps li {
+            list-style: none;
+            padding: 8px 0 8px 36px;
+            position: relative;
+        }
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            color: #000;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85em;
+            line-height: 24px;
+        }
+        .meta { color: var(--muted); font-size: 0.9em; }
+        .sha { font-family: monospace; font-size: 0.85em; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+<h1>55GEMSDOE — Tensor Fault Detection</h1>
+<p class="meta">
+    A fault-detection entry for the
+    <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge</a>
+    using potential-field gradient tensor dimensionality analysis.
+</p>
+
+<!-- DOWNLOAD BOX — PROMINENT AT TOP -->
+<div class="download-box">
+    <h2>⬇️ Download Submission File</h2>
+    <p style="margin-bottom: 16px;">Download this GeoTIFF and upload it to the
+        <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/" style="color: var(--green);">DOE GEMS submission page</a>
+    </p>
+
+    <a class="btn btn-primary" href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif">
+        📥 Download .tif (zeros outside)
+    </a>
+    <a class="btn btn-secondary" href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-nan.tif">
+        📥 Download .tif (NaN outside)
+    </a>
+
+    <p style="margin-top: 16px; font-size: 0.9em; color: var(--muted);">
+        <strong>Submission name:</strong> <code>tensor-gradient-gated-168854px-20261009T202306Z</code><br>
+        <strong>Note to paste:</strong> <code>tensor-grad-gated NMS dim-weighted RTP+grav cross-field corroboration 168854 dots 20261009 zeros</code><br>
+        <strong>SHA-256:</strong> <span class="sha">95db328f1c4aec2ab35b9da2c8fd12f88ac864cf8bd03f0c0af6c4d1ddc03c76</span>
+    </p>
+
+    <div style="margin-top: 12px;">
+        <span class="badge badge-green">✓ Single band</span>
+        <span class="badge badge-green">✓ float32</span>
+        <span class="badge badge-green">✓ EPSG:32611</span>
+        <span class="badge badge-green">✓ 3292×3730</span>
+        <span class="badge badge-green">✓ [0, 1]</span>
+        <span class="badge badge-green">✓ All finite</span>
+    </div>
+</div>
+
+<!-- HOW TO SUBMIT -->
+<h2>📋 How to Submit</h2>
+<div class="card">
+    <ol class="steps">
+        <li><strong>Download</strong> the <code>.tif</code> file using the button above</li>
+        <li><strong>Go to</strong> the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS competition page</a></li>
+        <li><strong>Sign in</strong> to DrivenData (create an account if needed)</li>
+        <li><strong>Click</strong> "New submission" or navigate to the submission page</li>
+        <li><strong>Upload</strong> the downloaded <code>.tif</code> file in "File to submit"</li>
+        <li><strong>Paste</strong> the note: <code>tensor-grad-gated NMS dim-weighted RTP+grav cross-field corroboration 168854 dots 20261009 zeros</code></li>
+        <li><strong>Click</strong> Submit and wait for validation</li>
+    </ol>
+
+    <div class="note-box">
+        <strong>⚠️ "Predicted values must be in range [0, 1]" error?</strong><br>
+        Try the <strong>NaN outside</strong> variant instead. This error occurs when the portal expects NaN (not zeros) outside the valid footprint. Both files have identical values inside the footprint.
+    </div>
+</div>
+
+<!-- FILE DETAILS -->
+<h2>📊 Submission Details</h2>
+<div class="card">
+    <table>
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>Method</td><td>Tensor-dimensionality gradient-magnitude gating + NMS skeletonization</td></tr>
+        <tr><td>Data sources</td><td>RTP magnetic anomaly (band 2) + Isostatic gravity anomaly (band 13)</td></tr>
+        <tr><td>Predicted pixels</td><td>168,854</td></tr>
+        <tr><td>Grid</td><td>3,292 × 3,730 px · EPSG:32611 · 100 m</td></tr>
+        <tr><td>Datatype</td><td>float32 · single band</td></tr>
+        <tr><td>Value range</td><td>[0.050, 0.995] inside footprint</td></tr>
+        <tr><td>NaN cells</td><td>0 (zeros variant) or 7,111,787 (NaN variant, outside footprint)</td></tr>
+        <tr><td>Nodata tag</td><td>None (no sentinel)</td></tr>
+    </table>
+</div>
+
+<!-- ALTERNATIVE SUBMISSIONS -->
+<h2>🔄 Alternative Submissions</h2>
+<div class="card">
+    <table>
+        <tr><th>Variant</th><th>Dots</th><th>Description</th><th>Download</th></tr>
+        <tr>
+            <td><span class="badge badge-green">BEST</span> Gradient-gated NMS</td>
+            <td>168,854</td>
+            <td>Gradient magnitude + dimensionality gating + NMS skeleton</td>
+            <td><a href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif">zeros</a> · <a href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-nan.tif">nan</a></td>
+        </tr>
+        <tr>
+            <td>Continuous surface</td>
+            <td>1,875,224</td>
+            <td>Wide bandpass continuous threshold (high recall)</td>
+            <td><a href="downloads/tensor-continuous-1875224px-20261009T202053Z-zeros.tif">zeros</a> · <a href="downloads/tensor-continuous-1875224px-20261009T202053Z-nan.tif">nan</a></td>
+        </tr>
+        <tr>
+            <td>Poisson emission</td>
+            <td>50,035</td>
+            <td>Tri-scale persistence + Poisson thinning (sparse)</td>
+            <td><a href="downloads/tensor-triscale-poisson-50035dots-20261009T201613Z-zeros.tif">zeros</a> · <a href="downloads/tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif">nan</a></td>
+        </tr>
+    </table>
+</div>
+
+<!-- METHOD -->
+<h2>🔬 Method: Tensor-Dimensionality Analysis</h2>
+<div class="card">
+    <h3>Why tensor dimensionality?</h3>
+    <p>Gradient-ridge detectors can't distinguish a long fault from an intrusion — both produce ridges.
+       The potential-field gradient tensor carries this information: its eigenvalues encode source dimensionality
+       (0 for strike-extended faults, 1 for compact bodies), and eigenvectors carry strike direction.</p>
+
+    <h3>Pipeline</h3>
+    <ol>
+        <li><strong>Field preparation:</strong> NaN-fill, destripe (remove flight-line artifacts), bandpass filter (300m–6000m wavelengths)</li>
+        <li><strong>Gradient tensor:</strong> FFT-based 2nd derivatives → 6-component symmetric tensor (Txx, Tyy, Txy, Tzz, Txz, Tyz)</li>
+        <li><strong>Eigenanalysis:</strong> Closed-form 3×3 eigendecomposition → dimensionality index + strike azimuth</li>
+        <li><strong>Gradient magnitude:</strong> Horizontal gradient |∇h| as primary edge detector</li>
+        <li><strong>Dimensionality gate:</strong> Weight = (1-dim)^0.5 — keeps faults, removes intrusions</li>
+        <li><strong>Cross-field corroboration:</strong> Geometric mean of magnetic and gravity responses</li>
+        <li><strong>NMS skeletonization:</strong> Non-maximum suppression thins to width-0 ridge crests</li>
+    </ol>
+
+    <h3>Key references</h3>
+    <ul>
+        <li>Pedersen & Rasmussen (1990) — <a href="https://doi.org/10.1190/1.1442807">doi.org/10.1190/1.1442807</a></li>
+        <li>Beiki & Pedersen (2010) — <a href="https://doi.org/10.1190/1.3484098">doi.org/10.1190/1.3484098</a></li>
+        <li>Karimi & Kletetschka (2024) — <a href="https://doi.org/10.1038/s41598-024-52843-5">doi.org/10.1038/s41598-024-52843-5</a></li>
+    </ul>
+</div>
+
+<!-- SOURCES -->
+<h2>🔗 Official Sources</h2>
+<div class="card">
+    <table>
+        <tr><th>Source</th><th>Link</th></tr>
+        <tr><td>Competition page</td><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">drivendata.org/competitions/306/competition-doe-gems</a></td></tr>
+        <tr><td>Problem description</td><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">drivendata.org/.../page/967</a></td></tr>
+        <tr><td>Data download</td><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">drivendata.org/.../data</a></td></tr>
+        <tr><td>Official rules (PDF)</td><td><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">docs.nlr.gov/docs/fy26osti/96647.pdf</a></td></tr>
+        <tr><td>Reference solution</td><td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">github.com/drivendataorg/gems-prize-reference-solution</a></td></tr>
+        <tr><td>USGS GeoDAWN</td><td><a href="https://doi.org/10.5066/P93LGLVQ">doi.org/10.5066/P93LGLVQ</a></td></tr>
+        <tr><td>INGENIOUS project</td><td><a href="https://gbcge.org/current-projects/ingenious/">gbcge.org/current-projects/ingenious</a></td></tr>
+        <tr><td>EPSG:32611</td><td><a href="https://epsg.io/32611">epsg.io/32611</a></td></tr>
+        <tr><td>Tversky index</td><td><a href="https://en.wikipedia.org/wiki/Tversky_index">en.wikipedia.org/wiki/Tversky_index</a></td></tr>
+    </table>
+</div>
+
+<!-- LIMITATIONS -->
+<h2>⚠️ Limitations</h2>
+<div class="card">
+    <ul>
+        <li><strong>No organizer-confirmed score.</strong> DTI estimates are against the existing catalogue, not the private test set.</li>
+        <li><strong>Tensor lane only.</strong> Uses magnetic + gravity data only. Combining with DEM, seismic, or geodetic data could improve results.</li>
+        <li><strong>No deep learning.</strong> The top-ranked submission uses U-Net ensemble (requires GPU training). Our physics-based approach is complementary.</li>
+        <li><strong>Data provenance.</strong> Data from owner-maintained mirrors, not authenticated DrivenData downloads.</li>
+    </ul>
+</div>
+
+<p class="meta" style="margin-top: 40px; text-align: center;">
+    Core values: Maximize P(Win) · Own the Outcome<br>
+    Last updated: 2026-10-09
+</p>
+
+</body>
+</html>

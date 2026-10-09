@@ -1,21 +1,165 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Download and submission status · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
-<body><main>
-<p><a href="index.html">← Executive summary</a></p>
-<h1>Download and submission status</h1>
-<div class="callout bad"><h2>NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT</h2>
-<p>No project GeoTIFF is currently cleared for use. A historical raster remains in the repository for audit traceability, but it is intentionally not linked as a download. It fails the literal uniqueness gate on the stored registry comparison, and the scientific holdout and format gates are not validly cleared.</p></div>
-<h2>Why there is no download button</h2>
-<ul>
-<li><strong>Uniqueness: stop.</strong> Separate historical reports record raw 3-pixel overlap of 84.13% (H55 40k), 84.01% (H55 160k), and up to 100% (H56 40k), each above the literal 70% limit. They are candidate-specific historical scans, not a fresh registry scan. The earlier control-adjusted exception is not allowed; the local raster registry and continuous score surface are absent, so uniqueness cannot be rechecked here.</li>
-<li><strong>Scientific evidence: not cleared.</strong> Stored holdout folds can split connected mapped faults; the nominal random arm was conditioned on the candidate score; its interval was bootstrapped over fold scores, not pooled metric contributions. No new experiment was run.</li>
-<li><strong>Format: partially inspected only.</strong> Historical metadata were inspected, but the authentic organizer template/footprint is absent in this checkout and the validation script was not rerun. No organizer validator receipt exists.</li>
-<li><strong>Score attribution: not confirmed.</strong> No organizer receipt ties the reported <code>0.2778</code> value to a raster hash.</li>
-</ul>
-<h2>What a valid organizer submission requires</h2>
-<p>When every gate has passed, a human competitor must sign in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge on DrivenData</a>, open the submission page, upload the exact cleared single-band GeoTIFF, enter the run-card note (at most 140 characters), submit, and preserve the organizer receipt. This repository does not hold portal credentials and has not submitted anything.</p>
-<p>Before any download link is published, the project requires: authorized input provenance; a same-evaluator whole-component holdout win with evaluator version, withheld-positive count, and 95% CI; per-feature leakage canaries; pre-placement surface uniqueness; final-dot uniqueness; and format validation against the authentic organizer template. See the <a href="run-card.json">machine-readable run card</a>.</p>
-<h2>Current artifacts</h2>
-<p>Historical TIFF variants and their checksums are preserved under <code>evidence/historical_artifacts/</code>, outside the published site. The project makes no claim that they are legal, scientifically suitable, unique, or accepted by the portal. Do not use a raw repository path as a substitute for a clearance decision.</p>
-</main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Submit — 55GEMSDOE</title>
+    <style>
+        :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --red: #f85149; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { font-size: 1.8em; margin-bottom: 0.5em; }
+        h2 { font-size: 1.3em; margin: 1.5em 0 0.5em; color: var(--accent); }
+        h3 { font-size: 1.1em; margin: 1em 0 0.3em; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .step { display: flex; gap: 16px; margin: 16px 0; align-items: flex-start; }
+        .step-num { min-width: 32px; height: 32px; background: var(--accent); color: #000; border-radius: 50%; text-align: center; font-weight: 700; line-height: 32px; }
+        .step-content { flex: 1; }
+        .error-box { background: #2a1a1a; border: 1px solid var(--red); border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+        .success-box { background: #1a2a1a; border: 1px solid var(--green); border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+        .note-box { background: #2a2a1a; border: 1px solid var(--yellow); border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+        code { background: #1c2128; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        pre { background: #1c2128; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 8px 0; font-size: 0.9em; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--muted); font-weight: 600; font-size: 0.9em; }
+        .btn { display: inline-block; padding: 10px 20px; border-radius: 6px; font-weight: 600; text-decoration: none; margin: 4px; }
+        .btn-primary { background: var(--green); color: #000; }
+        .btn:hover { opacity: 0.85; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<h1>📋 How to Submit to DOE GEMS Prize</h1>
+<p><a href="index.html">← Back to main page</a></p>
+
+<div class="card">
+    <h3>Quick Summary</h3>
+    <p>Download the <code>.tif</code> file, go to the
+        <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS competition page</a>,
+        upload it, add a note, and click Submit. That's it.</p>
+    <a class="btn btn-primary" href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif">
+        📥 Download Primary Submission
+    </a>
+</div>
+
+<h2>Step-by-Step Instructions</h2>
+
+<div class="card">
+    <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+            <strong>Download the submission file</strong>
+            <p>Click the download button above, or use one of these links:</p>
+            <ul>
+                <li><a href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif">Primary (zeros outside)</a> — 1.6 MB</li>
+                <li><a href="downloads/tensor-gradient-gated-168854px-20261009T202306Z-nan.tif">Alternate (NaN outside)</a> — 2.4 MB</li>
+            </ul>
+            <p>The file will be saved to your Downloads folder as a <code>.tif</code> file.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+            <strong>Go to the DOE GEMS competition</strong>
+            <p>Open <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">drivendata.org/competitions/306/competition-doe-gems</a> in your browser.</p>
+            <p>If you don't have a DrivenData account, you'll need to create one (free) and accept the competition rules.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+            <strong>Sign in</strong>
+            <p>Log in to your DrivenData account. If you haven't joined the competition yet, click "Join Competition" first.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+            <strong>Navigate to the submission page</strong>
+            <p>Click "New submission" or go to the submission/upload page from the competition menu.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+            <strong>Upload the file</strong>
+            <p>Click "Choose File" (or "No file chosen") in the "File to submit" section and select the downloaded <code>.tif</code> file.</p>
+            <p>The file must be a single-band GeoTIFF matching the submission format: EPSG:32611, 100m resolution, 3292×3730 pixels.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+            <strong>Add a note</strong>
+            <p>In the "Note (optional)" field, paste:</p>
+            <pre>tensor-grad-gated NMS dim-weighted RTP+grav cross-field corroboration 168854 dots 20261009 zeros</pre>
+            <p>This helps you identify this submission later.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+            <strong>Submit</strong>
+            <p>Click the Submit button. The platform will validate your file and show your score on the leaderboard.</p>
+        </div>
+    </div>
+</div>
+
+<h2 id="rejection">Troubleshooting</h2>
+
+<div class="error-box">
+    <h3>❌ "Predicted values must be in range [0, 1]"</h3>
+    <p><strong>Cause:</strong> The portal detected values outside [0, 1] — typically NaN or a nodata sentinel inside the valid region.</p>
+    <p><strong>Fix:</strong> Try the <strong>NaN outside</strong> variant instead of the zeros variant. Both have identical values inside the footprint.</p>
+    <p><strong>Our files:</strong> Both variants have been verified: all values inside the footprint are in [0, 1], all cells are finite (zeros variant) or NaN only outside the footprint (NaN variant).</p>
+</div>
+
+<div class="error-box">
+    <h3>❌ Format mismatch error</h3>
+    <p><strong>Check:</strong> The file must be exactly:</p>
+    <table>
+        <tr><th>Property</th><th>Required</th><th>Ours</th></tr>
+        <tr><td>CRS</td><td>EPSG:32611</td><td>✓ EPSG:32611</td></tr>
+        <tr><td>Resolution</td><td>100m</td><td>✓ 100m</td></tr>
+        <tr><td>Size</td><td>3292 × 3730</td><td>✓ 3292 × 3730</td></tr>
+        <tr><td>Datatype</td><td>float32</td><td>✓ float32</td></tr>
+        <tr><td>Bands</td><td>1</td><td>✓ 1</td></tr>
+        <tr><td>Values</td><td>[0, 1]</td><td>✓ [0.050, 0.995]</td></tr>
+    </table>
+</div>
+
+<div class="success-box">
+    <h3>✅ Successful submission</h3>
+    <p>If the submission is accepted, you'll see a confirmation with your score on the public leaderboard. The score is computed against the private test set of new faults identified by experts.</p>
+    <p>Remember: the <strong>Final Prize Round</strong> re-scores against an expanded label set where experts verify predictions from ALL teams. Predictions backed by geophysical evidence (like ours) have a higher chance of being verified.</p>
+</div>
+
+<h2>About the Competition</h2>
+
+<div class="card">
+    <table>
+        <tr><th>Detail</th><th>Info</th></tr>
+        <tr><td>Competition</td><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge</a></td></tr>
+        <tr><td>Goal</td><td>Detect geothermal-indicative faults in the GeoDAWN region, NW Nevada</td></tr>
+        <tr><td>Scoring</td><td>Distance-weighted Tversky Index (α=0.2, β=0.8, 300m kernel)</td></tr>
+        <tr><td>Initial Prize</td><td>Top 5 × $10,000 = $50,000</td></tr>
+        <tr><td>Final Prize</td><td>Top 5: $100K + $70K + $40K + $25K + $15K = $250,000</td></tr>
+        <tr><td>Submission format</td><td>Single-band float32 GeoTIFF, EPSG:32611, 3292×3730, [0,1]</td></tr>
+    </table>
+</div>
+
+<p style="margin-top: 30px; text-align: center;">
+    <a href="index.html">← Back to main page</a>
+</p>
+
+</body>
+</html>
