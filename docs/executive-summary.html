@@ -1,49 +1,88 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>How to submit — GEMS Prize workbench</title>
-<style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
-h1{font-size:1.6rem}h2{font-size:1.2rem;margin-top:2rem;border-bottom:1px solid #d7dce5;padding-bottom:.3rem}
-.box{background:#fff7e6;border:1px solid #f0c36d;border-radius:8px;padding:1rem 1.2rem}
-code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}
-table{border-collapse:collapse;width:100%}td,th{border:1px solid #d7dce5;padding:.4rem .5rem;text-align:left;vertical-align:top}
-a{color:#0b5cad}.muted{color:#5b6475}
-</style></head><body>
-<p><a href="index.html">← Back to overview</a></p>
-<h1>Executive summary: how to make a submission</h1>
-<div class="box"><strong>Current status (2026-10-09): no file is recommended for upload.</strong>
-The tensor-dimensionality lane is negative on our holdout, and its files are published only for review.
-They are named <code>NEGATIVE-DO-NOT-SUBMIT_…</code>.</div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Executive summary and exact GeoTIFF upload guide for 55GEMSDOE.">
+  <meta name="theme-color" content="#10271e">
+  <title>Executive summary — 55GEMSDOE</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./index.html">Home</a><a href="./hypotheses.html">Hypotheses</a><a href="./sources.html">Sources</a><a href="./irregularities.html">Audit flags</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Executive summary · submission steps</div>
+        <h1>How to make a GEMS submission</h1>
+        <p class="lead">The portal accepts a single-band GeoTIFF or a ZIP containing exactly one GeoTIFF. This page explains the required checks and the upload steps. It does not upload anything for you.</p>
+        <div class="status-banner" role="alert">
+          <div class="status-icon" aria-hidden="true">⛔</div>
+          <div><strong>Current answer: DO NOT SUBMIT.</strong><p>This project has not produced or validated a candidate TIFF. No file or download link is available. The following is a future-use guide, not approval of any prior artifact.</p></div>
+        </div>
+        <div class="actions"><a class="button secondary" href="./index.html">← Back to project status</a><a class="button secondary" href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Official format rules</a><a class="button secondary" href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">Official Prize Rules PDF</a></div>
+      </div>
+    </section>
 
-<h2>1. What the competition accepts</h2>
-<p>Source: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a>.</p>
-<table>
-<tr><th>Requirement</th><th>Value</th></tr>
-<tr><td>File</td><td>One single-band GeoTIFF (<code>.tif</code>) or a <code>.zip</code> containing one GeoTIFF</td></tr>
-<tr><td>CRS</td><td>EPSG:32611 (UTM zone 11N) — <a href="https://epsg.io/32611">epsg.io/32611</a></td></tr>
-<tr><td>Resolution</td><td>100 m</td></tr>
-<tr><td>Shape / bounds</td><td>3,730 rows × 3,292 columns; same bounds as the training features (from the competition sample file)</td></tr>
-<tr><td>Data type</td><td>float32</td></tr>
-<tr><td>Values</td><td>0 to 1 inside the study area; null/NaN outside (the template's valid mask has 5,167,373 cells)</td></tr>
-</table>
-<p class="muted">The error "Predicted values must be in range [0, 1]" means a value outside 0–1 was present. Our writer clips values and runs a validator before writing. See <a href="irregularities.html">irregularities</a>.</p>
+    <section class="section">
+      <div class="wrap">
+        <h2>Clearance comes before download</h2>
+        <p class="section-intro">A future file will be offered here only after every research and packaging gate passes. A new name or a format-valid file alone is not enough.</p>
+        <ol class="steps">
+          <li><strong>Validate the prediction scientifically.</strong><br>Use the canonical whole-segment, buffered hide-and-recover evaluator. Recompute catalogue-derived features from visible faults only, mask visible-fault pixels exactly, and report pooled `HOLDOUT-DTI` with evaluator/version, withheld-positive count, and paired 95% CI. Check each feature alone for leakage and test tensor-strike agreement against random ridges.</li>
+          <li><strong>Check the lane and registry twice.</strong><br>Compare the continuous surface before placing dots, then compare final dots. Stop if absolute rank-correlation exceeds 0.90 or more than 70% of dots fall within 3 pixels of one registry raster. The full registry and shared checker are not present in this checkout, so this gate has not run.</li>
+          <li><strong>Write with the canonical submission writer and verify bytes.</strong><br>Do not make a private replacement. Re-open the final TIFF after writing and compare it to the authentic sample/template: one band, float32, matching CRS, shape, bounds, transform, and resolution; values in [0,1] throughout the scored footprint; no NaN/Inf or invalid nodata sentinel inside that footprint; null/NaN outside the bounds as the competition specifies. Record the file SHA-256 and validator receipt.</li>
+          <li><strong>Publish the exact artifact details.</strong><br>The landing page should show the download link, unique submission name, short identifying note (this project limits notes to 140 characters), holdout card, uniqueness receipt, and validator output together. A projection must never be called a score. The current page correctly has no download link.</li>
+          <li><strong>Upload only after the separate selector approves a slot.</strong><br>Do not spend a weekly slot directly from the experiment step. The selector must confirm that the candidate beats the current comparable holdout best and that the weekly cap permits promotion.</li>
+        </ol>
+      </div>
+    </section>
 
-<h2>2. Steps</h2>
-<ol>
-<li>Create a DrivenData account, accept the rules, and get the data from the data tab (login required). Rules: <a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">official PDF</a>.</li>
-<li>Place the three files in <code>data/</code> and run <code>python scripts/prepare_data.py</code>. It checks the sha256 pins.</li>
-<li>Generate a candidate with a script in <code>scripts/</code>. Each run writes a holdout result to <code>docs/results/</code>.</li>
-<li>Validate: <code>python -m gems.submission &lt;file.tif&gt; data/sample_submission.tif</code> must print <code>"all_passed": true</code>.</li>
-<li>Uniqueness: <code>python scripts/registry_check.py &lt;file.tif&gt; &lt;registry_dir&gt; &lt;out.json&gt;</code>. Rank correlation ≤ 0.90 and overlap ≤ 70% are required (see irregularity #7 for the saturation caveat).</li>
-<li>Upload on the competition submission page: choose <em>File to submit</em>, then enter a unique name and a short note (≤ 140 characters, e.g. <code>tensor-lane v1 | holdout 0.058</code>).</li>
-<li>Limits: three submissions per week. Choose <strong>one</strong> final submission before the deadline. Disclose any generative-AI use in the narrative.</li>
-</ol>
+    <section class="section">
+      <div class="wrap two-col">
+        <article class="card">
+          <h2>Portal steps when an approved TIFF exists</h2>
+          <p class="small">The screen wording below follows the submission form text supplied in the project request; this session did not log into or submit to DrivenData.</p>
+          <ol class="list">
+            <li>Open the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS competition page</a> and choose <strong>Submit</strong> / <strong>New submission</strong>.</li>
+            <li>Under <strong>File to submit</strong>, choose the approved `.tif` file. A `.zip` is acceptable only if it contains a single GeoTIFF.</li>
+            <li>In <strong>Note (optional)</strong>, paste the published unique submission name and the short approved comment. Never substitute an owner-reported score or model projection for the method note.</li>
+            <li>Re-check the filename and comment; select <strong>Create</strong> to send the submission.</li>
+            <li>Save the organizer's receipt and record its exact value as `ORGANIZER-CONFIRMED`. A public leaderboard row without a receipt linking it to the file is not file attribution.</li>
+          </ol>
+        </article>
+        <aside class="warning">
+          <strong>Do not try this with an unvalidated file.</strong>
+          <p>The user previously saw “Predicted values must be in range [0, 1]”. Without the rejected TIFF and matching sample, this review cannot diagnose that exact upload. Possible causes include a real out-of-range value, infinity, or NaN inside the scored footprint. Verify the whole footprint and the exact grid; do not infer the cause from a filename.</p>
+          <p>The official problem page permits null/NaN outside the submitted bounds, but the scored interior still must contain valid probability/confidence values in [0,1]. Follow the authentic sample and canonical writer.</p>
+        </aside>
+      </div>
+    </section>
 
-<h2>3. Downloads (review only)</h2>
-<ul>
-<li><a href="downloads/NEGATIVE-DO-NOT-SUBMIT_tensor-lane-E1-ridge-baseline_v1.tif">NEGATIVE-DO-NOT-SUBMIT — tensor-lane E1 ridge baseline (.tif)</a> — holdout 0.0578 [0.0499, 0.0652]</li>
-<li><a href="downloads/NEGATIVE-DO-NOT-SUBMIT_tensor-lane-E3-full-lane_v1.tif">NEGATIVE-DO-NOT-SUBMIT — tensor-lane E3 full lane (.tif)</a> — holdout 0.0444 [0.0383, 0.0502]</li>
-</ul>
-
-<h2>4. Score labels</h2>
-<p><strong>HOLDOUT-DTI</strong> = our hide-and-recover estimate (evaluator <code>gems.metric v1</code>, withheld positives, 95% CI). <strong>ORGANIZER-CONFIRMED</strong> = copied from a submission-page receipt. We have <strong>no organiser-confirmed scores</strong> in this repository.</p>
-</body></html>
+    <section class="section">
+      <div class="wrap">
+        <h2>Submission-page fields</h2>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Field</th><th>What will go there</th><th>Current value</th></tr></thead>
+            <tbody>
+              <tr><td>File to submit</td><td>One cleared single-band float32 GeoTIFF (or a ZIP with one TIFF).</td><td><strong>None — no file generated.</strong></td></tr>
+              <tr><td>Note (optional)</td><td>Unique name plus a short method identifier, at most 140 characters for this project.</td><td><span class="code">NOT-CREATED</span> · No validated candidate exists; do not upload.</td></tr>
+              <tr><td>Organizer receipt</td><td>Saved receipt that links submission to the organizer's displayed score.</td><td>None.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small source-note">The official <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem and submission specification</a> is the authority. See <a href="./sources.html">source verification notes</a> and the machine-readable <a href="./run-card.json">negative run card</a>.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · no current download · no slot used</p><p><a href="./index.html">Home</a> · <a href="./hypotheses.html">Hypotheses</a> · <a href="./sources.html">Sources</a> · <a href="../README.md">Persistent brief</a></p></div></footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+name: Check research site
+
+on:
+  push:
+    branches: [main, 'arena/**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  status-and-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check status, run card, and local links
+        run: python -m unittest discover -s tests -v

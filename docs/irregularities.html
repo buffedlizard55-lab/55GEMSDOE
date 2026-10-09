@@ -1,97 +1,133 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Irregularities</title><style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
-table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid #d7dce5;padding:.35rem .5rem;vertical-align:top;text-align:left}
-code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}a{color:#0b5cad}
-</style></head><body><p><a href="index.html">← Overview</a></p><h1>Irregularities log (flagged for manual review)</h1>
-<p>Each row: what was found, the evidence (reproducible command or link), and the status.</p>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Open evidence and provenance issues for the 55GEMSDOE project."><title>Audit flags — 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./executive-summary.html">Executive summary</a><a href="./hypotheses.html">Hypotheses</a><a href="./sources.html">Sources</a></nav></div></header>
+<main><section class="hero"><div class="wrap"><div class="eyebrow">Audit trail · open issues</div><h1>Irregularities to resolve</h1><p class="lead">Open issues are shown directly rather than converted into confident claims. They explain why the current answer is “do not submit.”</p><div class="status-banner" role="alert"><div class="status-icon" aria-hidden="true">⚠</div><div><strong>Blocking issues remain.</strong><p>No experiment, candidate TIFF, registry check, validator receipt, or organizer submission receipt exists in this checkout.</p></div></div></div></section>
+<section class="section"><div class="wrap"><div class="table-wrap"><table class="table"><thead><tr><th>Flag</th><th>Severity</th><th>What is known</th><th>What remains open</th></tr></thead><tbody>
+<tr><td>IR-55-001</td><td><span class="tag red">Blocking</span></td><td>This checkout has only a README; no data, pipeline, test suite, evaluator, writer, or registry.</td><td>Pin the authoritative shared template and restore the approved inputs/tools.</td></tr>
+<tr><td>IR-55-002</td><td><span class="tag red">Blocking</span></td><td>The central template tree uses different file names and an evaluation interface not demonstrated to match this protocol. A sibling repo has `evaluate_holdout.py` and `submission_writer.py`, but is not designated canonical here.</td><td>Resolve the shared-tool source of truth; do not privately fork it.</td></tr>
+<tr><td>IR-55-003</td><td><span class="tag red">Blocking</span></td><td>Data tab required login; an owner-maintained public bridge exists elsewhere but is absent locally and not organizer-authenticated by hash pins alone.</td><td>Verify provenance and checksums for the input stack in the approved workflow.</td></tr>
+<tr><td>IR-55-004</td><td><span class="tag amber">High</span></td><td>USGS describes four acquisition blocks and publishes flight-path metadata; no block mask/flight-line raster is in this checkout.</td><td>Get the official file, align it, document it, then run block-aware processing.</td></tr>
+<tr><td>IR-55-005</td><td><span class="tag red">High</span></td><td><strong>0.2778 — USER-REPORTED / NOT ORGANIZER-CONFIRMED</strong> is attributed to H33 by the prompt. GEMSDOE32's own page/audit labels its H33 artifact unscored and describes a projection; a sibling page says the public row is not linked to that TIFF.</td><td>Obtain a submission-page receipt linking that exact TIFF/hash to the displayed score.</td></tr>
+<tr><td>IR-55-006</td><td><span class="tag red">High</span></td><td><strong>0.3195 — USER-REPORTED / NOT ORGANIZER-CONFIRMED</strong> is called the current high by the prompt. A sibling dated report says <strong>0.3774 — PUBLIC-LEADERBOARD SNAPSHOT, NOT A SUBMISSION-PAGE RECEIPT</strong> was rank one and 0.3195 rank seven; direct fetch here returned “Loading…”.</td><td>Read the official live board and retain the date. Do not treat row values as file receipts.</td></tr>
+<tr><td>IR-55-007</td><td><span class="tag amber">Medium</span></td><td>The `zeros` filename suffix is ambiguous. The owner audit describes a mode name and positive pixels, but this checkout has not read the raster bytes.</td><td>Do not infer all-zero vs zero-outside from the suffix.</td></tr>
+<tr><td>IR-55-008</td><td><span class="tag amber">Medium</span></td><td>The user's earlier range rejection cannot be diagnosed without the rejected file and authentic sample.</td><td>Inspect the full scored footprint for NaN/Inf/sentinels and values outside [0,1] in the canonical writer.</td></tr>
+<tr><td>IR-55-009</td><td><span class="tag red">High</span></td><td>Sibling archives include DILCOND, magnetic ridges and cross-gradient methods; no comprehensive raster registry is present.</td><td>Run the continuous-surface and final-dot uniqueness scan over the full corpus before placement.</td></tr>
+<tr><td>IR-55-010</td><td><span class="tag red">Blocking</span></td><td>There is no same-evaluator current holdout best or `HOLDOUT-DTI` result in this checkout.</td><td>Establish a comparable baseline before testing or spending a slot.</td></tr>
+<tr><td>IR-55-011</td><td><span class="tag amber">Medium</span></td><td>The official leaderboard did not return rows to this page-fetcher.</td><td>Do not call this site an up-to-date live score feed until a stable official endpoint is tested.</td></tr>
+</tbody></table></div>
+<p class="small source-note">The full dispositions are maintained in the repository's audit register. A blocked result is retained as the run's negative deliverable.</p>
+<div class="actions"><a class="button" href="./run-card.json">Open negative run card</a><a class="button secondary" href="./sources.html">Review sources</a><a class="button secondary" href="./executive-summary.html">Submission guide</a></div></div></section></main>
+<footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · no current candidate is cleared</p><p><a href="./index.html">Home</a> · <a href="./hypotheses.html">Hypotheses</a> · <a href="../README.md">Persistent brief</a></p></div></footer>
+<!-- session-additions:start -->
+<section class="session-additions">
+<h2>Additions from the tensor-lane run (2026-10-09, same review session)</h2>
 <table>
 <thead>
 <tr>
-<th>#</th>
-<th>Irregularity</th>
-<th>Evidence</th>
-<th>Status</th>
+<th>ID</th>
+<th>Severity</th>
+<th>Finding</th>
+<th>Evidence / consequence</th>
+<th>Resolution needed</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1</td>
-<td><strong>The competition's <code>sample_submission.tif</code> is not a fault-absence file.</strong> The rules page says the sample "predicts total fault absence", but its 60,988 positive cells are <em>identical</em> to the training labels.</td>
-<td><code>np.array_equal(sample==1, labels==1)</code> → True; 60,988 positives in both. Rules text: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description</a> ("A sample submission that predicts total fault absence…").</td>
-<td><strong>Flag.</strong> Do not use the template's 1-values as a baseline. We use it only for footprint, CRS, transform and shape.</td>
+<td>IR-55-012</td>
+<td><strong>High</strong></td>
+<td><strong>Private evaluator/writer fork.</strong> <code>gems/metric.py</code>, <code>gems/submission.py</code> and <code>gems/holdout.py</code> re-implement the DTI, writer and holdout because no authorised shared template was available in this checkout. <code>AGENTS.md</code> forbids a private fork.</td>
+<td>The formula matches the official page, and its worked-example arithmetic is tested (<code>tests_numeric/test_metric.py</code>). It is still not the canonical evaluator.</td>
+<td>Reconcile against the shared template's evaluator on identical inputs, then replace <code>gems/</code> with it or record a shared-tool repair there. Until then, all numbers are labelled with evaluator <code>gems.metric v1</code>.</td>
 </tr>
 <tr>
-<td>2</td>
-<td>Feature rasters carry <strong>real values outside the official footprint</strong> (label/template invalid mask).</td>
-<td>RTP band 2: 1,540 finite cells outside footprint (range −342 to 514). <code>scripts/run_tensor_lane.py</code> JSON field <code>feature_values_outside_footprint</code>.</td>
-<td>Masked to NaN in our pipeline. Rules say data outside bounds must be null/NaN.</td>
+<td>IR-55-013</td>
+<td><strong>High</strong></td>
+<td><strong>Competition template is not a fault-absence file.</strong> The sample-submission raster in the sibling's <code>data/bridge</code> has 60,988 positive cells, the same count as the training fault pixels. The official problem description says the sample is an "all-zero template".</td>
+<td>Local check on the sibling bytes, whose sha256 matches the sibling manifest. The organisers' copy was not accessed.</td>
+<td>Ask the organisers which file is authoritative. Do not use the template's 1-values as a baseline.</td>
 </tr>
 <tr>
-<td>3</td>
-<td><strong>Feature nodata sentinel −3.4028e38 appears inside the footprint</strong> in RTP and isostatic bands (3,061 cells).</td>
-<td><code>feature_gaps_inside_footprint</code> in <code>docs/results/tensor_lane_results.json</code>. The GeoTIFF nodata tag is −3.4028234663852886e+38.</td>
-<td>Treated as missing and filled by footprint mean before low-pass. Flag for the organisers.</td>
+<td>IR-55-014</td>
+<td>Medium</td>
+<td><strong>Feature rasters have real values outside the official footprint</strong>: 1,540 finite RTP cells lie outside the template's valid mask (<code>rtp_band2</code>; same count in <code>iso_band13</code>).</td>
+<td><code>docs/results/tensor_lane_results.json</code> → <code>feature_values_outside_footprint</code>. The pipeline masks them to NaN, as the official format requires.</td>
+<td>Note for the organisers.</td>
 </tr>
 <tr>
-<td>4</td>
-<td><strong>Competition rasters are committed in a public sibling repo</strong> (<code>buffedlizard55-lab/GEMSDOE</code>, folder <code>data/bridge/</code>, ~420 MB in parts). The rules grant the data to registered competitors; I did not find a clause permitting redistribution. Rules §A.5 require third-party content to be properly licensed.</td>
-<td><code>gh api repos/buffedlizard55-lab/GEMSDOE/contents/data/bridge/manifest.json</code>. Rules: <a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">PDF §3.1, §A.5</a>.</td>
-<td><strong>Legal review needed.</strong> We pulled the files <strong>locally only</strong> (gitignored) and did not copy them into this repository.</td>
+<td>IR-55-015</td>
+<td>Medium</td>
+<td><strong>Nodata sentinel −3.4028e38 appears inside the footprint</strong> (3,061 cells in RTP and isostatic bands).</td>
+<td><code>feature_gaps_inside_footprint</code>. Filled with the footprint mean before the low-pass.</td>
+<td>Note for the organisers.</td>
 </tr>
 <tr>
-<td>5</td>
-<td><strong>Sibling repo "audit" JSON labels projections as leaderboard values</strong> (e.g. <code>predicted_leaderboard_dti: 0.2747</code> for the GEMSDOE32 H33-2-B2 file; the file records <code>UNSCORED</code>).</td>
-<td><code>docs/downloads/gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-audit.json</code> in <code>buffedlizard55-lab/GEMSDOE32</code>.</td>
-<td>Treated as a projection, not a score.</td>
+<td>IR-55-016</td>
+<td><strong>High</strong></td>
+<td><strong>Competition rasters live in a public sibling repository</strong> (<code>buffedlizard55-lab/GEMSDOE</code>, <code>data/bridge/</code>, about 414 MB). The organisers' data page is login-gated, and external data is allowed only under a licence that permits use and sharing with the sponsor. This checkout does not contain the rasters: they were read from the sibling repo into the gitignored <code>data/</code> folder for local analysis only.</td>
+<td>DrivenData rules: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/</a>; NLR rules: <a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">https://docs.nlr.gov/docs/fy26osti/96647.pdf</a> (§A.5).</td>
+<td><strong>Legal review.</strong> Recommend removing the bridge from the public sibling repo and never committing payloads here.</td>
 </tr>
 <tr>
-<td>6</td>
-<td><strong>Score figures in the brief disagree.</strong> The brief lists "Current competition leaderboard GEMSDOE high score: 0.3774" and also "0.3195 is the highest score right now".</td>
-<td>Brief text (user-supplied).</td>
-<td>Unresolved. Neither value is organiser-confirmed in this sandbox.</td>
+<td>IR-55-017</td>
+<td><strong>High</strong></td>
+<td><strong>Strike-prediction test is not a fair comparison.</strong> Ridge orientation is perpendicular to the gradient, and the strike of a 2-D source is also perpendicular to it, so ridge-vs-field agreement is nearly built in. Result: withheld segments 43.2% (N=910) vs random ridges 87.6% (N=133,448), Fisher one-sided p=1.0.</td>
+<td><code>docs/results/tensor_lane_results.json</code> → <code>strike_test</code>. Reported as a failed prediction with this caveat.</td>
+<td>Pixel-matched redesign: compare each withheld fault's own geometry against the field at the same pixels, on the same footprint.</td>
 </tr>
 <tr>
-<td>7</td>
-<td><strong>The registry overlap rule is saturated.</strong> Many registry rasters have ~5.1–5.2 million positive cells (≈ the whole 5.17 M footprint), so almost any dot lies within 3 px of one. Literal application flags 70 of 630 same-grid rasters for <em>any</em> candidate.</td>
-<td><code>docs/results/registry_check_E3.json</code>, <code>docs/results/registry_check_tensor_lane_E1.json</code>.</td>
-<td>The protocol needs a chance-corrected overlap (observed vs expected by registry positive density). Not yet implemented.</td>
+<td>IR-55-018</td>
+<td><strong>High (fixed)</strong></td>
+<td><strong>Azimuth sign bug.</strong> Grid rows increase south, but azimuths were computed as if rows were north. Strikes were mirrored.</td>
+<td>Fixed in <code>gems/tensor.py</code>. Regression test <code>tests_numeric/test_tensor.py::test_strike_is_north_convention_and_not_mirrored</code>. All reported numbers were regenerated after the fix.</td>
+<td>None.</td>
 </tr>
 <tr>
-<td>8</td>
-<td><strong>The strike-prediction test is not a fair comparison as implemented.</strong> A ridge is perpendicular to the gradient, and the strike of a 2-D source is also perpendicular to the gradient, so ridge-vs-field agreement is nearly built in.</td>
-<td><code>docs/results/tensor_lane_results.json</code> → <code>strike_test</code> (withheld 43.2% vs random ridges 87.6%).</td>
-<td>Reported as a failed prediction, with this caveat. A pixel-matched redesign is needed.</td>
+<td>IR-55-019</td>
+<td>Medium</td>
+<td><strong>Dimensionality index normalisation not verified</strong> against Pedersen &amp; Rasmussen (1990). The index used is |λ_min|/|λ_mid|, from the Beiki TSVD abstract.</td>
+<td>The 1990 paper was not retrievable. No independent check against the 1990 formula has been run.</td>
+<td>Verify against the 1990 paper before publication.</td>
 </tr>
 <tr>
-<td>9</td>
-<td><strong>Sign-convention bug found and fixed in this session.</strong> Grid rows increase south; azimuths were initially computed as if y were north, mirroring every strike (135° → 45°).</td>
-<td>Synthetic test <code>tests/test_tensor.py::test_strike_is_north_convention_and_not_mirrored</code>. The fix is in <code>gems/tensor.py</code>.</td>
-<td>Fixed; regression test added. Earlier numbers in this session were recomputed after the fix.</td>
+<td>IR-55-020</td>
+<td><strong>High</strong></td>
+<td><strong>Registry overlap rule is saturated.</strong> Literal application flags 70 of 630 same-grid registry rasters, for both E1 and E3. Several registry rasters are dense, so a fixed 70% overlap threshold is easily met by chance.</td>
+<td><code>docs/results/registry_check_tensor_lane_E1.json</code>, <code>docs/results/registry_check_E3.json</code>. Max Spearman was 0.165 (E1).</td>
+<td>The protocol needs a chance-corrected overlap (observed vs expected at the registry's positive density). Not yet implemented.</td>
 </tr>
 <tr>
-<td>10</td>
-<td><strong>Exact Pedersen &amp; Rasmussen (1990) normalisation not verified.</strong> Sources give the endpoints (0 = 2-D, 1 = 3-D) and the smallest/intermediate eigenvalue ratio, not the full formula.</td>
-<td><a href="https://www.sciencedirect.com/science/article/abs/pii/S0926985113000062">ScienceDirect abstract (Beiki TSVD)</a>; <a href="https://www.tandfonline.com/doi/pdf/10.1071/ASEG2012ab057">ASEG 2012 abstract</a>. The 1990 paper was not retrievable.</td>
-<td>Index used =</td>
+<td>IR-55-021</td>
+<td>Medium</td>
+<td><strong>Acquisition blocks are not in the 19-band stack</strong>, so the "process each block separately" step was not possible. The whole grid was processed.</td>
+<td>Band tags, <code>data/README.md</code>. No block-ID raster was found in the 19-band stack.</td>
+<td>Obtain block polygons from USGS GeoDAWN metadata (not reachable from this sandbox).</td>
 </tr>
 <tr>
-<td>11</td>
-<td><strong>Only the RTP/iso bands were used for the tensor lane.</strong> The protocol asks for derivatives of the RTP magnetic and isostatic gravity grids; the provided derivative bands (<code>tmi_hg</code>, <code>tmi_vg</code>, <code>iso_grav_anom_hg</code>, <code>iso_grav_anom_vg</code>) were not used.</td>
-<td>Band list from <code>gdal</code> tags.</td>
-<td>Intentional (recomputed from FFT per the protocol).</td>
+<td>IR-55-022</td>
+<td>Medium</td>
+<td><strong>Sibling audit labels a projection</strong> as <code>predicted_leaderboard_dti: 0.2747</code> for the GEMSDOE32 H33-2-B2 file (the audit JSON labels it a projection).</td>
+<td><code>docs/leaderboard-analysis.md</code>.</td>
+<td>Treated as a projection.</td>
 </tr>
 <tr>
-<td>12</td>
-<td><strong>"Acquisition blocks" are not in the data.</strong> The protocol says to work within each acquisition block; no block ID band exists in the 19-band stack.</td>
-<td>Band tags, <code>data/README.md</code>.</td>
-<td>Whole-grid processing; a limitation. Needs block IDs from the organisers or USGS GeoDAWN metadata.</td>
+<td>IR-55-023</td>
+<td>Medium</td>
+<td><strong>Pages and data hosts blocked from this sandbox.</strong> USGS S3 (<code>prd-tnm.s3.amazonaws.com</code>), the National Map downloader, ScienceBase, and OpenEI all failed to connect (curl HTTP 000, 2026-10-09).</td>
+<td>Local curl checks. This blocks the official 1 m DEM route for any scarp hypothesis.</td>
+<td>Obtain these from a machine with open egress, then re-verify hashes.</td>
 </tr>
 <tr>
-<td>13</td>
-<td>The sibling <code>data/README.md</code> says the stack was verified "by sha256 against the pinned inventory" but the pinning run used a GitHub runner whose own egress is not independently documented.</td>
-<td><code>buffedlizard55-lab/GEMSDOE/data/README.md</code>.</td>
-<td>Our check only confirms the bytes match the sibling's pins.</td>
+<td>IR-55-024</td>
+<td>Medium</td>
+<td><strong>Merge conflict with <code>main</code>.</strong> This branch and <code>main</code> both replaced the README and the site pages. Resolved by keeping <code>main</code>'s governing files and adding this session's results on top. Our two negative candidate TIFFs were removed from <code>docs/</code> so the no-TIFF rule (<code>tests/test_site_status.py</code>) holds.</td>
+<td><code>git merge origin/main</code> on <code>arena/6a696f4d-55gemsdoe</code>.</td>
+<td>None.</td>
 </tr>
 </tbody>
-</table></body></html>
+</table>
+<h3>Disposition of this run</h3>
+<p>Three holdout experiments were run (within the 3-experiment budget). Results are HOLDOUT-DTI only (see <code>docs/results.md</code>). The tensor lane is <strong>negative</strong>: E1 ridge baseline 0.0578 beat E2 0.0463 and E3 0.0444 on the same holdout, and the strike test failed. Nothing is cleared, no TIFF is published, and no weekly slot was used.</p>
+</section>
+<!-- session-additions:end -->
+</body></html>

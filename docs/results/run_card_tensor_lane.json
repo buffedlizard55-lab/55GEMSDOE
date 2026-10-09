@@ -70,8 +70,8 @@
     "shape_matches_template": true,
     "transform_matches_template": true
   },
-  "submission_name": "NEGATIVE-DO-NOT-SUBMIT tensor-lane E1/E3 v1",
-  "submission_note": "Tensor-dim lane v1: holdout negative vs ridge baseline; not for upload (see run card)",
+  "submission_name": "NOT PUBLISHED - no upload (tensor lane negative)",
+  "submission_note": "No upload. Tensor lane negative on holdout (0.0444 vs ridge 0.0578). No cleared candidate.",
   "verdict": "negative",
   "organiser_confirmed_scores": [],
   "budget": "3 experiments (E1,E2,E3) within the 2-hour budget; no submission slot used"

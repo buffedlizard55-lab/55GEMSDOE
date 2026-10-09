@@ -1,55 +1,125 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GEMS Prize (DOE) — fault prediction workbench</title>
-<style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
-h1{font-size:1.7rem}h2{font-size:1.2rem;margin-top:2rem;border-bottom:1px solid #d7dce5;padding-bottom:.3rem}
-.box{background:#fff7e6;border:1px solid #f0c36d;border-radius:8px;padding:1rem 1.2rem}
-.ok{background:#eefbf1;border:1px solid #9fd8ad;border-radius:8px;padding:1rem 1.2rem}
-code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}
-table{border-collapse:collapse;width:100%}td,th{border:1px solid #d7dce5;padding:.4rem .5rem;text-align:left;vertical-align:top}
-a{color:#0b5cad}.muted{color:#5b6475}
-</style></head><body>
-<h1>GEMS Prize (DOE) — fault prediction workbench</h1>
-<p class="muted">Competition: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DrivenData #306</a> · Repo: <a href="https://github.com/buffedlizard55-lab/55GEMSDOE">buffedlizard55-lab/55GEMSDOE</a> · Updated 2026-10-09</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Auditable tensor-dimensionality research status for the DOE GEMS fault-mapping challenge.">
+  <meta name="theme-color" content="#10271e">
+  <title>55GEMSDOE — research and submission status</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./executive-summary.html">Executive summary</a>
+        <a href="./hypotheses.html">Hypotheses</a>
+        <a href="./sources.html">Sources</a>
+        <a href="./irregularities.html">Audit flags</a>
+        <a href="../README.md">Project brief</a>
+      </nav>
+    </div>
+  </header>
 
-<div class="box"><strong>Executive summary.</strong> We built a verified scoring, validation and uniqueness pipeline,
-and tested one new method. The method (tensor dimensionality with strike gating) <strong>lost</strong> to a plain ridge
-baseline on our holdout, and its strike test failed. <strong>No file is recommended for upload today.</strong>
-Next steps are in <a href="hypotheses.html">hypotheses</a> and <a href="#next">next steps</a>.
-<br><br><a href="executive-summary.html"><strong>→ How to make a submission (step by step)</strong></a></div>
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">DOE GEMS · Fault-mapping research</div>
+        <h1>Evidence first. A submission only when it is cleared.</h1>
+        <p class="lead">This project tests whether potential-field tensor dimensionality and strike can separate long, fault-like structures from compact sources. The task predicts geological faults; it does not directly detect or certify geothermal vents.</p>
+        <p class="small"><strong>Maximize P(Win)</strong> with evidence, not promises. <strong>Own the Outcome</strong> with traceable checks and honest no-go decisions.</p>
 
-<h2>Current results (HOLDOUT-DTI only — not organiser-confirmed)</h2>
-<p class="muted">Evaluator <code>gems.metric v1</code> (DTI α=0.2, β=0.8, R=300 m). Holdout = quadrant folds of catalogue fault segments; visible faults masked pixel-exactly. CI = 1,000-rep block bootstrap (10 km blocks).</p>
-<table>
-<tr><th>Variant</th><th>HOLDOUT-DTI</th><th>95% CI</th><th>Withheld positive px</th></tr>
-<tr><td>E1 ridge baseline (RTP gradient ridges, stripes masked)</td><td>0.0578</td><td>0.0499 – 0.0652</td><td>60,594</td></tr>
-<tr><td>E2 + dimensionality down-weight</td><td>0.0463</td><td>0.0398 – 0.0523</td><td>60,594</td></tr>
-<tr><td>E3 full tensor lane (+ strike gate)</td><td>0.0444</td><td>0.0383 – 0.0502</td><td>60,594</td></tr>
-</table>
-<p>Leakage canary: every single feature has AUC between 0.48 and 0.52 on ridge pixels, so no leakage is detected (threshold 0.90).
-Strike test (withheld fault strikes vs random ridges): <strong>failed</strong>, 43.2% vs 87.6%, with a caveat (<a href="irregularities.html">irregularity #8</a>).</p>
+        <div class="status-banner" role="alert" aria-live="polite">
+          <div class="status-icon" aria-hidden="true">⛔</div>
+          <div>
+            <strong>NOT CLEARED — NO TIFF AVAILABLE. DO NOT DOWNLOAD OR SUBMIT.</strong>
+            <p>No candidate raster, holdout result, registry comparison, or format receipt exists in this checkout. There is intentionally no download link. The current run card is negative/blocked.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <span class="button disabled" aria-disabled="true">No submission file to download</span>
+          <a class="button secondary" href="./executive-summary.html">How submission clearance works <span aria-hidden="true">→</span></a>
+        </div>
+        <p class="small">Last repository review: 2026-10-09 UTC. The official live leaderboard fetch returned “Loading…”; this page is not an automatically refreshed score feed.</p>
+      </div>
+    </section>
 
-<h2>Uniqueness</h2>
-<p>Checked against <strong>630 same-grid GEMSDOE rasters</strong> from 63 repos. Maximum rank correlation was 0.165 (E1), well below 0.90.
-Dot overlap is saturated by dense registry rasters, so the literal 70% rule flags 70 rasters. A chance-corrected rule is needed (<a href="irregularities.html">#7</a>).
-Files: <a href="results/registry_check_tensor_lane_E1.json">E1</a>, <a href="results/registry_check_E3.json">E3</a>.</p>
+    <section class="section">
+      <div class="wrap">
+        <h2>Submission gate at a glance</h2>
+        <p class="section-intro">A file is not download-ready just because it has a new filename or valid GeoTIFF metadata. It must first beat a comparable spatial holdout, pass the lane-uniqueness test, and be re-read from disk by the shared writer/validator.</p>
+        <div class="grid" aria-label="Current submission checks">
+          <article class="card"><div class="metric-label">Candidate</div><div class="metric-value">None</div><p>No prediction TIFF was generated.</p></article>
+          <article class="card"><div class="metric-label">HOLDOUT-DTI</div><div class="metric-value">Not run</div><p>No evaluator or fold receipt in this checkout.</p></article>
+          <article class="card"><div class="metric-label">Registry</div><div class="metric-value">Not checked</div><p>No registry raster corpus is present.</p></article>
+          <article class="card"><div class="metric-label">Format validator</div><div class="metric-value">Not run</div><p>No candidate file to validate.</p></article>
+        </div>
+      </div>
+    </section>
 
-<h2>Leaderboard: why 0.2778 scored high</h2>
-<p>See <a href="leaderboard-analysis.html">the analysis</a> (HTML) or the same text in <a href="leaderboard-analysis.md">Markdown</a>. Short version: asymmetric DTI weights reward sparse, confident dots near real faults, and the entry pruned dots on the known catalogue.</p>
+    <section class="section">
+      <div class="wrap two-col">
+        <article class="card">
+          <span class="tag red">Why no TIFF?</span>
+          <h2 style="margin-top:12px">The data and shared tools are absent here.</h2>
+          <p>This repository now contains the project brief, research notes, static status site, and documentation checks; it still has no cached competition grid, labels, sample submission, verified whole-segment evaluator, approved submission writer, or registry. The DrivenData data page redirected to login. Owner-maintained mirrors and sibling tools exist elsewhere, but their hashes do not authenticate organizer origin, and the authoritative shared-tool location and protocol fit remain unresolved.</p>
+          <p style="margin-top:12px">Generating a placeholder would hide these blockers and could reproduce the upload error. The project does not do that.</p>
+        </article>
+        <aside class="warning">
+          <strong>What “OK to submit” will mean here</strong>
+          <ul class="list">
+            <li>Comparable hide-and-recover `HOLDOUT-DTI` with evaluator version, withheld positives, and 95% CI.</li>
+            <li>No feature-only leakage canary above the alarm threshold left unexplained.</li>
+            <li>Continuous surface and final dots both pass the registry correlation/overlap gate.</li>
+            <li>On-disk raster matches the official grid and passes the range/footprint validator.</li>
+            <li>A separate selector approves any use of a weekly slot.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
 
-<h2>Irregularities (flagged for review)</h2>
-<p>Thirteen items are logged in <a href="irregularities.html">irregularities</a>. The most important: the competition's "sample submission" is identical to the training labels, even though the rules call it a fault-absence sample. Also, the competition rasters are committed in a sibling public repo, which needs legal review.</p>
+    <section class="section">
+      <div class="wrap">
+        <h2>Results of the tensor-lane run (HOLDOUT-DTI)</h2>
+        <p>Negative. E3 full lane <strong>0.0444</strong> [0.0383, 0.0502] vs E1 ridge baseline <strong>0.0578</strong> [0.0499, 0.0652]; 60,594 withheld positives; evaluator <code>gems.metric v1</code>. Strike test failed. No TIFF is published and no download is allowed. Details: <a href="results.html">results</a>, <a href="irregularities.html">irregularities</a>.</p>
+        <h2>Assigned scientific question</h2>
+        <p class="section-intro">Potential-field gradient ridges can come from faults, contacts, dikes, intrusions, or acquisition artifacts. The tensor lane tests whether a source is approximately two-dimensional and whether its eigenvector-derived strike agrees with the candidate ridge's own orientation.</p>
+        <div class="grid">
+          <article class="card"><h3>Layers</h3><p>RTP magnetic anomaly and isostatic gravity anomaly, plus official acquisition-block and flight-line metadata for processing masks.</p></article>
+          <article class="card"><h3>Mechanism</h3><p>Low-pass first; derive the tensor by FFT within each block; estimate dimensionality and strike; down-weight compact 3-D signatures.</p></article>
+          <article class="card"><h3>Falsifiable test</h3><p>On whole held-out fault segments, tensor strike should agree with segment strike more often than matched random ridges do.</p></article>
+          <article class="card"><h3>Main confounders</h3><p>Lithologic contacts, intrusions, vents, east–west flight-line striping, block seams, and spectral edge artifacts.</p></article>
+        </div>
+        <div class="actions"><a class="button" href="./hypotheses.html">Read the ranked hypotheses</a><a class="button secondary" href="./sources.html">Review official sources</a></div>
+      </div>
+    </section>
 
-<h2>Sources</h2>
-<p>Every external claim links to a verified or blocked source: <a href="sources.html">sources</a>.</p>
+    <section class="section">
+      <div class="wrap">
+        <h2>Evidence categories are kept separate</h2>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Evidence class</th><th>Meaning</th><th>Current state</th></tr></thead>
+            <tbody>
+              <tr><td><strong>HOLDOUT-DTI</strong></td><td>Result from the specified spatial hide-and-recover evaluator, with evaluator/version, withheld-positive count, and CI.</td><td>None computed.</td></tr>
+              <tr><td><strong>ORGANIZER-CONFIRMED</strong></td><td>Value copied from an organizer submission-page receipt tied to a submission.</td><td>None available.</td></tr>
+              <tr><td><strong>User/sibling claim</strong></td><td>Value or result stated in a prompt or owner-maintained site; useful for research, not proof.</td><td>H33 score attribution and current leaderboard value disputed; see <a href="./irregularities.html">audit flags</a>.</td></tr>
+              <tr><td><strong>Projection</strong></td><td>Modelled or estimated value; never a score.</td><td>Not used as a score here.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small source-note">Official task and file requirements: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a>. Research sources and availability notes: <a href="./sources.html">source register</a>.</p>
+      </div>
+    </section>
+  </main>
 
-<h2 id="next">Next steps (ranked)</h2>
-<ol>
-<li>Test the tilt-angle zero-contour hypothesis (rank 1) on the same holdout, with the same gates.</li>
-<li>Fix the strike test with a pixel-matched design (irregularity #8).</li>
-<li>Add a chance-corrected overlap to the registry check (irregularity #7).</li>
-<li>Resolve the leaderboard figure conflict (0.3774 vs 0.3195) and the template-label identity with the organisers (#1, #6).</li>
-<li>Get the USGS 1 m DEM tiles from a machine with open egress (rank 4).</li>
-</ol>
-<p class="muted">Negative results are deliverables. The run card is at <a href="results/run_card_tensor_lane.json">results/run_card_tensor_lane.json</a>.</p>
-</body></html>
+  <footer class="footer">
+    <div class="wrap">
+      <p><strong>55GEMSDOE</strong> · research status and submission gate</p>
+      <p><a href="./executive-summary.html">Submission guide</a> · <a href="./hypotheses.html">Hypotheses</a> · <a href="./sources.html">Sources</a> · <a href="./run-card.json">Run card</a> · <a href="../README.md">Persistent project brief</a></p>
+      <p class="small" style="color:#b7c9bd">No automatic upload. No submission slot used. No result is claimed beyond the evidence linked on this site.</p>
+    </div>
+  </footer>
+</body>
+</html>

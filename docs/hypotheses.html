@@ -1,82 +1,56 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hypotheses</title><style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#1d2330}
-table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border:1px solid #d7dce5;padding:.35rem .5rem;vertical-align:top;text-align:left}
-code{background:#f1f3f7;padding:.1rem .3rem;border-radius:4px}a{color:#0b5cad}
-</style></head><body><p><a href="index.html">← Overview</a></p><h1>Candidate hypotheses (ranked) — not yet all validated</h1>
-<p>Gate for every candidate (protocol): validate on the spatially blocked holdout first. Do not spend a
-submission slot on an idea that does not beat the current holdout best. <strong>Current holdout bar in this repo:
-E1 ridge baseline, HOLDOUT-DTI 0.0578, 95% CI [0.0499, 0.0652], 60,594 withheld positive px</strong> (evaluator
-<code>gems.metric v1</code>). Band names below are from the GeoTIFF band tags (full list: <a href="data_dictionary.html">data dictionary</a>).</p>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Ranked tensor-dimensionality hypotheses for GEMS fault mapping."><title>Hypotheses — 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./executive-summary.html">Executive summary</a><a href="./sources.html">Sources</a><a href="./irregularities.html">Audit flags</a></nav></div></header>
+<main>
+<section class="hero"><div class="wrap"><div class="eyebrow">Research plan · assigned lane only</div><h1>Four testable tensor-lane hypotheses</h1><p class="lead">These are qualitative rankings of research opportunity and implementation cost, not holdout results or score projections. No candidate has been built, tested, or declared unique.</p><div class="status-banner" role="alert"><div class="status-icon" aria-hidden="true">⛔</div><div><strong>NO VALIDATED CANDIDATE — DO NOT SUBMIT.</strong><p>The checkout lacks the cached grids, approved evaluator, writer, and full registry.</p></div></div></div></section>
+<section class="section"><div class="wrap"><div class="table-wrap"><table class="table"><thead><tr><th>Rank</th><th>Layers & physical signature</th><th>Why it may find an unmapped fault</th><th>Difference / cost</th></tr></thead><tbody>
+<tr><td><strong>1</strong><br><span class="tag">highest priority</span></td><td><strong>Joint magnetic/gravity tensor dimensionality and strike concordance.</strong><br>RTP magnetic anomaly + isostatic gravity anomaly. Low-pass and compute the gradient tensor per acquisition block; compare eigenvalue dimensionality/strike with the local ridge axis; suppress compact responses and flight-line stripes.</td><td>A label-independent, strike-extended boundary may continue outside the public catalogue. Agreement across fields can make a structural edge more credible, but it is not proof of faulting.</td><td>No implementation in this checkout. Related sibling work includes magnetic ridges, cross-gradient, and a `DILCOND` name; exact novelty must be checked. <strong>Cost: high.</strong> Expected upside is qualitative and unmeasured.</td></tr>
+<tr><td><strong>2</strong></td><td><strong>Scale-persistent near-2-D strike.</strong><br>Same two potential-field layers and block masks; test stability of dimensionality and axial strike over preregistered low-pass scales.</td><td>Persistent orientation may distinguish geological structure from derivative noise, short-wavelength compact sources, or survey seams.</td><td>A stability gate beyond a one-scale ridge or basic cross-gradient. <strong>Cost: medium/high.</strong> No score estimate.</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Gravity-only near-2-D tensor ridges.</strong><br>Isostatic gravity anomaly; tensor index, quasi-2-D eigenvector strike, and ridge/strike agreement.</td><td>Density boundaries and basin/basement offsets may show a fault continuation that has a weak magnetic response.</td><td>Distinct from simple gravity-gradient magnitude only if it uses full tensor dimensionality and strike; check archived raster/code. <strong>Cost: medium.</strong></td></tr>
+<tr><td><strong>4</strong></td><td><strong>RTP-to-pseudogravity tensor.</strong><br>Reduced-to-pole magnetics transformed to pseudogravity under an explicit magnetization assumption, then tensor dimensionality and strike.</td><td>May make elongated magnetic-source geometry more interpretable as a structural strike where a fault is absent from the catalogue.</td><td>Different from raw magnetic ridges, but sensitive to magnetization assumptions and prior `DILCOND` work. <strong>Cost: medium/high.</strong></td></tr>
+</tbody></table></div>
+<p class="section-intro" style="margin-top:20px">“Why off-catalogue” is a geological rationale, not measured discovery performance. The hide-and-recover test on known catalogue faults is a proxy and cannot prove that a candidate is a real new fault.</p>
+<div class="warning"><strong>Key source available, local masks absent.</strong><p>The USGS GeoDAWN data release describes four acquisition blocks and includes flight-path/survey-outline files. The official release is publicly listed and CC0, but the block polygons/flight lines have not been downloaded or aligned here. See <a href="./sources.html">source status</a>.</p></div>
+<div class="actions"><a class="button" href="./sources.html">Review sources</a><a class="button secondary" href="./run-card.json">Open negative run card</a><a class="button secondary" href="../README.md">Read full research plan</a></div></div></section>
+</main><footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · hypotheses only · no score or TIFF</p><p><a href="./index.html">Home</a> · <a href="./executive-summary.html">Submission guide</a> · <a href="./sources.html">Sources</a></p></div></footer>
+<!-- session-additions:start -->
+<section class="session-additions">
+<h2>Result of the tensor-lane run (2026-10-09) — HOLDOUT-DTI</h2>
+<p>Evaluator <code>gems.metric v1</code> (DTI α=0.2, β=0.8, R=300 m). Holdout = four quadrant folds of catalogue fault segments, visible faults masked pixel-exactly. 60,594 withheld positive pixels. 95% CI from a 1,000-rep block bootstrap (10 km blocks).</p>
 <table>
 <thead>
 <tr>
-<th>Rank</th>
-<th>Hypothesis</th>
-<th>Layer(s) (band #)</th>
-<th>Physical signature targeted</th>
-<th>Why it should catch a <em>missing</em> fault</th>
-<th>Named non-fault mimic</th>
-<th>Cost</th>
-<th>Status</th>
+<th>Experiment</th>
+<th>Hypothesis tested</th>
+<th>HOLDOUT-DTI</th>
+<th>95% CI</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1</td>
-<td><strong>Tilt-angle zero-contours</strong> pick out buried, low-contrast faults that amplitude gradients miss</td>
-<td><code>tc</code> tilt/total curvature (6); RTP (2)</td>
-<td>Zero-crossing of the tilt angle marks the edge of a source regardless of amplitude</td>
-<td>Amplitude-normalised: weak but sharp faults show a clean zero-contour, while a strong sediment-hosted anomaly does not swamp it. Uses a layer we have not used</td>
-<td>Lithologic contacts and basalt flow edges (2-D, non-fault)</td>
-<td>Low (one FFT pass)</td>
-<td><strong>Not tested</strong> — next experiment</td>
+<td>E1</td>
+<td>Gradient ridges of RTP (stripe rows masked). Reference, not a tensor test</td>
+<td><strong>0.0578</strong></td>
+<td>0.0499 – 0.0652</td>
 </tr>
 <tr>
-<td>2</td>
-<td><strong>Geodetic strain-rate localisation</strong></td>
-<td>shear rate (7), second invariant (4), dilatation (8)</td>
-<td>Ridges of shear-rate magnitude where deformation localises</td>
-<td>Active faults localise strain; faults with no surface expression can still show a shear-rate ridge</td>
-<td>GPS/InSAR processing artefacts and broad plate-boundary strain</td>
-<td>Low (layers present)</td>
-<td><strong>Not tested</strong>. Check the native resolution of the geodetic layers before use</td>
+<td>E2</td>
+<td>E1 weighted by (1 − dimensionality index), magnetic pseudogravity tensor</td>
+<td>0.0463</td>
+<td>0.0398 – 0.0523</td>
 </tr>
 <tr>
-<td>3</td>
-<td><strong>Seismicity alignment</strong></td>
-<td>earthquake intensity (16), distance to earthquake (10)</td>
-<td>Linear alignments of hypocentres and minima of distance-to-event</td>
-<td>Microseismicity clusters along unmapped faults</td>
-<td>Induced seismicity, mine blasts, and population-density clustering</td>
-<td>Low</td>
-<td><strong>Not tested</strong>. The meaning of the n=100 km, a=15° parameters must be confirmed from the official data dictionary</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>Topographic scarp detection at 1 m</strong></td>
-<td>detrended elevation slope (19); 1 m DEM (external)</td>
-<td>Sharp linear scarps in high-resolution topography</td>
-<td>Scarps are direct evidence of young faulting and are absent from the USGS catalogue for many faults</td>
-<td>Erosion lines, roads, canals, and field boundaries</td>
-<td>High: needs the USGS 1 m DEM tiles</td>
-<td><strong>Blocked here.</strong> The official host (<code>prd-tnm.s3.amazonaws.com</code>), the National Map downloader, and ScienceBase all failed to connect from this sandbox (2026-10-09, curl HTTP 000). Free and official, but must be fetched from a machine with open egress</td>
-</tr>
-<tr>
-<td>—</td>
-<td><strong>Tensor dimensionality + strike gating</strong> (this session)</td>
-<td>RTP (2), iso gravity (13)</td>
-<td>2-D ridges with strike agreeing with ridge orientation; down-weighted 3-D bodies</td>
-<td>Targets strike-extended structures</td>
-<td>E-W flight-line striping (masked); 2-D contacts and dykes</td>
-<td>Medium</td>
-<td><strong>Tested, negative.</strong> E1 0.0578 &gt; E2 0.0463 &gt; E3 0.0444. Strike test failed (see caveat, irregularity #8). Canary AUC ≈0.5 (no leakage, but weak signal)</td>
+<td>E3</td>
+<td>E2 combined with the gravity index and a strike-agreement gate (candidate lane method)</td>
+<td>0.0444</td>
+<td>0.0383 – 0.0502</td>
 </tr>
 </tbody>
 </table>
-<h2>Notes on the ranking</h2>
-<ul>
-<li>Ranking is judgement: expected DTI gain × (1 / implementation cost). None of ranks 1–4 is yet validated, so no expected gain is claimed as a number.</li>
-<li>The tensor lane (row "—") is kept as a reference result. Its negative holdout result argues that 2-D-ness alone does not separate catalogue faults from other ridges in this area.</li>
-<li>Anything that gets to submission must pass: holdout beats E1's CI lower bound (or a pre-registered margin), canary AUC ≤ 0.90, and the chance-corrected uniqueness check (irregularity #7).</li>
-</ul></body></html>
+<p>Leakage canary: every single feature has AUC 0.48–0.52 on ridge pixels (threshold 0.90): no leakage detected, but also little discriminative signal. Strike test: <strong>failed</strong> (43.2% vs 87.6%; design caveat IR-55-017). Budget used: 3 experiments.</p>
+<p><strong>Verdict for the tensor lane: negative.</strong> From E1 to E2 the weighted true positives fell from 3,794 to 2,816 and false positives from 82,002 to 59,039, while missed positives rose from 56,800 to 57,778. The weight removed signal and noise at similar rates, so the Tversky score fell. This is the opposite of the lane's premise and is recorded as a result. Possible next experiments (within the lane only): pixel-matched strike test, and a chance-corrected uniqueness check.</p>
+<p>Out-of-lane ideas (tilt-angle zero-contours, geodetic strain, seismicity alignments, 1 m DEM scarps) were drafted in this session and are <strong>parked</strong>. <code>AGENTS.md</code> keeps this checkout to the tensor lane, so they are not implemented here. They need a separate lane approval and their own preregistration.</p>
+</section>
+<!-- session-additions:end -->
+</body></html>
