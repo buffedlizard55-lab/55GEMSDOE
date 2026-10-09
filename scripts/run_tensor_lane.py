@@ -45,7 +45,7 @@ def main():
     ap.add_argument("--reps", type=int, default=1000)
     args = ap.parse_args()
 
-    feat = DATA / "training_features.tif"
+    feat = DATA / "gems-geodawn-numerical-features.tif"  # IR-55-026
     labp = DATA / "labels.tif"
     tmpl = DATA / "sample_submission.tif"
     for p in (feat, labp, tmpl):

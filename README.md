@@ -30,6 +30,22 @@ cleared competition submission. The web site repeats this distinction at the top
 of [`docs/index.html`](docs/index.html). A chance-adjusted overlap is reported for
 research, but it never overrides the literal >70% stop rule.
 
+## Tensor-lane final pass (h55 audit file, 2026-10-09) — DO NOT SUBMIT
+
+This session used its 3-experiment budget. The pre-registered rule selected N\* = 160,000 dots. The result is **NEGATIVE** (HOLDOUT-DTI).
+
+* **Primary Q4:** tensor_full 0.1019 (fold-level 95% CI 0.0877–0.1185, 60,988 withheld positives) vs uniform random 0.1627. Random wins at 40k, 80k and 160k.
+* **Secondary B = 15 px:** tensor beats random at 40k and 160k (p = 0.008, p = 0.004). The rule needs both protocols to pass, so the label stays NEGATIVE.
+* **Audit file:** `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 `ffd2a892…`). Format 12/12. **Uniqueness is blocked** under the literal 70% duplicate-stop rule (raw 0.8401 against a spacing-5 lattice, chance-level; not a copy). **Do not submit.** Download for audit only.
+* **Page:** `docs/h55-160k-audit.html`. **Run card:** `docs/run-card-h55-160k.json`, `docs/status-h55-160k.json`. The canonical `docs/run-card.json` and `docs/status.json` describe the h56 file and are not overwritten.
+* **Hypotheses:** H-B to H-F (out of lane, proposals only) are in `docs/hypotheses.md` and on the audit page.
+* **Irregularities:** IR-55-025 to IR-55-033 (striping axis unreconciled, two striping detectors, literal uniqueness stop, holdout arm vs shipped emitter, zeros/NaN encoding).
+* **Template fixes (each applied once):** validator pixel size (IR-55-025), feature-raster name in `io55`, `prepare_data`, `run_tensor_lane` and `build_docs` (IR-55-026), sidecar selection (IR-55-027).
+
+Reproduce the audit file: `scripts/submission_writer.py --tag v1 --n-dots 160000`, then `scripts/validate_submission.py`, `scripts/verify_unique.py`, `scripts/make_final_card.py`, `scripts/build_site.py`, `scripts/build_h55_audit_page.py` (in that order).
+
+---
+
 ## Reproducible commands
 
 Competition payloads are intentionally not committed. On a machine where the

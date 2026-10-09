@@ -14,7 +14,7 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=
 
 
 def dictionary():
-    p = ROOT / "data" / "training_features.tif"
+    p = ROOT / "data" / ("gems-geodawn-numerical-features.tif" if (ROOT / "data" / "gems-geodawn-numerical-features.tif").exists() else "training_features.tif")  # IR-55-026
     if not p.exists():
         return None
     rows = ["| band | description (from tag) | category | short name |", "|---|---|---|---|"]

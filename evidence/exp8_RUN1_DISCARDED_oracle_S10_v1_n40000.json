@@ -1,0 +1,388 @@
+{
+  "experiment": "exp8_visible_prior_gate",
+  "label": "HOLDOUT-DTI (per-fold visible-only features; dti55 exact official metric)",
+  "evaluator": "src/gems55/dti55.py alpha=0.2 beta=0.8 R=3px (300 m triangular kernel)",
+  "n_catalogue_px": 60988,
+  "protocols": {
+    "Q4": {
+      "protocol": "Q4",
+      "n_folds": 4,
+      "n_total_dots": 40000,
+      "arms": {
+        "random": {
+          "fold_pooled_dti": 0.0742156636939414,
+          "fold_mean_dti": 0.08753265994188321,
+          "per_fold_dti": [
+            0.042838,
+            0.064675,
+            0.135754,
+            0.106863
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.06659348188046123,
+          "fold_mean_dti": 0.07418604544828375,
+          "per_fold_dti": [
+            0.047217,
+            0.072027,
+            0.095119,
+            0.082381
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.01334661449359945,
+          "diff_vs_random_signflip_p_two_sided": 0.5,
+          "folds_beating_random": "2/4"
+        },
+        "H-A-500": {
+          "fold_pooled_dti": 0.05214875418331114,
+          "fold_mean_dti": 0.05895091675323314,
+          "per_fold_dti": [
+            0.038288,
+            0.035659,
+            0.090538,
+            0.071319
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.028581743188650057,
+          "diff_vs_random_signflip_p_two_sided": 0.125,
+          "folds_beating_random": "0/4"
+        },
+        "H-A-1500": {
+          "fold_pooled_dti": 0.06483091131075501,
+          "fold_mean_dti": 0.0744408084034536,
+          "per_fold_dti": [
+            0.040475,
+            0.071579,
+            0.099276,
+            0.086434
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.013091851538429598,
+          "diff_vs_random_signflip_p_two_sided": 0.375,
+          "folds_beating_random": "1/4"
+        },
+        "prox-500": {
+          "fold_pooled_dti": 0.027949045895550105,
+          "fold_mean_dti": 0.03130542327993975,
+          "per_fold_dti": [
+            0.020737,
+            0.022845,
+            0.048646,
+            0.032994
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.05622723666194345,
+          "diff_vs_random_signflip_p_two_sided": 0.125,
+          "folds_beating_random": "0/4"
+        },
+        "prox-1500": {
+          "fold_pooled_dti": 0.029469819662845426,
+          "fold_mean_dti": 0.032917237275180644,
+          "per_fold_dti": [
+            0.020649,
+            0.033248,
+            0.046236,
+            0.031536
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.05461542266670255,
+          "diff_vs_random_signflip_p_two_sided": 0.125,
+          "folds_beating_random": "0/4"
+        }
+      },
+      "leakage_canary_auc_mean": {
+        "tensor_full_score": 0.41381057861798964,
+        "ridge": 0.5417380341068773,
+        "one_minus_dim": 0.5117530640900246,
+        "strike_agree": 0.5145381441272111,
+        "neg_visible_distance": 0.5171594264666716
+      },
+      "leakage_canary_auc_max": {
+        "tensor_full_score": 0.41930258603635867,
+        "ridge": 0.5499517888615434,
+        "one_minus_dim": 0.5267538799479167,
+        "strike_agree": 0.5310868948475707,
+        "neg_visible_distance": 0.5566007419270833
+      },
+      "leakage_canary_rows": [
+        {
+          "fold": 0,
+          "tensor_full_score": 0.41930258603635867,
+          "ridge": 0.5454787697397592,
+          "one_minus_dim": 0.49492972730993556,
+          "strike_agree": 0.5209906279204611,
+          "neg_visible_distance": 0.509807777465125
+        },
+        {
+          "fold": 1,
+          "tensor_full_score": 0.4126112861225786,
+          "ridge": 0.5499517888615434,
+          "one_minus_dim": 0.5069811950222293,
+          "strike_agree": 0.5310868948475707,
+          "neg_visible_distance": 0.5219640999126707
+        },
+        {
+          "fold": 2,
+          "tensor_full_score": 0.4128974110630212,
+          "ridge": 0.5437929301699567,
+          "one_minus_dim": 0.5183474540800169,
+          "strike_agree": 0.5070437670220627,
+          "neg_visible_distance": 0.4802650865618072
+        },
+        {
+          "fold": 3,
+          "tensor_full_score": 0.41043103125,
+          "ridge": 0.52772864765625,
+          "one_minus_dim": 0.5267538799479167,
+          "strike_agree": 0.49903128671875,
+          "neg_visible_distance": 0.5566007419270833
+        }
+      ],
+      "leakage_flag_gt_0p90": []
+    },
+    "S10": {
+      "protocol": "S10",
+      "n_folds": 10,
+      "n_total_dots": 40000,
+      "arms": {
+        "random": {
+          "fold_pooled_dti": 0.326425580513905,
+          "fold_mean_dti": 0.32640509948679786,
+          "per_fold_dti": [
+            0.334203,
+            0.320714,
+            0.323354,
+            0.332381,
+            0.327538,
+            0.321724,
+            0.328579,
+            0.324748,
+            0.323805,
+            0.327004
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000
+        },
+        "tensor_full": {
+          "fold_pooled_dti": 0.1866933653016704,
+          "fold_mean_dti": 0.18668051175499764,
+          "per_fold_dti": [
+            0.189607,
+            0.187108,
+            0.182459,
+            0.190255,
+            0.182956,
+            0.186372,
+            0.191118,
+            0.185651,
+            0.185014,
+            0.186266
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.1397245877318002,
+          "diff_vs_random_signflip_p_two_sided": 0.001953125,
+          "folds_beating_random": "0/10"
+        },
+        "H-A-500": {
+          "fold_pooled_dti": 0.16889950740222154,
+          "fold_mean_dti": 0.16888992834374816,
+          "per_fold_dti": [
+            0.170182,
+            0.172189,
+            0.16659,
+            0.168998,
+            0.1661,
+            0.167592,
+            0.173253,
+            0.169091,
+            0.170395,
+            0.16451
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.1575151711430497,
+          "diff_vs_random_signflip_p_two_sided": 0.001953125,
+          "folds_beating_random": "0/10"
+        },
+        "H-A-1500": {
+          "fold_pooled_dti": 0.1781304556402746,
+          "fold_mean_dti": 0.17811603246615887,
+          "per_fold_dti": [
+            0.181068,
+            0.180692,
+            0.172746,
+            0.182513,
+            0.176062,
+            0.177453,
+            0.183184,
+            0.177743,
+            0.175683,
+            0.174015
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.14828906702063896,
+          "diff_vs_random_signflip_p_two_sided": 0.001953125,
+          "folds_beating_random": "0/10"
+        },
+        "prox-500": {
+          "fold_pooled_dti": 0.11594513822745653,
+          "fold_mean_dti": 0.11595791587242052,
+          "per_fold_dti": [
+            0.115659,
+            0.115478,
+            0.117816,
+            0.119525,
+            0.116398,
+            0.11539,
+            0.111703,
+            0.115095,
+            0.116916,
+            0.115598
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.2104471836143773,
+          "diff_vs_random_signflip_p_two_sided": 0.001953125,
+          "folds_beating_random": "0/10"
+        },
+        "prox-1500": {
+          "fold_pooled_dti": 0.11594513822745653,
+          "fold_mean_dti": 0.11595791587242052,
+          "per_fold_dti": [
+            0.115659,
+            0.115478,
+            0.117816,
+            0.119525,
+            0.116398,
+            0.11539,
+            0.111703,
+            0.115095,
+            0.116916,
+            0.115598
+          ],
+          "n_withheld_truth": 60988,
+          "n_dots": 40000,
+          "diff_vs_random_mean": -0.2104471836143773,
+          "diff_vs_random_signflip_p_two_sided": 0.001953125,
+          "folds_beating_random": "0/10"
+        }
+      },
+      "leakage_canary_auc_mean": {
+        "tensor_full_score": 0.40093779806246915,
+        "ridge": 0.5055050755858815,
+        "one_minus_dim": 0.5065723245223308,
+        "strike_agree": 0.5053945587016526,
+        "neg_visible_distance": 0.39793571709464604
+      },
+      "leakage_canary_auc_max": {
+        "tensor_full_score": 0.4094946325043906,
+        "ridge": 0.5116191282504274,
+        "one_minus_dim": 0.5158520538613753,
+        "strike_agree": 0.5122063291096869,
+        "neg_visible_distance": 0.4017052265084723
+      },
+      "leakage_canary_rows": [
+        {
+          "fold": 0,
+          "tensor_full_score": 0.4063389588923903,
+          "ridge": 0.5057393334110077,
+          "one_minus_dim": 0.5111241186967708,
+          "strike_agree": 0.5074453327474554,
+          "neg_visible_distance": 0.39845735783166614
+        },
+        {
+          "fold": 1,
+          "tensor_full_score": 0.4003298565071873,
+          "ridge": 0.5034548409558601,
+          "one_minus_dim": 0.5158520538613753,
+          "strike_agree": 0.5011232005798684,
+          "neg_visible_distance": 0.4002178794755882
+        },
+        {
+          "fold": 2,
+          "tensor_full_score": 0.3934364098548523,
+          "ridge": 0.5044213567488786,
+          "one_minus_dim": 0.5055048534386914,
+          "strike_agree": 0.507093919374268,
+          "neg_visible_distance": 0.3980305924090865
+        },
+        {
+          "fold": 3,
+          "tensor_full_score": 0.40540648594299605,
+          "ridge": 0.5065417785704763,
+          "one_minus_dim": 0.5025967198209007,
+          "strike_agree": 0.5011466990506351,
+          "neg_visible_distance": 0.4001213084433396
+        },
+        {
+          "fold": 4,
+          "tensor_full_score": 0.39727981844117194,
+          "ridge": 0.5046380765872228,
+          "one_minus_dim": 0.5074999948641191,
+          "strike_agree": 0.500078711906567,
+          "neg_visible_distance": 0.3919450656510593
+        },
+        {
+          "fold": 5,
+          "tensor_full_score": 0.39816672477621706,
+          "ridge": 0.502527350136436,
+          "one_minus_dim": 0.5069762196158488,
+          "strike_agree": 0.5078132665453656,
+          "neg_visible_distance": 0.4017052265084723
+        },
+        {
+          "fold": 6,
+          "tensor_full_score": 0.4094946325043906,
+          "ridge": 0.5116191282504274,
+          "one_minus_dim": 0.49955014277109544,
+          "strike_agree": 0.5122063291096869,
+          "neg_visible_distance": 0.39685466552679516
+        },
+        {
+          "fold": 7,
+          "tensor_full_score": 0.40226894531458857,
+          "ridge": 0.5065029315026138,
+          "one_minus_dim": 0.5042370120507538,
+          "strike_agree": 0.5071344703764188,
+          "neg_visible_distance": 0.3965646564363181
+        },
+        {
+          "fold": 8,
+          "tensor_full_score": 0.3974089492650779,
+          "ridge": 0.5023137780917943,
+          "one_minus_dim": 0.5100201825889497,
+          "strike_agree": 0.5004920445149268,
+          "neg_visible_distance": 0.3961946540744672
+        },
+        {
+          "fold": 9,
+          "tensor_full_score": 0.3992471991258189,
+          "ridge": 0.5072921816040981,
+          "one_minus_dim": 0.5023619475148033,
+          "strike_agree": 0.5094116128113342,
+          "neg_visible_distance": 0.39926576458966806
+        }
+      ],
+      "leakage_flag_gt_0p90": []
+    }
+  },
+  "pre_registered_verdict": {
+    "Q4": {
+      "H-A-500_beats_random_and_lane_with_p_lt_0.05": false
+    },
+    "S10": {
+      "H-A-500_beats_random_and_lane_with_p_lt_0.05": false
+    }
+  },
+  "promote": false,
+  "seconds": 242.2
+}

@@ -35,7 +35,11 @@ DATA = REPO / "data"
 # mirrors used the descriptive GeoDAWN filename; ``feature_path`` below accepts
 # that name as a read-only compatibility alias without making the pipeline
 # depend on a private mirror.
-FEATURES_TIF = DATA / "training_features.tif"
+# On-disk name is the competition's name; the sibling-repo alias training_features.tif is a fallback.
+# (IR-55-026: naming mismatch fixed once here, in the shared I/O module.)
+FEATURES_TIF = (DATA / "gems-geodawn-numerical-features.tif"
+                if (DATA / "gems-geodawn-numerical-features.tif").exists()
+                else DATA / "training_features.tif")
 FEATURES_TIF_LEGACY = DATA / "gems-geodawn-numerical-features.tif"
 LABELS_TIF = DATA / "labels.tif"
 TEMPLATE_TIF = DATA / "sample_submission.tif"

@@ -37,6 +37,7 @@ NAV = [
     ("leaderboard-analysis.html", "Anchor analysis"),
     ("sources.html", "Sources"),
     ("irregularities.html", "Irregularities"),
+    ("h55-160k-audit.html", "h55 audit (DO NOT SUBMIT)"),  # written by scripts/build_h55_audit_page.py, run after this
 ]
 
 

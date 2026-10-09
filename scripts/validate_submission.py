@@ -46,7 +46,9 @@ def validate(path: Path, *, outside: str) -> bool:
     ck("CRS is EPSG:32611", crs is not None and crs.to_epsg() == 32611, f"crs={crs}")
     ck("shape matches template", (h, w) == (grid.height, grid.width), f"{h}x{w}")
     ck("geotransform matches template", tr == tuple(grid.transform)[:6], f"{tr}")
-    ck("resolution is 100 m", (h, w) == (grid.height, grid.width), "from transform above")
+    # pixel size is read from the transform (a, e), not inferred from the shape (IR-55-025 fix)
+    px_ok = abs(tr[0]) == 100.0 and abs(tr[4]) == 100.0 and tr[1] == 0.0 and tr[3] == 0.0
+    ck("resolution is 100 m", px_ok, f"a={tr[0]} e={tr[4]} b={tr[1]} d={tr[3]}")
     finite = a[np.isfinite(a)]
     ck("all finite values in [0,1]", finite.size and finite.min() >= 0.0 and finite.max() <= 1.0,
        f"min={finite.min() if finite.size else 'NA'} max={finite.max() if finite.size else 'NA'}")

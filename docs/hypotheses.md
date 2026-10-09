@@ -73,3 +73,34 @@ The previous one-scale tensor run used a quadrant-style evaluator and is **not t
 current baseline** for this experiment. It is retained as historical evidence, not
 combined with the segment holdout below. The evaluator design correction is logged
 in `docs/irregularities.md` and the new results will replace stale status claims.
+
+## Out-of-lane hypotheses H-B to H-F (2026-10-09, tensor-lane final pass)
+
+These are **proposals only**. None has been implemented or evaluated. AGENTS.md keeps this checkout to the tensor-dimensionality lane, so each one needs lane approval before any work. Gain labels are priors, not measurements, and are not HOLDOUT-DTI.
+
+Break-even bar for any new dot: expected kernel credit above α·DTI/(1+α·DTI). At the random control DTI 0.0757 (HOLDOUT-DTI, 60,988 withheld positives) that is **≈ 0.0149 per dot**. H-A (visible-prior gate) was tested earlier in this session and failed, so it is not repeated here.
+
+| Rank | Hypothesis | Layers (band no., `docs/data_dictionary.md`) | Physical reasoning | Expected DTI gain (prior) | Implementation cost | Status |
+|---|---|---|---|---|---|---|
+| 1 | **H-F: 1 m lidar DEM scarp detection.** Fault scarps in young alluvium show as topographic steps. | 1 m DEM from USGS 3DEP (not in the competition stack) | Quaternary faults in the label set usually show as scarps. A scarp map is the most direct independent evidence for an unmapped trace. | High (potentially largest, unquantified) | High: 3DEP tiles unreachable from this sandbox (curl returned 000 for the prd-tnm S3 host); large download; scarp detector needs its own canary | Blocked on data access; out of lane |
+| 2 | **H-B: depth-to-basement step.** A fault offsets the magnetic basement, so the depth surface shows a step across the trace. | 15 (depth to basement), 2 (RTP mag) | A fault can offset basement without a surface trace, so the step is independent of mapping. | Moderate (partly redundant with ridge detectors on band 2) | Medium: derivative of an existing band, co-location with ridges, sensitivity to basement-model interpolation | Out of lane; not built |
+| 3 | **H-D: geodetic strain-rate corridors.** Unmapped faults sit in deforming crust. | 4 (second invariant), 7 (shear rate), 8 (dilatation rate) | Strain accumulates on structures whether or not they are mapped. | Low–moderate (coarse grid; interpolation artefacts likely) | Low–medium: bands provided; leakage canary first | Out of lane; not built |
+| 4 | **H-C: tilt-angle zero-contour.** Zero-contours of the tilt angle locate horizontal edges. | 6 (tilt / total curvature) | Standard edge-location method (citation not verified in this session; do not cite until it is). | Low–moderate. Highly redundant with the tensor lane's ridges, which use the same field derivatives. | Low: band provided; contouring is simple | Out of lane; not built |
+| 5 | **H-E: seismicity lineaments.** Earthquake density and distance trace active structures. | 10 (distance to earthquake), 16 (earthquake intensity) | Seismicity clusters along active faults. | Low. Leakage risk: derived from an external catalogue, so the canary must run first. | Low: bands provided | Out of lane; not built |
+
+Ordering: rank 1 has the largest physical upside but is blocked, so its cost is high and its gain is untested. Ranks 2–4 use bands already in the stack, so their costs are lower, but their redundancy with the tensor lane limits their gain. Rank 5 is cheap but carries leakage risk.
+
+## Tensor-lane final pass — HOLDOUT-DTI (2026-10-09, h55 audit file)
+
+Evaluator `src/gems55/dti55.py` (exact official DTI). Protocols: Q4 quadrant hide-and-recover (PRIMARY) and B = 15 px distance-banded whole-segment folds (SECONDARY). Withheld positives 60,988. Audit page: `docs/h55-160k-audit.html`.
+
+| Experiment | What it tested | Result |
+|---|---|---|
+| exp8 run 2 | H-A visible-prior gate | Q4 fails (H-A-500 0.0521 vs random 0.0742); promote = false |
+| exp9 | H-A at distance bands 3, 15, 30 px | H-A fails at every band ≥ 1.5 km (B15: H-A-500 0.0001, worse than random in all 10 folds) |
+| exp10 | Dot-mass sweep, N ∈ {20k, 40k, 80k, 160k} | Q4 tensor_full 0.0459 / 0.0666 / 0.0889 / 0.1019 vs random 0.0422 / 0.0742 / 0.1202 / 0.1627 |
+
+- **Pre-registered N\* = 160,000** (argmax of tensor_full on Q4; upper edge of the grid, so the largest N tested). Label **NEGATIVE**. Q4 loses to random at 40k, 80k and 160k. At 20k it is +0.0030 (p = 0.25, not significant).
+- Secondary B = 15 px: tensor beats random at 40k (+0.0015, p = 0.008) and 160k (+0.0026, p = 0.004), not at 80k (p = 0.20). The sign depends on the protocol (IR-55-031). The primary governs under the rule.
+- Audit file: `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 ffd2a892…). Validator 12/12. Uniqueness BLOCKED under the literal 70% rule (IR-55-030). **DO NOT SUBMIT.** Download for audit only.
+- Budget: 3 of 3 experiments used.
