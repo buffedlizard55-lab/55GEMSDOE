@@ -38,3 +38,19 @@ No candidate in this list requires a new geothermal observation dataset to formu
 - Isostatic/gravity correction artifacts, remanent magnetization, and imperfect RTP/pseudogravity assumptions can shift or rotate a geophysical signature.
 
 A tensor dimensionality index is a source-geometry discriminator under potential-field assumptions, not a fault detector by itself. Geological interpretation and the held-out prediction test remain necessary.
+
+## Result of the tensor-lane run (2026-10-09) — HOLDOUT-DTI
+
+Evaluator `gems.metric v1` (DTI α=0.2, β=0.8, R=300 m). Holdout = four quadrant folds of catalogue fault segments, visible faults masked pixel-exactly. 60,594 withheld positive pixels. 95% CI from a 1,000-rep block bootstrap (10 km blocks).
+
+| Experiment | Hypothesis tested | HOLDOUT-DTI | 95% CI |
+|---|---|---|---|
+| E1 | Gradient ridges of RTP (stripe rows masked). Reference, not a tensor test | **0.0578** | 0.0499 – 0.0652 |
+| E2 | E1 weighted by (1 − dimensionality index), magnetic pseudogravity tensor | 0.0463 | 0.0398 – 0.0523 |
+| E3 | E2 combined with the gravity index and a strike-agreement gate (candidate lane method) | 0.0444 | 0.0383 – 0.0502 |
+
+Leakage canary: every single feature has AUC 0.48–0.52 on ridge pixels (threshold 0.90): no leakage detected, but also little discriminative signal. Strike test: **failed** (43.2% vs 87.6%; design caveat IR-55-017). Budget used: 3 experiments.
+
+**Verdict for the tensor lane: negative.** From E1 to E2 the weighted true positives fell from 3,794 to 2,816 and false positives from 82,002 to 59,039, while missed positives rose from 56,800 to 57,778. The weight removed signal and noise at similar rates, so the Tversky score fell. This is the opposite of the lane's premise and is recorded as a result. Possible next experiments (within the lane only): pixel-matched strike test, and a chance-corrected uniqueness check.
+
+Out-of-lane ideas (tilt-angle zero-contours, geodetic strain, seismicity alignments, 1 m DEM scarps) were drafted in this session and are **parked**. `AGENTS.md` keeps this checkout to the tensor lane, so they are not implemented here. They need a separate lane approval and their own preregistration.

@@ -14,4 +14,43 @@
 <div class="warning"><strong>Key source available, local masks absent.</strong><p>The USGS GeoDAWN data release describes four acquisition blocks and includes flight-path/survey-outline files. The official release is publicly listed and CC0, but the block polygons/flight lines have not been downloaded or aligned here. See <a href="./sources.html">source status</a>.</p></div>
 <div class="actions"><a class="button" href="./sources.html">Review sources</a><a class="button secondary" href="./run-card.json">Open negative run card</a><a class="button secondary" href="../README.md">Read full research plan</a></div></div></section>
 </main><footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · hypotheses only · no score or TIFF</p><p><a href="./index.html">Home</a> · <a href="./executive-summary.html">Submission guide</a> · <a href="./sources.html">Sources</a></p></div></footer>
+<!-- session-additions:start -->
+<section class="session-additions">
+<h2>Result of the tensor-lane run (2026-10-09) — HOLDOUT-DTI</h2>
+<p>Evaluator <code>gems.metric v1</code> (DTI α=0.2, β=0.8, R=300 m). Holdout = four quadrant folds of catalogue fault segments, visible faults masked pixel-exactly. 60,594 withheld positive pixels. 95% CI from a 1,000-rep block bootstrap (10 km blocks).</p>
+<table>
+<thead>
+<tr>
+<th>Experiment</th>
+<th>Hypothesis tested</th>
+<th>HOLDOUT-DTI</th>
+<th>95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>Gradient ridges of RTP (stripe rows masked). Reference, not a tensor test</td>
+<td><strong>0.0578</strong></td>
+<td>0.0499 – 0.0652</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>E1 weighted by (1 − dimensionality index), magnetic pseudogravity tensor</td>
+<td>0.0463</td>
+<td>0.0398 – 0.0523</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>E2 combined with the gravity index and a strike-agreement gate (candidate lane method)</td>
+<td>0.0444</td>
+<td>0.0383 – 0.0502</td>
+</tr>
+</tbody>
+</table>
+<p>Leakage canary: every single feature has AUC 0.48–0.52 on ridge pixels (threshold 0.90): no leakage detected, but also little discriminative signal. Strike test: <strong>failed</strong> (43.2% vs 87.6%; design caveat IR-55-017). Budget used: 3 experiments.</p>
+<p><strong>Verdict for the tensor lane: negative.</strong> From E1 to E2 the weighted true positives fell from 3,794 to 2,816 and false positives from 82,002 to 59,039, while missed positives rose from 56,800 to 57,778. The weight removed signal and noise at similar rates, so the Tversky score fell. This is the opposite of the lane's premise and is recorded as a result. Possible next experiments (within the lane only): pixel-matched strike test, and a chance-corrected uniqueness check.</p>
+<p>Out-of-lane ideas (tilt-angle zero-contours, geodetic strain, seismicity alignments, 1 m DEM scarps) were drafted in this session and are <strong>parked</strong>. <code>AGENTS.md</code> keeps this checkout to the tensor lane, so they are not implemented here. They need a separate lane approval and their own preregistration.</p>
+</section>
+<!-- session-additions:end -->
 </body></html>

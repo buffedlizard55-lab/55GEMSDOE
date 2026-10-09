@@ -19,4 +19,115 @@
 <p class="small source-note">The full dispositions are maintained in the repository's audit register. A blocked result is retained as the run's negative deliverable.</p>
 <div class="actions"><a class="button" href="./run-card.json">Open negative run card</a><a class="button secondary" href="./sources.html">Review sources</a><a class="button secondary" href="./executive-summary.html">Submission guide</a></div></div></section></main>
 <footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · no current candidate is cleared</p><p><a href="./index.html">Home</a> · <a href="./hypotheses.html">Hypotheses</a> · <a href="../README.md">Persistent brief</a></p></div></footer>
+<!-- session-additions:start -->
+<section class="session-additions">
+<h2>Additions from the tensor-lane run (2026-10-09, same review session)</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Severity</th>
+<th>Finding</th>
+<th>Evidence / consequence</th>
+<th>Resolution needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IR-55-012</td>
+<td><strong>High</strong></td>
+<td><strong>Private evaluator/writer fork.</strong> <code>gems/metric.py</code>, <code>gems/submission.py</code> and <code>gems/holdout.py</code> re-implement the DTI, writer and holdout because no authorised shared template was available in this checkout. <code>AGENTS.md</code> forbids a private fork.</td>
+<td>The formula matches the official page, and its worked-example arithmetic is tested (<code>tests_numeric/test_metric.py</code>). It is still not the canonical evaluator.</td>
+<td>Reconcile against the shared template's evaluator on identical inputs, then replace <code>gems/</code> with it or record a shared-tool repair there. Until then, all numbers are labelled with evaluator <code>gems.metric v1</code>.</td>
+</tr>
+<tr>
+<td>IR-55-013</td>
+<td><strong>High</strong></td>
+<td><strong>Competition template is not a fault-absence file.</strong> The sample-submission raster in the sibling's <code>data/bridge</code> has 60,988 positive cells, the same count as the training fault pixels. The official problem description says the sample is an "all-zero template".</td>
+<td>Local check on the sibling bytes, whose sha256 matches the sibling manifest. The organisers' copy was not accessed.</td>
+<td>Ask the organisers which file is authoritative. Do not use the template's 1-values as a baseline.</td>
+</tr>
+<tr>
+<td>IR-55-014</td>
+<td>Medium</td>
+<td><strong>Feature rasters have real values outside the official footprint</strong>: 1,540 finite RTP cells lie outside the template's valid mask (<code>rtp_band2</code>; same count in <code>iso_band13</code>).</td>
+<td><code>docs/results/tensor_lane_results.json</code> → <code>feature_values_outside_footprint</code>. The pipeline masks them to NaN, as the official format requires.</td>
+<td>Note for the organisers.</td>
+</tr>
+<tr>
+<td>IR-55-015</td>
+<td>Medium</td>
+<td><strong>Nodata sentinel −3.4028e38 appears inside the footprint</strong> (3,061 cells in RTP and isostatic bands).</td>
+<td><code>feature_gaps_inside_footprint</code>. Filled with the footprint mean before the low-pass.</td>
+<td>Note for the organisers.</td>
+</tr>
+<tr>
+<td>IR-55-016</td>
+<td><strong>High</strong></td>
+<td><strong>Competition rasters live in a public sibling repository</strong> (<code>buffedlizard55-lab/GEMSDOE</code>, <code>data/bridge/</code>, about 414 MB). The organisers' data page is login-gated, and external data is allowed only under a licence that permits use and sharing with the sponsor. This checkout does not contain the rasters: they were read from the sibling repo into the gitignored <code>data/</code> folder for local analysis only.</td>
+<td>DrivenData rules: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/</a>; NLR rules: <a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">https://docs.nlr.gov/docs/fy26osti/96647.pdf</a> (§A.5).</td>
+<td><strong>Legal review.</strong> Recommend removing the bridge from the public sibling repo and never committing payloads here.</td>
+</tr>
+<tr>
+<td>IR-55-017</td>
+<td><strong>High</strong></td>
+<td><strong>Strike-prediction test is not a fair comparison.</strong> Ridge orientation is perpendicular to the gradient, and the strike of a 2-D source is also perpendicular to it, so ridge-vs-field agreement is nearly built in. Result: withheld segments 43.2% (N=910) vs random ridges 87.6% (N=133,448), Fisher one-sided p=1.0.</td>
+<td><code>docs/results/tensor_lane_results.json</code> → <code>strike_test</code>. Reported as a failed prediction with this caveat.</td>
+<td>Pixel-matched redesign: compare each withheld fault's own geometry against the field at the same pixels, on the same footprint.</td>
+</tr>
+<tr>
+<td>IR-55-018</td>
+<td><strong>High (fixed)</strong></td>
+<td><strong>Azimuth sign bug.</strong> Grid rows increase south, but azimuths were computed as if rows were north. Strikes were mirrored.</td>
+<td>Fixed in <code>gems/tensor.py</code>. Regression test <code>tests_numeric/test_tensor.py::test_strike_is_north_convention_and_not_mirrored</code>. All reported numbers were regenerated after the fix.</td>
+<td>None.</td>
+</tr>
+<tr>
+<td>IR-55-019</td>
+<td>Medium</td>
+<td><strong>Dimensionality index normalisation not verified</strong> against Pedersen &amp; Rasmussen (1990). The index used is |λ_min|/|λ_mid|, from the Beiki TSVD abstract.</td>
+<td>The 1990 paper was not retrievable. No independent check against the 1990 formula has been run.</td>
+<td>Verify against the 1990 paper before publication.</td>
+</tr>
+<tr>
+<td>IR-55-020</td>
+<td><strong>High</strong></td>
+<td><strong>Registry overlap rule is saturated.</strong> Literal application flags 70 of 630 same-grid registry rasters, for both E1 and E3. Several registry rasters are dense, so a fixed 70% overlap threshold is easily met by chance.</td>
+<td><code>docs/results/registry_check_tensor_lane_E1.json</code>, <code>docs/results/registry_check_E3.json</code>. Max Spearman was 0.165 (E1).</td>
+<td>The protocol needs a chance-corrected overlap (observed vs expected at the registry's positive density). Not yet implemented.</td>
+</tr>
+<tr>
+<td>IR-55-021</td>
+<td>Medium</td>
+<td><strong>Acquisition blocks are not in the 19-band stack</strong>, so the "process each block separately" step was not possible. The whole grid was processed.</td>
+<td>Band tags, <code>data/README.md</code>. No block-ID raster was found in the 19-band stack.</td>
+<td>Obtain block polygons from USGS GeoDAWN metadata (not reachable from this sandbox).</td>
+</tr>
+<tr>
+<td>IR-55-022</td>
+<td>Medium</td>
+<td><strong>Sibling audit labels a projection</strong> as <code>predicted_leaderboard_dti: 0.2747</code> for the GEMSDOE32 H33-2-B2 file (the audit JSON labels it a projection).</td>
+<td><code>docs/leaderboard-analysis.md</code>.</td>
+<td>Treated as a projection.</td>
+</tr>
+<tr>
+<td>IR-55-023</td>
+<td>Medium</td>
+<td><strong>Pages and data hosts blocked from this sandbox.</strong> USGS S3 (<code>prd-tnm.s3.amazonaws.com</code>), the National Map downloader, ScienceBase, and OpenEI all failed to connect (curl HTTP 000, 2026-10-09).</td>
+<td>Local curl checks. This blocks the official 1 m DEM route for any scarp hypothesis.</td>
+<td>Obtain these from a machine with open egress, then re-verify hashes.</td>
+</tr>
+<tr>
+<td>IR-55-024</td>
+<td>Medium</td>
+<td><strong>Merge conflict with <code>main</code>.</strong> This branch and <code>main</code> both replaced the README and the site pages. Resolved by keeping <code>main</code>'s governing files and adding this session's results on top. Our two negative candidate TIFFs were removed from <code>docs/</code> so the no-TIFF rule (<code>tests/test_site_status.py</code>) holds.</td>
+<td><code>git merge origin/main</code> on <code>arena/6a696f4d-55gemsdoe</code>.</td>
+<td>None.</td>
+</tr>
+</tbody>
+</table>
+<h3>Disposition of this run</h3>
+<p>Three holdout experiments were run (within the 3-experiment budget). Results are HOLDOUT-DTI only (see <code>docs/results.md</code>). The tensor lane is <strong>negative</strong>: E1 ridge baseline 0.0578 beat E2 0.0463 and E3 0.0444 on the same holdout, and the strike test failed. Nothing is cleared, no TIFF is published, and no weekly slot was used.</p>
+</section>
+<!-- session-additions:end -->
 </body></html>

@@ -5,8 +5,17 @@
   "submission_tif": null,
   "download_allowed": false,
   "submit_allowed": false,
-  "holdout_dti": null,
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "tensor_lane_E3": 0.0444,
+    "E1_ridge_baseline": 0.0578,
+    "ci95_E3": [
+      0.0383,
+      0.0502
+    ],
+    "withheld_positive_count": 60594
+  },
   "organizer_confirmed_score": null,
   "official_leaderboard_feed": "page_fetched_loading_only_no_rows",
-  "reason": "This checkout has no data, cached feature stack, approved whole-segment evaluator, submission writer, registry corpus, or candidate raster."
+  "reason": "Holdout run completed and negative for the tensor lane. No candidate passed the gates. No TIFF published. Registry overlap rule saturated (IR-55-020)."
 }

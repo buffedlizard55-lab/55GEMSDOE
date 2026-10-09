@@ -42,3 +42,14 @@ These links were supplied in the project brief. They are convenient references, 
 - Record an item as “not checked” when the page or artifact cannot be read; do not fill in a current leaderboard value from memory.
 - A public leaderboard row is not a submission-page receipt linking a row to a filename/hash. Only the latter can be recorded as `ORGANIZER-CONFIRMED` under this project's rule.
 - No `HOLDOUT-DTI` was computed for this session. No external dataset, raster, or candidate artifact is claimed as locally downloaded or validated.
+
+## Additional sources checked in the tensor-lane run (2026-10-09)
+
+| Source | Status | What it supports |
+|---|---|---|
+| [DrivenData problem description](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/) | Re-fetched 2026-10-09 | DTI formula, α, β, R; output format (float32, [0,1], EPSG:32611, 100 m, NaN outside bounds). |
+| [NLR official rules PDF](https://docs.nlr.gov/docs/fy26osti/96647.pdf) | Re-fetched, chunks 0–4 of 7 read | §1.3 eligibility; §3.2 up to three submissions per week and GenAI disclosure; §3.4 one final submission; §A.4 public elements; §A.5 representations. Chunks 5–6 not read. |
+| [GitHub sibling repo GEMSDOE, data/bridge/manifest.json](https://github.com/buffedlizard55-lab/GEMSDOE/blob/main/data/bridge/manifest.json) | Read via API, bytes re-hashed | sha256 pins for the three rasters (see `data/README.md`). The pinned bytes were re-hashed locally. |
+| [GEMSDOE32 repository](https://github.com/buffedlizard55-lab/GEMSDOE32) | Read via API | `submissions_manifest.json` and the audit for the 0.2778 entry: grid, and a `predicted_leaderboard_dti` projection (0.2747) that is not a score. |
+| [USGS S3 DEM bucket](https://prd-tnm.s3.amazonaws.com) | **Blocked** (curl HTTP 000) | Needed for any 1 m DEM hypothesis. |
+| [National Map downloader](https://apps.nationalmap.gov/downloader/), [ScienceBase GeoDAWN item](https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7), [OpenEI GDR submission 1391](https://gdr.openei.org/submissions/1391) | **Blocked** (curl HTTP 000) | Free official sources, not reachable from this sandbox. |

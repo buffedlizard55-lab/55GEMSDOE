@@ -69,14 +69,19 @@ class SiteStatusTests(unittest.TestCase):
                 target = (page.parent / unquote(url.path)).resolve()
                 self.assertTrue(target.exists(), f"{page.relative_to(ROOT)} -> {href}")
 
-    def test_run_card_labels_unrun_evaluation(self) -> None:
+    def test_run_card_labels_holdout_evaluation(self) -> None:
+        # Updated 2026-10-09: the holdout HAS run (negative). Every number must carry its label, evaluator,
+        # withheld-positive count and CI, and must not be presented as an organiser score.
         card = json.loads((DOCS / "run-card.json").read_text())
         holdout = card["holdout_dti"]
         self.assertEqual(holdout["evidence_class"], "HOLDOUT-DTI")
-        self.assertEqual(holdout["status"], "NOT_RUN")
-        self.assertIsNone(holdout["evaluator_version"])
-        self.assertIsNone(holdout["withheld_positive_count"])
-        self.assertIsNone(holdout["ci95"])
+        self.assertEqual(holdout["status"], "RUN")
+        self.assertTrue(holdout["evaluator_version"])
+        self.assertIsInstance(holdout["withheld_positive_count"], int)
+        self.assertEqual(len(holdout["ci95"]), 2)
+        self.assertLessEqual(holdout["ci95"][0], holdout["value"])
+        self.assertLessEqual(holdout["value"], holdout["ci95"][1])
+        self.assertNotIn("organizer_confirmed_score", card)
 
 
 if __name__ == "__main__":

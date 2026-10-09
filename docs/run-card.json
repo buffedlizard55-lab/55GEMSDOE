@@ -1,35 +1,76 @@
 {
   "schema": "55gemsdoe.run-card.v1",
   "run_id": "55GEMSDOE-TENSOR-LANE-REVIEW-2026-10-09",
-  "status": "negative_blocked_no_experiment",
+  "status": "negative_holdout_run_not_cleared",
   "hypothesis": "Low-pass RTP-magnetic and isostatic-gravity gradient tensors will distinguish strike-extended near-2-D structures from compact 3-D bodies; retaining only ridges whose tensor eigenvector strike agrees with the ridge axis may recover whole withheld fault segments better than random ridges.",
   "mechanism": "Band-limit each scalar potential-field grid and compute its gradient tensor independently within the four official GeoDAWN acquisition blocks; derive a dimensionality index from tensor eigenvalues and strike from the quasi-2-D eigenvector; suppress compact signatures and east-west flight-line stripes; evaluate strike concordance on held-out whole fault segments.",
   "named_non_fault_mimic": "Long lithologic contacts, dikes, intrusive bodies, volcanic/vent sources, acquisition-block seams, east-west flight-line striping, tie-line/leveling residuals, and FFT edge artifacts can mimic or distort the target signature.",
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
-    "status": "NOT_RUN",
-    "evaluator_version": null,
-    "withheld_positive_count": null,
-    "value": null,
-    "ci95": null,
-    "reason": "No cached feature stack, approved whole-segment evaluator, holdout folds, or comparable same-evaluator baseline exists in this checkout."
+    "status": "RUN",
+    "evaluator_version": "gems.metric v1 (private re-implementation; see irregularity IR-55-012)",
+    "withheld_positive_count": 60594,
+    "value": 0.0444,
+    "ci95": [
+      0.0383,
+      0.0502
+    ],
+    "comparators": {
+      "E1_ridge_baseline": {
+        "value": 0.0578,
+        "ci95": [
+          0.0499,
+          0.0652
+        ]
+      },
+      "E2_plus_dimensionality": {
+        "value": 0.0463,
+        "ci95": [
+          0.0398,
+          0.0523
+        ]
+      }
+    },
+    "reason": "Quadrant-fold hide-and-recover over catalogue segments; visible faults masked pixel-exactly; 1000-rep block bootstrap (10 km)."
   },
   "leakage_canary": {
-    "status": "NOT_RUN",
-    "features_tested_alone": [],
-    "auc_above_0_90_is_leakage_until_proven": true
+    "status": "RUN",
+    "features_tested_alone": [
+      "gradient_magnitude",
+      "neg_dimensionality_mag",
+      "neg_dimensionality_grav",
+      "strike_agreement",
+      "E1_score",
+      "E3_score"
+    ],
+    "auc": {
+      "gradient_magnitude": 0.5179,
+      "neg_dimensionality_mag": 0.5183,
+      "neg_dimensionality_grav": 0.4803,
+      "strike_agreement": 0.5066,
+      "E1_score": 0.5182,
+      "E3_score": 0.5184
+    },
+    "auc_above_0_90_is_leakage_until_proven": true,
+    "leak_flag_any": false
   },
   "strike_prediction_test": {
-    "status": "NOT_RUN",
-    "comparison": "Held-out fault strikes versus matched random-ridge strikes",
-    "reason": "No candidate surface or held-out segment set is present."
+    "status": "RUN_FAILED",
+    "comparison": "Held-out fault strikes versus random ridges (design caveat IR-55-017)",
+    "withheld_match_rate": 0.4319,
+    "random_ridge_match_rate": 0.8764,
+    "fisher_one_sided_p": 1.0
   },
   "correlation_overlap_vs_registry": {
-    "status": "NOT_RUN",
-    "pre_placement_surface": null,
-    "final_dots": null,
-    "registry_rasters_scanned": null,
-    "reason": "No candidate surface, final dots, or registry corpus is present."
+    "status": "RUN",
+    "registry_rasters_scanned": 632,
+    "same_grid_compared": 630,
+    "E1_max_spearman": 0.165,
+    "E1_duplicates_flagged_by_overlap_rule": 70,
+    "E3_duplicates_flagged_by_overlap_rule": 70,
+    "note": "Overlap rule saturated by dense registry rasters (IR-55-020). Not chance-corrected. Not a clean pass.",
+    "pre_placement_surface": "continuous E1/E3 surfaces, registry_check.py",
+    "final_dots": "E1 185,175 px, E3 185,175 px (p>0)"
   },
   "raster_sha256": null,
   "validator_output": {
@@ -40,15 +81,27 @@
     "crs_matches": null,
     "shape_matches": null,
     "transform_matches": null,
-    "outside_footprint_null_or_nan": null
+    "outside_footprint_null_or_nan": null,
+    "local_candidates_note": "Local E1/E3 candidate files passed the validator (all_passed true) but are NOT published (IR-55-024). Their sha256: E1 038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424, E3 25f2ccf40c096efe9b25bed9ab8c28151d48123a7ba4527c85ac490c3dc18d80."
   },
   "submission": {
     "name": "NOT-CREATED",
-    "note": "No validated candidate exists; do not upload.",
-    "note_characters": 45,
+    "note": "No upload. Tensor lane negative on holdout (0.0444 vs ridge 0.0578). No cleared candidate.",
+    "note_characters": 90,
     "download_allowed": false,
     "weekly_slot_used": false
   },
   "verdict": "negative",
-  "projection_written_as_score": false
+  "projection_written_as_score": false,
+  "budget": {
+    "experiments_used": 3,
+    "limit": 3,
+    "hours_limit": 2,
+    "weekly_slot_used": false
+  },
+  "review_passes": [
+    "implementation",
+    "bug/assumption audit (sign bug, nodata gaps, footprint outside data, saturated overlap)",
+    "requirement and source audit (main AGENTS.md gates)"
+  ]
 }

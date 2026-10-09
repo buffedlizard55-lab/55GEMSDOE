@@ -108,3 +108,52 @@ The following is a compact index of the prior values in the user prompt. Every v
 These rows are retained for history only. They are not a promotion criterion; only the current same-evaluator holdout and an organizer receipt can support the respective claims.
 
 </details>
+
+## Core Values
+
+These two values are the focal point of every session in this repository:
+
+1. **Maximize P(Win).** Prefer work whose result could change a submission decision, and state the expected gain honestly. Do not spend a competition slot on a candidate that has not passed every gate.
+2. **Own the Outcome.** Report negative results plainly, mark what is unknown, fix defects in the shared tools instead of forking them, and say what is still missing.
+
+Operational meaning in this checkout: every number carries its evidence label (`HOLDOUT-DTI`, `ORGANIZER-CONFIRMED`, `USER-PROVIDED`, or `PROJECTION`); a projection is never written as a score; and no download or submit call-to-action appears unless all gates pass.
+
+## Session result: tensor-dimensionality lane (2026-10-09)
+
+Read these first:
+
+- **Results:** [docs/results.md](docs/results.md). Every number is HOLDOUT-DTI with evaluator `gems.metric v1`, 60,594 withheld positives, and a 95% CI.
+- **Status:** [docs/status.json](docs/status.json) and [docs/run-card.json](docs/run-card.json). Overall: **not cleared**. No TIFF is published and no download is allowed.
+- **Irregularities:** [docs/irregularities.md](docs/irregularities.md) (IR-55-001 to IR-55-024).
+
+Headline (HOLDOUT-DTI): E1 ridge baseline 0.0578 [0.0499, 0.0652]; E2 0.0463 [0.0398, 0.0523]; E3 full tensor lane 0.0444 [0.0383, 0.0502]. The lane **does not beat its own baseline**, and the strike test failed (43.2% vs 87.6%; its design is caveated in IR-55-017). The result is negative for this lane. The three-experiment budget is spent.
+
+### What changed in this PR
+
+- The tensor-dimensionality lane was implemented in `gems/` and `scripts/run_tensor_lane.py`. Three review passes were done: implementation; bug and assumption audit (fixed a north/south azimuth sign bug, IR-55-018); and a requirement and source audit against `AGENTS.md`.
+- Registry overlap check against 632 registry GeoTIFFs (630 on the same grid). Result is inconclusive because the rule is saturated (IR-55-020).
+- The Pages site (`docs/`) now has run-card and status JSON, the results page, and build tooling that never overwrites hand-written HTML.
+- `tests/` keeps only the stdlib `unittest` guard tests that CI runs. The numeric tests moved to `tests_numeric/` (they need numpy and rasterio).
+
+### Remaining work and limitations
+
+1. **Shared evaluator (blocking).** `gems/` is a private re-implementation. Reconcile it with the authorised template evaluator on identical inputs, then replace or repair it there (IR-55-012).
+2. **Data rights (blocking for any publication).** Competition rasters were copied from a public sibling repo into gitignored `data/` for local analysis. Redistribution rights are not confirmed. Legal review is needed (IR-55-016).
+3. **Strike test redesign.** The current test is near-tautological for 2-D fields (IR-55-017).
+4. **Chance-corrected uniqueness.** The overlap threshold is saturated by dense registry rasters (IR-55-020).
+5. **Block-aware processing.** The four GeoDAWN acquisition blocks are not in the stack, so the whole grid was processed (IR-55-021).
+6. **Blocked hosts.** USGS S3, National Map, ScienceBase and OpenEI could not be reached from the sandbox (IR-55-023), so no DEM-based hypothesis can run here.
+7. **Leaderboard conflict.** 0.3774 vs 0.3195 for the top GEMSDOE score is unresolved. No organiser receipt is in the sandbox.
+8. **Verbatim prompt.** This README holds the consolidated brief from the earlier request (see "Persistent project brief" above). The full original wording was not retained in this session's notes and is not reproduced here.
+9. **Out-of-lane ideas** (tilt-angle zero-contours, geodetic strain, seismicity alignments, DEM scarps) are parked. `AGENTS.md` keeps this checkout to the tensor lane.
+
+### Reproduce
+
+```bash
+python3 -m unittest discover -s tests -v            # CI guard tests (stdlib only)
+python -m pytest -q tests_numeric                    # numeric tests (needs numpy, rasterio)
+python scripts/prepare_data.py                       # checks sha256 pins for data/
+python scripts/run_tensor_lane.py --out outputs/tensor-lane-candidate.tif --tag tensor-lane-v1 --results docs/results/tensor_lane_results.json
+python scripts/make_run_card.py
+python scripts/build_docs.py                         # renders new docs/*.md only
+```

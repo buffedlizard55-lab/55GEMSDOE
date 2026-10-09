@@ -1,0 +1,138 @@
+{
+  "generated_utc": "2026-10-09T04:48:41+00:00",
+  "evaluator": "gems.metric v1 (DrivenData distance-weighted Tversky, alpha=0.2, beta=0.8, R=300 m)",
+  "tag": "tensor-lane-v1",
+  "grid": {
+    "H": 3730,
+    "W": 3292,
+    "cell_m": 100
+  },
+  "feature_gaps_inside_footprint": {
+    "rtp_band2": 3061,
+    "iso_band13": 3061
+  },
+  "feature_values_outside_footprint": {
+    "rtp_band2": 1540,
+    "iso_band13": 1540
+  },
+  "striping": {
+    "rows_flagged": 129,
+    "rows_total": 3730,
+    "stripe_pixels_in_footprint": 86947
+  },
+  "holdout": {
+    "n_catalogue_px": 60988,
+    "n_segments": 3199,
+    "segments_per_fold": {
+      "NW": 1822,
+      "NE": 684,
+      "SW": 375,
+      "SE": 318
+    }
+  },
+  "experiments": {
+    "E1_ridge_baseline": {
+      "label": "HOLDOUT-DTI",
+      "evaluator": "gems.metric v1 (DrivenData distance-weighted Tversky, alpha=0.2, beta=0.8, R=300 m)",
+      "dti": 0.0578,
+      "ci95": [
+        0.0499,
+        0.0652
+      ],
+      "withheld_positive_px": 60594,
+      "TP_w": 3793.998046875,
+      "FP_w": 82001.640625,
+      "FN_w": 56800.0
+    },
+    "E2_plus_dimensionality": {
+      "label": "HOLDOUT-DTI",
+      "evaluator": "gems.metric v1 (DrivenData distance-weighted Tversky, alpha=0.2, beta=0.8, R=300 m)",
+      "dti": 0.0463,
+      "ci95": [
+        0.0398,
+        0.0523
+      ],
+      "withheld_positive_px": 60594,
+      "TP_w": 2816.279052734375,
+      "FP_w": 59038.8359375,
+      "FN_w": 57777.71875
+    },
+    "E3_full_tensor_lane": {
+      "label": "HOLDOUT-DTI",
+      "evaluator": "gems.metric v1 (DrivenData distance-weighted Tversky, alpha=0.2, beta=0.8, R=300 m)",
+      "dti": 0.0444,
+      "ci95": [
+        0.0383,
+        0.0502
+      ],
+      "withheld_positive_px": 60594,
+      "TP_w": 2662.876953125,
+      "FP_w": 54759.90234375,
+      "FN_w": 57931.12109375
+    }
+  },
+  "canary_auc_on_ridges": {
+    "n_pos": 23530,
+    "n_neg": 161645,
+    "features": {
+      "gradient_magnitude": {
+        "auc": 0.5179,
+        "leak_flag": false
+      },
+      "neg_dimensionality_mag": {
+        "auc": 0.5183,
+        "leak_flag": false
+      },
+      "neg_dimensionality_grav": {
+        "auc": 0.4803,
+        "leak_flag": false
+      },
+      "strike_agreement": {
+        "auc": 0.5066,
+        "leak_flag": false
+      },
+      "E1_score": {
+        "auc": 0.5182,
+        "leak_flag": false
+      },
+      "E3_score": {
+        "auc": 0.5184,
+        "leak_flag": false
+      }
+    }
+  },
+  "strike_test": {
+    "withheld_segments_tested": 910,
+    "withheld_match_rate": 0.4319,
+    "random_ridge_pixels_tested": 133448,
+    "random_ridge_match_rate": 0.8764,
+    "fisher_one_sided_p": 1.0,
+    "note": "withheld-fault strike (PCA of segment) vs median tensor strike on the segment; random ridge = ridge orientation vs tensor strike at the same pixel, ridges >300 m from catalogue"
+  },
+  "selected_for_file": "E1_ridge_baseline",
+  "submission": {
+    "file": "tensor-lane-candidate.tif",
+    "variant": "E1_ridge_baseline",
+    "sha256": "038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424",
+    "bytes": 2282098,
+    "nonzero_pixels": 185175,
+    "validator": {
+      "single_band": true,
+      "dtype_float32": true,
+      "crs_epsg_32611": true,
+      "shape_matches_template": true,
+      "transform_matches_template": true,
+      "resolution_100m": true,
+      "no_nan_inside_footprint": true,
+      "no_inf_anywhere": true,
+      "values_in_0_1_inside": true,
+      "outside_null_or_nan": true,
+      "footprint_inside_pixels": 5167373,
+      "positive_pixels": 185175,
+      "min_inside": 0.0,
+      "max_inside": 1.0,
+      "all_passed": true,
+      "sha256": "038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424"
+    }
+  }
+}
