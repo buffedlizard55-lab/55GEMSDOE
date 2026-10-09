@@ -132,6 +132,18 @@ class SiteStatusTests(unittest.TestCase):
         self.assertEqual(card["validator_findings"]["format_gate"], "NOT_CLEARED")
         self.assertIsNone(card["score_attribution"].get("organizer_receipt"))
 
+    def test_public_leaderboard_snapshot_is_not_h33_receipt(self) -> None:
+        card = json.loads((DOCS / "run-card.json").read_text())
+        status = json.loads((DOCS / "status.json").read_text())
+        snapshot = json.loads((ROOT / "evidence/leaderboard_snapshot_20261009.json").read_text())
+        self.assertTrue(card["score_attribution"]["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        self.assertTrue(status["leaderboard_attribution"]["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        self.assertEqual(status["leaderboard_attribution"]["h33_account_mapping"], "UNVERIFIED")
+        self.assertTrue(snapshot["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        rank16 = next(row for row in snapshot["rows"] if row["rank"] == 16)
+        self.assertEqual(rank16["participant"], "extradr19")
+        self.assertEqual(rank16["best_public_dw_tversky"], 0.2778)
+
     def test_metric_correction_is_visible_on_summary_page(self) -> None:
         index = (DOCS / "index.html").read_text()
         self.assertIn("0.2*TP_w + 0.2*FP_w + 0.8*|G|", index)

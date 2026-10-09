@@ -215,14 +215,15 @@
     "weekly_slot_used": false
   },
   "score_attribution": {
-    "evidence_class": "USER-REPORTED / NOT ORGANIZER-CONFIRMED",
-    "reported_0_2778": "No receipt or artifact hash ties this value to the H33 raster. Public owner-maintained manifest reports receipt=null and UNSCORED, with projected 0.2747.",
+    "evidence_class": "PUBLIC-LEADERBOARD snapshot (not a submission-page receipt; not ORGANIZER-CONFIRMED)",
+    "snapshot_file": "evidence/leaderboard_snapshot_20261009.json",
+    "reported_0_2778": "The captured public page lists 0.2778 at rank 16 under extradr19. No receipt or artifact hash ties that row to H33; the account-to-H33 mapping is unverified. The owner-maintained manifest reports receipt=null and UNSCORED for H33, with projected 0.2747.",
     "reported_leaderboard_values": [
       0.2778,
       0.3195,
       0.3774
     ],
-    "conclusion": "No organizer-confirmed score was found; neither a causal explanation for 0.2778 nor a claim of beating reported leaderboard values is established."
+    "conclusion": "No organizer-confirmed score or file attribution was found; neither a causal explanation for the public 0.2778 entry nor a claim of beating a leaderboard value is established."
   },
   "budget": {
     "experiments_used_recorded": 3,

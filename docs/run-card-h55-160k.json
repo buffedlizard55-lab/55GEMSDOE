@@ -84,9 +84,10 @@
     "weekly_slot_used": false
   },
   "score_attribution": {
-    "evidence_class": "NO ORGANIZER-CONFIRMED SCORE",
+    "evidence_class": "PUBLIC-LEADERBOARD snapshot (not a submission-page receipt; not ORGANIZER-CONFIRMED)",
     "organizer_receipt": null,
-    "reported_leaderboard_values": "0.2778, 0.3195, and 0.3774 remain user-reported; none is tied by an organizer receipt to this artifact."
+    "snapshot_file": "evidence/leaderboard_snapshot_20261009.json",
+    "reported_leaderboard_values": "The capture lists 0.2778 at rank 16 under extradr19, 0.3195 at rank 7, and 0.3774 at rank 1; none is tied by receipt/hash to this H55 artifact. Mapping of extradr19 to H33 is unverified."
   },
   "budget": {"experiments_used_recorded": 3, "experiment_limit": 3, "new_experiments_run_in_this_review": 0},
   "verdict": "NOT_CLEARED_DUPLICATE_STOP_NO_VALID_HOLDOUT_NO_ORGANIZER_RECEIPT"
