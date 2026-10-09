@@ -16,7 +16,11 @@
       "chance_fraction_within_3px": 0.18256413848971229,
       "excess_over_chance": 0.03211060677199979,
       "reference_positive_count": 343526,
-      "jaccard": 0.003309705865937378
+      "jaccard": 0.003309705865937378,
+      "reverse_fraction_reference_dots_near_candidate": 0.10663821661242526,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.02102345308413601,
+      "min_direction_fraction": 0.10663821661242526
     },
     {
       "raster": "12GEMSDOE__12GEMSDOE_r7-nms3-dem10-scarp_0c9199f14e62.tif",
@@ -26,7 +30,11 @@
       "chance_fraction_within_3px": 0.32244430583973716,
       "excess_over_chance": 0.08789785795258344,
       "reference_positive_count": 103347,
-      "jaccard": 0.003565332189736216
+      "jaccard": 0.003565332189736216,
+      "reverse_fraction_reference_dots_near_candidate": 0.10422169971068343,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.018375350807967008,
+      "min_direction_fraction": 0.10422169971068343
     },
     {
       "raster": "13GEMSDOE__13gems_20261001_r13-lattice-s5_v2_nan-outside.tif",
@@ -36,7 +44,11 @@
       "chance_fraction_within_3px": 0.9987132726822701,
       "excess_over_chance": -1.2343506354338296,
       "reference_positive_count": 206895,
-      "jaccard": 0.002780314652438174
+      "jaccard": 0.002780314652438174,
+      "reverse_fraction_reference_dots_near_candidate": 0.08686531815655284,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": -0.0006443686346828016,
+      "min_direction_fraction": 0.08686531815655284
     },
     {
       "raster": "14GEMSDOE__GEMS_r5-geom-horse-ensemble_20260929T154852Z_ccbe1de0_site_e96e942f.tif",
@@ -46,7 +58,11 @@
       "chance_fraction_within_3px": 0.055967703512016645,
       "excess_over_chance": 0.008905729729015021,
       "reference_positive_count": 116225,
-      "jaccard": 0.0032626427406199023
+      "jaccard": 0.0032626427406199023,
+      "reverse_fraction_reference_dots_near_candidate": 0.09868788986878899,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.012311211787195244,
+      "min_direction_fraction": 0.064375
     },
     {
       "raster": "15GEMSDOE__gems-tso1-20260929T005627Z-conj_alteration_mag.tif",
@@ -56,7 +72,11 @@
       "chance_fraction_within_3px": 0.45725652086659896,
       "excess_over_chance": 0.012539955605303896,
       "reference_positive_count": 99999,
-      "jaccard": 0.0029310046688569946
+      "jaccard": 0.0029310046688569946,
+      "reverse_fraction_reference_dots_near_candidate": 0.0897108971089711,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.0024739145834009953,
+      "min_direction_fraction": 0.0897108971089711
     },
     {
       "raster": "16GEMSDOE__gems16-h16-1-topo-geophys-baseline-ridges-20260930-df20f65e-allfinite.tif",
@@ -66,7 +86,11 @@
       "chance_fraction_within_3px": 0.2086464437539152,
       "excess_over_chance": 0.040567905448448696,
       "reference_positive_count": 123939,
-      "jaccard": 0.0036721725347314367
+      "jaccard": 0.0036721725347314367,
+      "reverse_fraction_reference_dots_near_candidate": 0.10387367979409226,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.017993978621986047,
+      "min_direction_fraction": 0.10387367979409226
     },
     {
       "raster": "16GEMSDOE__gems16-h18-3a-topo-geophys-x-complexity-prior-20260930-c502dfab-allfinite.tif",
@@ -76,7 +100,11 @@
       "chance_fraction_within_3px": 0.1755350349200648,
       "excess_over_chance": 0.02906729345086447,
       "reference_positive_count": 122120,
-      "jaccard": 0.0035821459451997064
+      "jaccard": 0.0035821459451997064,
+      "reverse_fraction_reference_dots_near_candidate": 0.10378316410088438,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01789478841436117,
+      "min_direction_fraction": 0.10378316410088438
     },
     {
       "raster": "16GEMSDOE__gems16-h18-4-usgs-geologic-map-faults-gap-20260930-aef8f42c-allfinite.tif",
@@ -86,7 +114,11 @@
       "chance_fraction_within_3px": 0.08123895836433716,
       "excess_over_chance": -0.00481785596443746,
       "reference_positive_count": 57783,
-      "jaccard": 0.0022957589588936886
+      "jaccard": 0.0022957589588936886,
+      "reverse_fraction_reference_dots_near_candidate": 0.08083692435491407,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": -0.007250489757301887,
+      "min_direction_fraction": 0.0768125
     },
     {
       "raster": "17GEMSDOE__17GEMSDOE_F-ensemble-2pct_20260930T050626Z.tif",
@@ -96,7 +128,11 @@
       "chance_fraction_within_3px": 0.049960202214935905,
       "excess_over_chance": 0.010173045179366944,
       "reference_positive_count": 103347,
-      "jaccard": 0.003649727111417591
+      "jaccard": 0.003649727111417591,
+      "reverse_fraction_reference_dots_near_candidate": 0.11291087307807678,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.027897245629242996,
+      "min_direction_fraction": 0.059625
     },
     {
       "raster": "18GEMSDOE__18GEMSDOE_H19-C_20260930T212401Z_c11e495e.tif",
@@ -106,7 +142,11 @@
       "chance_fraction_within_3px": 0.33010970951777624,
       "excess_over_chance": 0.02679959798984451,
       "reference_positive_count": 513786,
-      "jaccard": 0.002864049459275791
+      "jaccard": 0.002864049459275791,
+      "reverse_fraction_reference_dots_near_candidate": 0.09573635716037417,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.009076820801679358,
+      "min_direction_fraction": 0.09573635716037417
     },
     {
       "raster": "19GEMSDOE__gems19-h19-4-multiline-corroborated-openness-thermal-pop-20260930-691e4dfa-allfinite.tif",
@@ -116,7 +156,11 @@
       "chance_fraction_within_3px": 0.20359048979046027,
       "excess_over_chance": 0.036535237006253406,
       "reference_positive_count": 123779,
-      "jaccard": 0.0035322750866915074
+      "jaccard": 0.0035322750866915074,
+      "reverse_fraction_reference_dots_near_candidate": 0.1032485316572278,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01730891980738379,
+      "min_direction_fraction": 0.1032485316572278
     },
     {
       "raster": "19GEMSDOE__gems19-h19-5-powerlaw-budget-multiline-corroborated-20260930-e27054cf-allfinite.tif",
@@ -126,7 +170,11 @@
       "chance_fraction_within_3px": 0.19609480484571173,
       "excess_over_chance": 0.03758863027186779,
       "reference_positive_count": 121131,
-      "jaccard": 0.0035419731132040953
+      "jaccard": 0.0035419731132040953,
+      "reverse_fraction_reference_dots_near_candidate": 0.10416821457760607,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.018316739960866676,
+      "min_direction_fraction": 0.10416821457760607
     },
     {
       "raster": "20GEMSDOE__gems20-h20-1-sarnnpu-powerlaw-pi0363-tilt-wingcrack-20260930-be0e8f6b-allfinite.tif",
@@ -136,7 +184,11 @@
       "chance_fraction_within_3px": 0.2028688465105964,
       "excess_over_chance": 0.03630977582886348,
       "reference_positive_count": 123829,
-      "jaccard": 0.0035742225348271385
+      "jaccard": 0.0035742225348271385,
+      "reverse_fraction_reference_dots_near_candidate": 0.10298072341697018,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.017015446333189646,
+      "min_direction_fraction": 0.10298072341697018
     },
     {
       "raster": "20GEMSDOE__gems20-h20-5-continuous-pu-proxy-unverified-20260930-824ce73a-allfinite.tif",
@@ -146,7 +198,11 @@
       "chance_fraction_within_3px": 0.19334447116552259,
       "excess_over_chance": 0.035446392930314374,
       "reference_positive_count": 121258,
-      "jaccard": 0.003560696346447712
+      "jaccard": 0.003560696346447712,
+      "reverse_fraction_reference_dots_near_candidate": 0.10296227877748272,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.016995234063300436,
+      "min_direction_fraction": 0.10296227877748272
     },
     {
       "raster": "5GEMSDOE__gemsdoe-ens12-adopted-7f00890a.tif",
@@ -156,7 +212,11 @@
       "chance_fraction_within_3px": 0.2429211129136604,
       "excess_over_chance": 0.06903691012635382,
       "reference_positive_count": 172974,
-      "jaccard": 0.003451498481340668
+      "jaccard": 0.003451498481340668,
+      "reverse_fraction_reference_dots_near_candidate": 0.11056574976586077,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.025327378902260896,
+      "min_direction_fraction": 0.11056574976586077
     },
     {
       "raster": "5GEMSDOE__gemsdoe2-dual-family-union-f68e590f.tif",
@@ -166,7 +226,11 @@
       "chance_fraction_within_3px": 0.24545334737786492,
       "excess_over_chance": 0.07013701861671023,
       "reference_positive_count": 183642,
-      "jaccard": 0.0034631294828426813
+      "jaccard": 0.0034631294828426813,
+      "reverse_fraction_reference_dots_near_candidate": 0.11029067424663204,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.02502594169399518,
+      "min_direction_fraction": 0.11029067424663204
     },
     {
       "raster": "5GEMSDOE__pindrop-v4-discovery-37f9d5b855.tif",
@@ -176,7 +240,11 @@
       "chance_fraction_within_3px": 0.7341343464077394,
       "excess_over_chance": -0.0035613716737987007,
       "reference_positive_count": 155021,
-      "jaccard": 0.0029557170252819368
+      "jaccard": 0.0029557170252819368,
+      "reverse_fraction_reference_dots_near_candidate": 0.08760748543745686,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.00016892377988441748,
+      "min_direction_fraction": 0.08760748543745686
     },
     {
       "raster": "6GEMSDOE__gems6_hgb88-topk03_33cec71ff0.tif",
@@ -186,7 +254,11 @@
       "chance_fraction_within_3px": 0.08875999468201734,
       "excess_over_chance": 0.010482974037832386,
       "reference_positive_count": 155021,
-      "jaccard": 0.0032145853008980893
+      "jaccard": 0.0032145853008980893,
+      "reverse_fraction_reference_dots_near_candidate": 0.1040891234090865,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.018230069140054064,
+      "min_direction_fraction": 0.0983125
     },
     {
       "raster": "7GEMSDOE__gems7-lidarscarp-ridge-top2pct-36c3a3f341c8.tif",
@@ -196,7 +268,11 @@
       "chance_fraction_within_3px": 0.1638472779108456,
       "excess_over_chance": 0.02514818350003809,
       "reference_positive_count": 76859,
-      "jaccard": 0.0030786181865318555
+      "jaccard": 0.0030786181865318555,
+      "reverse_fraction_reference_dots_near_candidate": 0.09844000052043352,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.012039566119356127,
+      "min_direction_fraction": 0.09844000052043352
     },
     {
       "raster": "7GEMSDOE__gemsdoe4-combined-237f0063.tif",
@@ -206,7 +282,11 @@
       "chance_fraction_within_3px": 0.15136046884945212,
       "excess_over_chance": -0.005801012878551364,
       "reference_positive_count": 264247,
-      "jaccard": 0.002586539975100528
+      "jaccard": 0.002586539975100528,
+      "reverse_fraction_reference_dots_near_candidate": 0.07712102691799717,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": -0.011322497883385125,
+      "min_direction_fraction": 0.07712102691799717
     },
     {
       "raster": "8GEMSDOE__8GEMSDOE_Hedge-v2_submission.tif",
@@ -216,7 +296,11 @@
       "chance_fraction_within_3px": 0.2835643952933144,
       "excess_over_chance": 0.07467259353837968,
       "reference_positive_count": 227507,
-      "jaccard": 0.0026764721626306837
+      "jaccard": 0.0026764721626306837,
+      "reverse_fraction_reference_dots_near_candidate": 0.10747801166557512,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.02194372936697875,
+      "min_direction_fraction": 0.10747801166557512
     },
     {
       "raster": "GEMSDOE10__gems10-h16-continuation-20260927T065521077735Z-3431b83c7c.tif",
@@ -226,7 +310,11 @@
       "chance_fraction_within_3px": 0.17362013541503585,
       "excess_over_chance": 0.02103132630620533,
       "reference_positive_count": 310042,
-      "jaccard": 0.003419187458260369
+      "jaccard": 0.003419187458260369,
+      "reverse_fraction_reference_dots_near_candidate": 0.10172170222098942,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01563576763430759,
+      "min_direction_fraction": 0.10172170222098942
     },
     {
       "raster": "GEMSDOE10__gems10-h20-dem10-scarp-thin-20260927T155223039488Z-ffc91a1686.tif",
@@ -236,7 +324,11 @@
       "chance_fraction_within_3px": 0.19262263436372795,
       "excess_over_chance": 0.028025761681391745,
       "reference_positive_count": 153957,
-      "jaccard": 0.003388769829321715
+      "jaccard": 0.003388769829321715,
+      "reverse_fraction_reference_dots_near_candidate": 0.10035919120273842,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.014142681231255698,
+      "min_direction_fraction": 0.10035919120273842
     },
     {
       "raster": "GEMSDOE10__gems10-h25-ctx-ridge-20260927T232947704150Z-6452ae1d00.tif",
@@ -246,7 +338,11 @@
       "chance_fraction_within_3px": 0.263110481863802,
       "excess_over_chance": 0.051587812284733615,
       "reference_positive_count": 174232,
-      "jaccard": 0.0034074245988627854
+      "jaccard": 0.0034074245988627854,
+      "reverse_fraction_reference_dots_near_candidate": 0.10145667845171955,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015345345479123583,
+      "min_direction_fraction": 0.10145667845171955
     },
     {
       "raster": "GEMSDOE10__gems10-h28-dotted-ridge-20260928T020256236880Z-6452ae1d00.tif",
@@ -256,7 +352,11 @@
       "chance_fraction_within_3px": 0.27203532626733157,
       "excess_over_chance": 0.05962126363923954,
       "reference_positive_count": 69281,
-      "jaccard": 0.0030580680067277496
+      "jaccard": 0.0030580680067277496,
+      "reverse_fraction_reference_dots_near_candidate": 0.1010666705157258,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.014917961378360801,
+      "min_direction_fraction": 0.1010666705157258
     },
     {
       "raster": "GEMSDOE22__gems22-h23-a-dti-optimal-emission-6pct-20261002-e2ec4b49-allfinite.tif",
@@ -266,7 +366,11 @@
       "chance_fraction_within_3px": 0.41313429473738394,
       "excess_over_chance": 0.06377643969818839,
       "reference_positive_count": 335879,
-      "jaccard": 0.0034991957838540776
+      "jaccard": 0.0034991957838540776,
+      "reverse_fraction_reference_dots_near_candidate": 0.09782391873263883,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.011364442521673275,
+      "min_direction_fraction": 0.09782391873263883
     },
     {
       "raster": "GEMSDOE22__gems22-h23-b-dti-optimal-emission-10pct-20261002-86176698-allfinite.tif",
@@ -276,7 +380,11 @@
       "chance_fraction_within_3px": 0.5343281779736048,
       "excess_over_chance": 0.07338176889830862,
       "reference_positive_count": 516738,
-      "jaccard": 0.003354320594699759
+      "jaccard": 0.003354320594699759,
+      "reverse_fraction_reference_dots_near_candidate": 0.09564034384930081,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.00897160611544538,
+      "min_direction_fraction": 0.09564034384930081
     },
     {
       "raster": "GEMSDOE23__gemsdoe23-h30-arrangement-matched-habitat-20261002-0d4e02e8-allfinite.tif",
@@ -286,7 +394,11 @@
       "chance_fraction_within_3px": 0.41077564944508554,
       "excess_over_chance": 0.048325142245221386,
       "reference_positive_count": 91533,
-      "jaccard": 0.002937939525079744
+      "jaccard": 0.002937939525079744,
+      "reverse_fraction_reference_dots_near_candidate": 0.09345263456895328,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.006574239094876,
+      "min_direction_fraction": 0.09345263456895328
     },
     {
       "raster": "GEMSDOE26__gems26-dilcond-oof-v1-20261003-47629f496133-nan.tif",
@@ -296,7 +408,11 @@
       "chance_fraction_within_3px": 0.17078987717743618,
       "excess_over_chance": 0.021433195680326776,
       "reference_positive_count": 60068,
-      "jaccard": 0.002292671357419559
+      "jaccard": 0.002292671357419559,
+      "reverse_fraction_reference_dots_near_candidate": 0.09644070053938869,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.00984866448455553,
+      "min_direction_fraction": 0.09644070053938869
     },
     {
       "raster": "GEMSDOE27__gems27-topo-gap-closure-t-v2-on-d1-5-20261002-5512495c6bd1-allfinite.tif",
@@ -306,7 +422,11 @@
       "chance_fraction_within_3px": 0.1852153889413441,
       "excess_over_chance": 0.03440738899355293,
       "reference_positive_count": 61328,
-      "jaccard": 0.0029571984435797665
+      "jaccard": 0.0029571984435797665,
+      "reverse_fraction_reference_dots_near_candidate": 0.10266110096530133,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.0166651930652862,
+      "min_direction_fraction": 0.10266110096530133
     },
     {
       "raster": "GEMSDOE28__gems28-h27-4-r1-solo-d2-8-20261003-8acb75e1f2cc-allfinite.tif",
@@ -316,7 +436,11 @@
       "chance_fraction_within_3px": 0.1600641176861047,
       "excess_over_chance": 0.026785833047060295,
       "reference_positive_count": 40199,
-      "jaccard": 0.0026404524450946458
+      "jaccard": 0.0026404524450946458,
+      "reverse_fraction_reference_dots_near_candidate": 0.10191795815816314,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015850831635542923,
+      "min_direction_fraction": 0.10191795815816314
     },
     {
       "raster": "GEMSDOE28__gems28-h32-1-prethin-tip-euler-d2-8-20261003-31e35eee884e-allfinite.tif",
@@ -326,7 +450,11 @@
       "chance_fraction_within_3px": 0.16674913926283239,
       "excess_over_chance": 0.027753779596109168,
       "reference_positive_count": 42294,
-      "jaccard": 0.0025798018712162906
+      "jaccard": 0.0025798018712162906,
+      "reverse_fraction_reference_dots_near_candidate": 0.1020948597909869,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.016044686524867697,
+      "min_direction_fraction": 0.1020948597909869
     },
     {
       "raster": "GEMSDOE28__gems28-h36-1-rung30-blind-r1-20261003-b531dae0a36f-allfinite.tif",
@@ -336,7 +464,11 @@
       "chance_fraction_within_3px": 0.157525109954323,
       "excess_over_chance": 0.02808676000348696,
       "reference_positive_count": 37660,
-      "jaccard": 0.0024285447412665793
+      "jaccard": 0.0024285447412665793,
+      "reverse_fraction_reference_dots_near_candidate": 0.10292087095061073,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01694985794343473,
+      "min_direction_fraction": 0.10292087095061073
     },
     {
       "raster": "GEMSDOE28__gems28-h38-1-hf-euler-r30-r1-20261003-56a9f473edc7-allfinite.tif",
@@ -346,7 +478,11 @@
       "chance_fraction_within_3px": 0.15835357733997527,
       "excess_over_chance": 0.0280211761436444,
       "reference_positive_count": 37860,
-      "jaccard": 0.0024381618865044947
+      "jaccard": 0.0024381618865044947,
+      "reverse_fraction_reference_dots_near_candidate": 0.10293185419968304,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.016961893765260413,
+      "min_direction_fraction": 0.10293185419968304
     },
     {
       "raster": "GEMSDOE29__gems29-refd28-repro-20261003-1cc7dc534d51-nan.tif",
@@ -356,7 +492,11 @@
       "chance_fraction_within_3px": 0.17191094972242182,
       "excess_over_chance": 0.0303730018760027,
       "reference_positive_count": 44090,
-      "jaccard": 0.00271997597076443
+      "jaccard": 0.00271997597076443,
+      "reverse_fraction_reference_dots_near_candidate": 0.10204127920163303,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015985971073498754,
+      "min_direction_fraction": 0.10204127920163303
     },
     {
       "raster": "GEMSDOE29__gems29-wormrank-d28-20261003-59dcaf6dd11d-nan.tif",
@@ -366,7 +506,11 @@
       "chance_fraction_within_3px": 0.16962061767168735,
       "excess_over_chance": 0.030111998034202753,
       "reference_positive_count": 41338,
-      "jaccard": 0.0027281312301073763
+      "jaccard": 0.0027281312301073763,
+      "reverse_fraction_reference_dots_near_candidate": 0.10179495863370265,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015716044529168145,
+      "min_direction_fraction": 0.10179495863370265
     },
     {
       "raster": "GEMSDOE30__gemsdoe30-d28-poisson300m-offcat-44090-20261003T233156Z-91eae1ca-nanoutside.tif",
@@ -376,7 +520,11 @@
       "chance_fraction_within_3px": 0.17191094972242182,
       "excess_over_chance": 0.0303730018760027,
       "reference_positive_count": 44090,
-      "jaccard": 0.00271997597076443
+      "jaccard": 0.00271997597076443,
+      "reverse_fraction_reference_dots_near_candidate": 0.10204127920163303,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015985971073498754,
+      "min_direction_fraction": 0.10204127920163303
     },
     {
       "raster": "GEMSDOE31__gemsdoe31-h27-4-solo-d28-20261004-8acb75e1-allfinite.tif",
@@ -386,7 +534,11 @@
       "chance_fraction_within_3px": 0.1600641176861047,
       "excess_over_chance": 0.026785833047060295,
       "reference_positive_count": 40199,
-      "jaccard": 0.0026404524450946458
+      "jaccard": 0.0026404524450946458,
+      "reverse_fraction_reference_dots_near_candidate": 0.10191795815816314,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015850831635542923,
+      "min_direction_fraction": 0.10191795815816314
     },
     {
       "raster": "GEMSDOE32__gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-nan.tif",
@@ -396,7 +548,11 @@
       "chance_fraction_within_3px": 0.15085344139081888,
       "excess_over_chance": 0.024903308380377936,
       "reference_positive_count": 37654,
-      "jaccard": 0.0024100887435777674
+      "jaccard": 0.0024100887435777674,
+      "reverse_fraction_reference_dots_near_candidate": 0.10174217878578637,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.015658206557787845,
+      "min_direction_fraction": 0.10174217878578637
     },
     {
       "raster": "GEMSDOE33__GEMSDOE33-h33d-analog-tip-stepover-r30-20261004-cb490425926e-nanoutside.tif",
@@ -406,7 +562,11 @@
       "chance_fraction_within_3px": 0.16618560340041255,
       "excess_over_chance": 0.030584620154782388,
       "reference_positive_count": 41865,
-      "jaccard": 0.002685843008144169
+      "jaccard": 0.002685843008144169,
+      "reverse_fraction_reference_dots_near_candidate": 0.10294995819897289,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01698173274991335,
+      "min_direction_fraction": 0.10294995819897289
     },
     {
       "raster": "GEMSDOE34__h34-scatter-q50-arr-matched-20261004T223317Z.tif",
@@ -416,7 +576,11 @@
       "chance_fraction_within_3px": 0.17045198788630123,
       "excess_over_chance": 0.010078394489061697,
       "reference_positive_count": 37654,
-      "jaccard": 0.002428816979299006
+      "jaccard": 0.002428816979299006,
+      "reverse_fraction_reference_dots_near_candidate": 0.09252669039145907,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.005559557640647206,
+      "min_direction_fraction": 0.09252669039145907
     },
     {
       "raster": "GEMSDOE35__gemsdoe35-h35-06-aaa86efb25-20261004T225420098147Z-candidate.tif",
@@ -426,7 +590,11 @@
       "chance_fraction_within_3px": 0.018769885587899306,
       "excess_over_chance": 0.0061582031812396,
       "reference_positive_count": 39530,
-      "jaccard": 0.002998338270356188
+      "jaccard": 0.002998338270356188,
+      "reverse_fraction_reference_dots_near_candidate": 0.11669618011636732,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.03204531518210667,
+      "min_direction_fraction": 0.0248125
     },
     {
       "raster": "GEMSDOE36__gemsdoe36-anderson-geothermal-pinn-38854-20261004T230000Z-9b9ea4e6-nan.tif",
@@ -436,7 +604,11 @@
       "chance_fraction_within_3px": 0.15459015635217352,
       "excess_over_chance": 0.02872552742352839,
       "reference_positive_count": 38854,
-      "jaccard": 0.002522114189633745
+      "jaccard": 0.002522114189633745,
+      "reverse_fraction_reference_dots_near_candidate": 0.10320687702681834,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.017263273231719136,
+      "min_direction_fraction": 0.10320687702681834
     },
     {
       "raster": "GEMSDOE37__gemsdoe37-h6-physics-dotted-80k-20261005T055000Z-0bef9211631c.tif",
@@ -446,7 +618,11 @@
       "chance_fraction_within_3px": 0.2659895076279572,
       "excess_over_chance": 0.05817082019367207,
       "reference_positive_count": 80000,
-      "jaccard": 0.0029147209076378225
+      "jaccard": 0.0029147209076378225,
+      "reverse_fraction_reference_dots_near_candidate": 0.1005,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.014296984350867337,
+      "min_direction_fraction": 0.1005
     },
     {
       "raster": "GEMSDOE38__gems38-D-step-3p0-07pct-tipProt-20261005-ecfbf59e2b48-nan.tif",
@@ -456,7 +632,11 @@
       "chance_fraction_within_3px": 0.12422192088707357,
       "excess_over_chance": 0.03485823616851458,
       "reference_positive_count": 36171,
-      "jaccard": 0.00288345091405394
+      "jaccard": 0.00288345091405394,
+      "reverse_fraction_reference_dots_near_candidate": 0.10978408116999806,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.02447079958910904,
+      "min_direction_fraction": 0.10978408116999806
     },
     {
       "raster": "GEMSDOE42__gems42-xscale-worm-persistence-20261006T000541Z-nan.tif",
@@ -466,7 +646,11 @@
       "chance_fraction_within_3px": 0.19216572908516572,
       "excess_over_chance": 0.11220961300909048,
       "reference_positive_count": 60069,
-      "jaccard": 0.0038534119851670033
+      "jaccard": 0.0038534119851670033,
+      "reverse_fraction_reference_dots_near_candidate": 0.13437879771595998,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.05142253529604654,
+      "min_direction_fraction": 0.13437879771595998
     },
     {
       "raster": "GEMSDOE43__gems43-sup01-hgb21-sep40-n40000-20261006-bc2e4e9a8d6f-nan.tif",
@@ -476,7 +660,11 @@
       "chance_fraction_within_3px": 0.1866588690230026,
       "excess_over_chance": 0.032463169476356066,
       "reference_positive_count": 40000,
-      "jaccard": 0.002470373420214099
+      "jaccard": 0.002470373420214099,
+      "reverse_fraction_reference_dots_near_candidate": 0.099775,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.013502504432751023,
+      "min_direction_fraction": 0.099775
     },
     {
       "raster": "GEMSDOE44__GEMS44_h46-twostageAB_20261006T160000Z_b0cfe956-nan.tif",
@@ -486,7 +674,11 @@
       "chance_fraction_within_3px": 0.1443851643765604,
       "excess_over_chance": 0.007511949718305593,
       "reference_positive_count": 42000,
-      "jaccard": 0.002471611041014916
+      "jaccard": 0.002471611041014916,
+      "reverse_fraction_reference_dots_near_candidate": 0.0896904761904762,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.0024515366390510827,
+      "min_direction_fraction": 0.0896904761904762
     },
     {
       "raster": "GEMSDOE45__gems45-h51-km-faultzone-20261006-zeros.tif",
@@ -496,7 +688,11 @@
       "chance_fraction_within_3px": 0.11277587276939366,
       "excess_over_chance": 0.01490505817496681,
       "reference_positive_count": 37654,
-      "jaccard": 0.002485005885540255
+      "jaccard": 0.002485005885540255,
+      "reverse_fraction_reference_dots_near_candidate": 0.09770542306262282,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.011234590893795401,
+      "min_direction_fraction": 0.09770542306262282
     },
     {
       "raster": "GEMSDOE46__gems46-r11f-scarp-radiometric-fusion-00e049b51218-zeros.tif",
@@ -506,7 +702,11 @@
       "chance_fraction_within_3px": 0.20418576324952736,
       "excess_over_chance": 0.04162621780396664,
       "reference_positive_count": 44090,
-      "jaccard": 0.002485777681386697
+      "jaccard": 0.002485777681386697,
+      "reverse_fraction_reference_dots_near_candidate": 0.1020866409616693,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01603568004922183,
+      "min_direction_fraction": 0.1020866409616693
     },
     {
       "raster": "GEMSDOE48__gemsdoe48-h59-cover-ds-belief-b2xh33d-diag-belief-normalized-20261008T184547Z.tif",
@@ -516,7 +716,11 @@
       "chance_fraction_within_3px": 0.3286940965941495,
       "excess_over_chance": 0.06171687630877671,
       "reference_positive_count": 791389,
-      "jaccard": 0.0035211967843133355
+      "jaccard": 0.0035211967843133355,
+      "reverse_fraction_reference_dots_near_candidate": 0.10062055449342865,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01442909210820215,
+      "min_direction_fraction": 0.10062055449342865
     },
     {
       "raster": "GEMSDOE49__gems49-gate_ortho_w0.25-40k-20261006T213721Z-nan.tif",
@@ -526,7 +730,11 @@
       "chance_fraction_within_3px": 0.1532471141525878,
       "excess_over_chance": 0.012846588454819192,
       "reference_positive_count": 40000,
-      "jaccard": 0.0022550739163117012
+      "jaccard": 0.0022550739163117012,
+      "reverse_fraction_reference_dots_near_candidate": 0.093675,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.0068179147768758505,
+      "min_direction_fraction": 0.093675
     },
     {
       "raster": "GEMSDOE50__gems50-h52-coincidence8-80000-20261007T032938Z-nanoutside.tif",
@@ -536,7 +744,11 @@
       "chance_fraction_within_3px": 0.23857093343174568,
       "excess_over_chance": 0.061468715371215475,
       "reference_positive_count": 80000,
-      "jaccard": 0.00339691664489156
+      "jaccard": 0.00339691664489156,
+      "reverse_fraction_reference_dots_near_candidate": 0.104875,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.01909125971881058,
+      "min_direction_fraction": 0.104875
     },
     {
       "raster": "GEMSDOE53__gems53-h8-tiprelay-ridgeconcord-pr2-n80000-20261009-49bec522-nan-outside.tif",
@@ -546,7 +758,11 @@
       "chance_fraction_within_3px": 0.20840628303782213,
       "excess_over_chance": 0.017014684014756257,
       "reference_positive_count": 80000,
-      "jaccard": 0.0025167347194519577
+      "jaccard": 0.0025167347194519577,
+      "reverse_fraction_reference_dots_near_candidate": 0.0927875,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.005845361773664506,
+      "min_direction_fraction": 0.0927875
     },
     {
       "raster": "GEMSDOE54__gems54-h54c-manifest-edge-20261009T025732Z-73454bc5-zeros.tif",
@@ -556,7 +772,95 @@
       "chance_fraction_within_3px": 0.06860275037238457,
       "excess_over_chance": 0.00787499601329933,
       "reference_positive_count": 18880,
-      "jaccard": 0.002068490002298322
+      "jaccard": 0.002068490002298322,
+      "reverse_fraction_reference_dots_near_candidate": 0.10021186440677966,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.013981235464649279,
+      "min_direction_fraction": 0.0759375
+    },
+    {
+      "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+      "spearman": 0.024472863456122092,
+      "abs_spearman": 0.024472863456122092,
+      "fraction_candidate_dots_within_euclidean_3px": 0.86125,
+      "chance_fraction_within_3px": 0.7673247121893465,
+      "excess_over_chance": 0.4036753911188367,
+      "reference_positive_count": 1875224,
+      "jaccard": 0.004492326715056465,
+      "reverse_fraction_reference_dots_near_candidate": 0.12289358497971442,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.038836644435024784,
+      "min_direction_fraction": 0.12289358497971442
+    },
+    {
+      "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-zeros.tif",
+      "spearman": 0.024472863456122092,
+      "abs_spearman": 0.024472863456122092,
+      "fraction_candidate_dots_within_euclidean_3px": 0.86125,
+      "chance_fraction_within_3px": 0.7673247121893465,
+      "excess_over_chance": 0.4036753911188367,
+      "reference_positive_count": 1875224,
+      "jaccard": 0.004492326715056465,
+      "reverse_fraction_reference_dots_near_candidate": 0.12289358497971442,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.038836644435024784,
+      "min_direction_fraction": 0.12289358497971442
+    },
+    {
+      "raster": "PARALLEL16__tensor-gradient-gated-168854px-20261009T202306Z-nan.tif",
+      "spearman": 0.009909809194506987,
+      "abs_spearman": 0.009909809194506987,
+      "fraction_candidate_dots_within_euclidean_3px": 0.6213125,
+      "chance_fraction_within_3px": 0.4555539149196313,
+      "excess_over_chance": 0.3044536265806745,
+      "reference_positive_count": 168854,
+      "jaccard": 0.005526604945658678,
+      "reverse_fraction_reference_dots_near_candidate": 0.12535681713196015,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.0415359388882905,
+      "min_direction_fraction": 0.12535681713196015
+    },
+    {
+      "raster": "PARALLEL16__tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif",
+      "spearman": 0.009909809194506987,
+      "abs_spearman": 0.009909809194506987,
+      "fraction_candidate_dots_within_euclidean_3px": 0.6213125,
+      "chance_fraction_within_3px": 0.4555539149196313,
+      "excess_over_chance": 0.3044536265806745,
+      "reference_positive_count": 168854,
+      "jaccard": 0.005526604945658678,
+      "reverse_fraction_reference_dots_near_candidate": 0.12535681713196015,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.0415359388882905,
+      "min_direction_fraction": 0.12535681713196015
+    },
+    {
+      "raster": "PARALLEL16__tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
+      "spearman": 0.010736140259810607,
+      "abs_spearman": 0.010736140259810607,
+      "fraction_candidate_dots_within_euclidean_3px": 0.2673125,
+      "chance_fraction_within_3px": 0.13915310545609927,
+      "excess_over_chance": 0.14887594455667166,
+      "reference_positive_count": 50035,
+      "jaccard": 0.0069534454627243475,
+      "reverse_fraction_reference_dots_near_candidate": 0.2058359148595983,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.12972770022998498,
+      "min_direction_fraction": 0.2058359148595983
+    },
+    {
+      "raster": "PARALLEL16__tensor-triscale-poisson-50035dots-20261009T201613Z-zeros.tif",
+      "spearman": 0.010736140259810607,
+      "abs_spearman": 0.010736140259810607,
+      "fraction_candidate_dots_within_euclidean_3px": 0.2673125,
+      "chance_fraction_within_3px": 0.13915310545609927,
+      "excess_over_chance": 0.14887594455667166,
+      "reference_positive_count": 50035,
+      "jaccard": 0.0069534454627243475,
+      "reverse_fraction_reference_dots_near_candidate": 0.2058359148595983,
+      "reverse_chance_fraction": 0.08745333460541749,
+      "reverse_excess_over_chance": 0.12972770022998498,
+      "min_direction_fraction": 0.2058359148595983
     }
   ],
   "missing_registry_rasters": [],
@@ -566,19 +870,21 @@
       "error": "positive registry cells outside footprint"
     }
   ],
-  "manifest_raster_count": 56,
+  "manifest_raster_count": 62,
   "candidate_positive_count": 16000,
-  "scanned_registry_raster_count": 55,
+  "scanned_registry_raster_count": 61,
   "complete_registry_scan": false,
-  "max_abs_spearman": 0.00366618129250927,
+  "max_abs_spearman": 0.024472863456122092,
   "max_fraction_candidate_dots_within_euclidean_3px": 0.997125,
-  "max_excess_over_chance": 0.11220961300909048,
+  "max_excess_over_chance": 0.4036753911188367,
+  "max_reverse_fraction": 0.2058359148595983,
+  "max_min_direction_fraction": 0.2058359148595983,
   "max_excess_row": {
-    "raster": "GEMSDOE42__gems42-xscale-worm-persistence-20261006T000541Z-nan.tif",
-    "raw": 0.2828125,
-    "chance": 0.19216572908516572,
-    "excess": 0.11220961300909048,
-    "reference_positive_count": 60069
+    "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+    "raw": 0.86125,
+    "chance": 0.7673247121893465,
+    "excess": 0.4036753911188367,
+    "reference_positive_count": 1875224
   },
   "literal_rule_verdict": "DUPLICATE-STOP",
   "duplicate_note": "The literal >70% raw 3-pixel-overlap rule is breached. The chance-adjusted excess is reported separately; where the reference raster is much denser than the candidate, the raw value is largely a coverage artefact rather than evidence of a copied prediction."

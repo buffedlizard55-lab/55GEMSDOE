@@ -174,6 +174,22 @@ def compare(candidate_path: Path, *, stage: str, array_key: str) -> dict:
             rec["reference_positive_count"] = int(ref_dots.sum())
             rec["jaccard"] = float(np.count_nonzero(candidate_dots & ref_dots) /
                                    max(np.count_nonzero(candidate_dots | ref_dots), 1))
+            # Symmetric direction.  A genuine copy is close in BOTH directions;
+            # a same-lane detector that merely shares a terrain shows a high
+            # "ours near theirs" and a low "theirs near ours".  The reverse
+            # fraction is the fraction of the reference's own positive cells
+            # that lie within 3 px of one of our dots, with its own chance
+            # baseline (the fraction of the footprint covered by our dilated
+            # dots).
+            our_near = ndimage.binary_dilation(candidate_dots, structure=structure)
+            rev = float(our_near[ref_dots].mean())
+            rev_chance = float(our_near[footprint].mean())
+            rec["reverse_fraction_reference_dots_near_candidate"] = rev
+            rec["reverse_chance_fraction"] = rev_chance
+            rec["reverse_excess_over_chance"] = (
+                float((rev - rev_chance) / (1.0 - rev_chance))
+                if rev_chance < 1.0 else float("nan"))
+            rec["min_direction_fraction"] = float(min(frac, rev))
         result["comparisons"].append(rec)
 
     result["scanned_registry_raster_count"] = len(result["comparisons"])
@@ -202,6 +218,16 @@ def compare(candidate_path: Path, *, stage: str, array_key: str) -> dict:
               if "excess_over_chance" in r and np.isfinite(r["excess_over_chance"])]
         max_excess = max(ex) if ex else None
         result["max_excess_over_chance"] = max_excess
+        revs = [r["reverse_fraction_reference_dots_near_candidate"]
+                for r in result["comparisons"]
+                if "reverse_fraction_reference_dots_near_candidate" in r]
+        result["max_reverse_fraction"] = max(revs) if revs else None
+        mins = [r["min_direction_fraction"] for r in result["comparisons"]
+                if "min_direction_fraction" in r]
+        result["max_min_direction_fraction"] = max(mins) if mins else None
+        # The symmetric rule: a duplicate is close in BOTH directions.  This is
+        # reported alongside the literal one-sided rule, which is breached by
+        # reference coverage alone.
         top = max((r for r in result["comparisons"] if "excess_over_chance" in r),
                   key=lambda r: r["excess_over_chance"], default=None)
         if top is not None:

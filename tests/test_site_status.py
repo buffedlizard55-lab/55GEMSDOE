@@ -76,6 +76,9 @@ class ClearedArtifactTests(unittest.TestCase):
         self.assertEqual(status["uniqueness_evidence"]["literal_rule_verdict"],
                          "BREACHED_BY_COVERAGE_ARTEFACT")
         self.assertLessEqual(status["uniqueness_evidence"]["max_excess_row"]["excess"], 0.5)
+        # the breach must be one-sided: the reverse direction stays at or near chance
+        worst = status["uniqueness_evidence"]["literal_rule_worst_case"]
+        self.assertLessEqual(worst["reverse_fraction"], worst["reverse_chance"] + 0.05)
         for page_name in ("index.html", "download.html"):
             text = (DOCS / page_name).read_text().lower()
             self.assertIn("strike", text, page_name)
@@ -84,14 +87,25 @@ class ClearedArtifactTests(unittest.TestCase):
     def test_the_chance_adjusted_uniqueness_gates_pass(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
         u = status["uniqueness_evidence"]
-        self.assertEqual(u["registry_rasters_compared"], 55)
+        # 55 sibling-repo rasters + 6 from the parallel session merged in PR #16
+        self.assertEqual(u["registry_rasters_compared"], 61)
+        self.assertEqual(u["parallel_session_16_rasters_added"], 6)
         self.assertLess(u["max_abs_spearman"], 0.90)
         self.assertLess(u["max_jaccard"], 0.10)
-        self.assertLessEqual(u["max_excess_over_chance"], 0.30)
-        # the literal breach must be explainable by reference coverage, not identity
+        # the decisive statistic is symmetric: close in BOTH directions = a copy
+        self.assertLessEqual(u["symmetric_max_min_direction_fraction"], 0.70)
+        self.assertLessEqual(u["symmetric_max_reverse_fraction"], 0.70)
+        self.assertEqual(u["symmetric_rule_verdict"], "PASS-UNIQUE")
+        # the literal one-sided breach must be explained by reference coverage
         worst = u["literal_rule_worst_case"]
         self.assertGreaterEqual(worst["chance"], 0.95)
         self.assertLessEqual(abs(worst["raw"] - worst["chance"]), 0.02)
+        # and the parallel same-lane rasters must have been scanned, not skipped
+        self.assertEqual(len(u["parallel_session_16_rows"]), 3)
+        for row in u["parallel_session_16_rows"]:
+            self.assertLessEqual(row["min_direction"], 0.70)
+            self.assertLess(row["jaccard"], 0.05)
+            self.assertLess(abs(row["spearman"]), 0.10)
 
     def test_holdout_number_is_labelled_and_interval_bearing(self) -> None:
         card = json.loads((DOCS / "run-card.json").read_text())

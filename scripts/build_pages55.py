@@ -134,8 +134,8 @@ def main() -> int:
                'only by reference rasters whose own coverage makes the statistic uninformative '
                f'(the worst case: reference coverage {top_raw["chance_fraction_within_3px"]:.3f} '
                f'vs observed {top_raw["fraction_candidate_dots_within_euclidean_3px"]:.3f}, i.e. '
-               'an <em>excess over chance</em> that is at or below zero — a coverage artefact, '
-               'not a copy). '
+               'their positives are <em>not</em> concentrated on our dots — a one-sided coverage '
+               'artefact). '
                'See <a href="download.html">Download &amp; status</a>.'),
         '<div class="actions">' + actions + "</div>",
         '<p class="small">Single band, float32, EPSG:32611, 100 m, 3730 × 3292, values in '
