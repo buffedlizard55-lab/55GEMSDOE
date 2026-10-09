@@ -211,7 +211,7 @@ class SiteStatusTests(unittest.TestCase):
         self.assertIn("## User brief", readme)
         self.assertIn("**BLOCKED.**", readme)
         self.assertIn("session-20261009-verification.md", readme)
-        self.assertIn("IR-55-048", (DOCS / "irregularities.md").read_text())
+        self.assertIn("IR-55-053", (DOCS / "irregularities.md").read_text())
 
 
 if __name__ == "__main__":

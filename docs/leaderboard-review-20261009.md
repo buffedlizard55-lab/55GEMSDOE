@@ -11,7 +11,7 @@
 
 ## What can be established about 0.2778
 
-The saved **PUBLIC-LEADERBOARD (not a submission receipt, not ORGANIZER-CONFIRMED)** snapshot at [`evidence/leaderboard_snapshot_20261009.json`](../evidence/leaderboard_snapshot_20261009.json) lists **0.2778** at rank 16 under participant `extradr19`; it also lists **0.3195** at rank 7 and **0.3774** at rank 1. These are properties of the captured public page, not evidence that H33—or any file in this checkout—received those values. The mapping from the owner site name `GEMSDOE32`/H33 to `extradr19` is unverified.
+The saved **PUBLIC-LEADERBOARD (not a submission receipt, not ORGANIZER-CONFIRMED)** snapshot at [`evidence/leaderboard_snapshot_20261009.json`](../evidence/leaderboard_snapshot_20261009.json) lists **0.2778** at rank 17 under participant `extradr19`; it also lists **0.3195** at rank 7 and **0.3774** at rank 1. These are properties of the captured public page, not evidence that H33—or any file in this checkout—received those values. The mapping from the owner site name `GEMSDOE32`/H33 to `extradr19` is unverified.
 
 A read-only GitHub API check of the owner-maintained [GEMSDOE32 submissions manifest](https://github.com/buffedlizard55-lab/GEMSDOE32/blob/main/docs/downloads/submissions_manifest.json) reports `receipt: null` for H33, labels it `UNSCORED`, and calls **0.2747** projected. This is secondary owner-generated evidence, not an organizer receipt. No exact H33-to-leaderboard attribution is established.
 

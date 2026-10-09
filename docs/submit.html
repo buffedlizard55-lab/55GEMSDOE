@@ -25,7 +25,7 @@
 <li><strong>Repository check:</strong> the canonical grid constants in <code>src/gems55/io55.py</code> (EPSG 32611, 100 m, 3292 by 3730) match the official text. The authoritative organizer template is absent here, so this is not an organizer validation.</li>
 </ul>
 <h2>If the portal says "Predicted values must be in range [0, 1]"</h2>
-<p>The archived rasters in this repository all lie inside [0, 1], so the error from your earlier upload is <strong>unexplained</strong> (see <code>docs/irregularities.md</code>, IR-55-044). Check these causes against the exact file that was rejected:</p>
+<p>The archived rasters in this repository all lie inside [0, 1], so the error from your earlier upload is <strong>unexplained</strong> (see <code>docs/irregularities.md</code>, IR-55-049). Check these causes against the exact file that was rejected:</p>
 <ol>
 <li>Any value below 0 or above 1 anywhere in the file.</li>
 <li>NaN inside the footprint (the spec allows NaN only outside the bounds).</li>

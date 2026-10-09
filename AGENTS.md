@@ -1,6 +1,6 @@
 # Agent working agreement
 
-Before every work session, read the root `README.md`, `docs/run-card.json`, `docs/hypotheses.md`, and `docs/irregularities.md`. The README records the current user brief and verified status.
+Before every work session, read the root `README.md` (including its "Read first — standing brief" section, which holds the verbatim user brief), `docs/run-card.json`, `docs/session-20261009-review.md`, `docs/hypotheses.md`, and `docs/irregularities.md`. The README records the current user brief and verified status.
 
 - Work only on the Arena-assigned branch; do not change branches or edit sibling repositories.
 - The only assigned scientific lane is potential-field tensor dimensionality. Do not implement a different family to force a deliverable.

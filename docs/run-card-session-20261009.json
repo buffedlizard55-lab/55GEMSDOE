@@ -6,7 +6,7 @@
   "verdict_detail": "No candidate was generated, evaluated, or checked. The organizer feature stack, labels, sample template, and registry rasters are absent, and the sandbox cannot reach the data host. A negative/blocked outcome is recorded as a deliverable. Nothing here is promotable.",
   "hypothesis": {
     "tested": "none",
-    "candidates_proposed": ["H-N1 pseudogravity-transformed magnetic tensor (in-lane)", "H-N2 normalised-source-strength gate (in-lane)", "H-N3 GeoDAWN radiometric alteration corridor (out-of-lane, owner decision)", "H-N4 DEM scarp/lineament (out-of-lane, crowded)"],
+    "candidates_proposed": ["X1 pseudogravity-transformed magnetic tensor (in-lane)", "X2 normalised-source-strength gate (in-lane)", "X3 GeoDAWN radiometric alteration corridor (out-of-lane, owner decision)", "X4 DEM scarp/lineament (out-of-lane, crowded)"],
     "source": "docs/hypotheses.md (session addendum)"
   },
   "mechanism": "not tested. Under the official distance-weighted Tversky formula, a dot's marginal benefit depends on its hit probability relative to about 0.2 x DTI; this is an approximate derivation and has not been verified on data.",
@@ -14,7 +14,7 @@
     "lithologic contacts and thin dikes peak in normalised source strength and can mimic thin-sheet or 2-D sources",
     "remanent magnetization violates the induced-field assumption of a pseudogravity transform",
     "flight-line striping and leveling residuals mimic strike-extended structure",
-    "surface soil or lithology changes and radon can mimic a radiometric alteration signal (H-N3, not tested)"
+    "surface soil or lithology changes and radon can mimic a radiometric alteration signal (X3, not tested)"
   ],
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
@@ -75,5 +75,5 @@
     "https://doi.org/10.1190/1.3555343"
   ],
   "verification_log": "docs/session-20261009-verification.md",
-  "next_gate": "Reopen only with: authorized organizer files placed under data/ and matching the official specification; the shared evaluator and template reconciled; registry rasters or dot coordinates available; an explicit owner decision on the experiment budget; and, for H-N3, a confirmed licence."
+  "next_gate": "Reopen only with: authorized organizer files placed under data/ and matching the official specification; the shared evaluator and template reconciled; registry rasters or dot coordinates available; an explicit owner decision on the experiment budget; and, for X3, a confirmed licence."
 }
