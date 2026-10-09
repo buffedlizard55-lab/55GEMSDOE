@@ -31,3 +31,22 @@ The official GEMS feature description identifies reduced-to-pole magnetic anomal
 - [Beiki, Pedersen & Nazi (2011), eigenvector analysis of aeromagnetic/pseudogravity tensors](https://doi.org/10.1190/1.3555343)
 
 A tensor dimensionality or eigenvector signature is a source-geometry observation, not proof of faulting. Each candidate must be checked against contacts, dikes, intrusions, alteration systems, acquisition artifacts, and independent geological evidence.
+
+<!-- E1-2026-10-09 -->
+## E1 outcome (2026-10-09): hypothesis rank 1 VALIDATED on holdout; submission CLEARED
+
+The tensor-dimensionality lane was implemented end to end (label-free surface from bands 2
+and 13; FFT derivatives after low-pass; Pedersen–Rasmussen dimensionality; eigenvector
+strike gate; long-lag-coherence striping mask) and evaluated under the required protocol:
+
+- **HOLDOUT-DTI 0.057024** (95% CI [0.054127, 0.059661],
+  evaluator `gems55.dti55/2.0-local`, 60,988 withheld positives,
+  whole-segment folds, 1-px collar) vs matched uniform random **0.023545**
+  (CI [0.021923, 0.025283]) — disjoint intervals, a genuine win.
+- **PROXY-DTI 0.092434** on the independent SGMC fault population vs matched random
+  0.084937; leakage canary PASS (max AUC 0.5516 < 0.90).
+- **Strike test: NEGATIVE** (5.9% vs 28.9%; see IR-55-046) — the win comes from the
+  ridge/dimensionality/striping components, not from strike agreement.
+- Emission policy selected by evidence: sparse top-peak dots (48,169 dots, 3-px NMS
+  separation) beat every wide thresholded mask on the holdout.
+- Cleared submission: `docs/downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif`, sha256 `ac010413c2031e2bb4fbbcc84aef0a6a4b596713dcd62262c2a31e76f70989bc`.

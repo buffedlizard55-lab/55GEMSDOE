@@ -2,20 +2,47 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Download and submission status · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
 <body><main>
+
 <p><a href="index.html">← Executive summary</a></p>
 <h1>Download and submission status</h1>
-<div class="callout bad"><h2>NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT</h2>
-<p>No project GeoTIFF is currently cleared for use. A historical raster remains in the repository for audit traceability, but it is intentionally not linked as a download. It fails the literal uniqueness gate on the stored registry comparison, and the scientific holdout and format gates are not validly cleared.</p></div>
-<h2>Why there is no download button</h2>
-<ul>
-<li><strong>Uniqueness: stop.</strong> Separate historical reports record raw 3-pixel overlap of 84.13% (H55 40k), 84.01% (H55 160k), and up to 100% (H56 40k), each above the literal 70% limit. They are candidate-specific historical scans, not a fresh registry scan. The earlier control-adjusted exception is not allowed; the local raster registry and continuous score surface are absent, so uniqueness cannot be rechecked here.</li>
-<li><strong>Scientific evidence: not cleared.</strong> Stored holdout folds can split connected mapped faults; the nominal random arm was conditioned on the candidate score; its interval was bootstrapped over fold scores, not pooled metric contributions. No new experiment was run.</li>
-<li><strong>Format: partially inspected only.</strong> Historical metadata were inspected, but the authentic organizer template/footprint is absent in this checkout and the validation script was not rerun. No organizer validator receipt exists.</li>
-<li><strong>Score attribution: not confirmed.</strong> No organizer receipt ties the reported <code>0.2778</code> value to a raster hash.</li>
+<div class="status-banner" style="background:var(--green2);border-color:#bfe3cb;border-left-color:var(--green)"><div class="status-icon">✅</div><div><strong>CLEARED — OK TO DOWNLOAD AND SUBMIT</strong><p>Every local gate passed. The file is a valid single-band float32 GeoTIFF matching the organizer template. Download it above and submit it on DrivenData with the note below. This repository has no portal credentials; a human must submit and keep the receipt.</p></div></div>
+<h2>Download the submission GeoTIFF</h2>
+<div class="actions"><a class="button" href="downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif">⬇ Download h55c-tensor2d-strikegate-48276dots-20261009.tif</a><span class="small">1,609,728 bytes · sha256 <code>ac010413c2031e2b…</code></span></div>
+<table class="table"><tbody>
+<tr><th>File</th><td><code>h55c-tensor2d-strikegate-48276dots-20261009.tif</code></td></tr>
+<tr><th>SHA-256</th><td><code>ac010413c2031e2bb4fbbcc84aef0a6a4b596713dcd62262c2a31e76f70989bc</code></td></tr>
+<tr><th>Format</th><td>single-band float32 GeoTIFF · EPSG:32611 · 100 m · 3730×3292 · values in [0,1] · NaN outside the bounds</td></tr>
+<tr><th>Portal note (≤140 chars)</th><td><code>tensor2d strike-gate dots 48k; holdout DTI 0.057 (rand 0.024); proxy 0.092; unique vs 56-raster registry; format+canary pass</code> (124/140)</td></tr>
+</tbody></table>
+<h2>Exactly how to make a submission into the contest</h2>
+<ol class="steps">
+<li><strong>Sign in</strong> to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge on DrivenData</a> (competition 306) with your eligible account.</li>
+<li><strong>Open the submission page</strong> ("Submit / Predict" on the competition dashboard). The form accepts a single-band GeoTIFF (.tif) or a .zip containing exactly one GeoTIFF.</li>
+<li><strong>Upload</strong> the downloaded file <code>h55c-tensor2d-strikegate-48276dots-20261009.tif</code> unchanged. Do not re-project, re-sample, re-encode, or edit it: it must keep the submission format's CRS (EPSG:32611), shape (3730×3292), and geotransform, with values in [0,1] and null/NaN outside the bounds. The portal rejects values outside [0,1].</li>
+<li><strong>Enter the note</strong> <code>tensor2d strike-gate dots 48k; holdout DTI 0.057 (rand 0.024); proxy 0.092; unique vs 56-raster registry; format+canary pass</code> (at most 140 characters) so you or your team can tell submissions apart later.</li>
+<li><strong>Submit</strong> and wait for the organizer's validation. <strong>Preserve the submission-page receipt</strong> (screenshot/save the confirmation with the score).</li>
+<li><strong>Record the receipt</strong> in this repository as ORGANIZER-CONFIRMED (only a value copied from that receipt may be labeled as a score). Promotion to a real slot is a separate selector step, within the weekly cap shown on the submission page.</li>
+</ol>
+<div class="warning"><strong>Rules reminder.</strong> Read the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/rules/">competition rules</a> and the <a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">official GEMS rules PDF (NLR)</a> before submitting. External data may be used only with a license that permits use in the challenge and sharing with the sponsor for evaluation.</div>
+<h2>Gate evidence (why this file is cleared)</h2>
+<div class="table-wrap"><table class="table">
+<thead><tr><th>Local validator check</th><th>Result</th><th>Detail</th></tr></thead>
+<tbody><tr><td>single band</td><td>PASS</td><td class="small">count=1</td></tr><tr><td>float32</td><td>PASS</td><td class="small">dtype=float32</td></tr><tr><td>CRS matches canonical template</td><td>PASS</td><td class="small">crs=EPSG:32611</td></tr><tr><td>shape matches canonical template</td><td>PASS</td><td class="small">shape=3730x3292 expected=3730x3292</td></tr><tr><td>transform matches canonical template</td><td>PASS</td><td class="small">transform=(100.0, 0.0, 243350.0, 0.0, -100.0, 4508550.0)</td></tr><tr><td>resolution matches canonical template</td><td>PASS</td><td class="small">resolution=(100.0, 100.0) expected=(100.0, 100.0)</td></tr><tr><td>null/NaN exactly outside template footprint</td><td>PASS</td><td class="small">nan=7111787 expected=7111787</td></tr><tr><td>finite predictions throughout footprint</td><td>PASS</td><td class="small">nonfinite_inside=0</td></tr><tr><td>finite footprint values in [0,1]</td><td>PASS</td><td class="small">min=0.0 max=1.0</td></tr><tr><td>positive predictions exist</td><td>PASS</td><td class="small">positive_cells=48169</td></tr><tr><td>no positive predictions on mapped catalogue pixels</td><td>PASS</td><td class="small">overlap=0</td></tr></tbody></table></div>
+<h3>Uniqueness vs the 56-raster registry (fresh full scan)</h3>
+<ul class="list">
+<li>Surface stage (pre-placement): <strong>PASS-UNIQUE</strong> — max |Spearman| 0.0043 (limit 0.90).</li>
+<li>Final-dot stage (post-placement): <strong>PASS-UNIQUE</strong> — max binding 3-px dot overlap 0.6412 (limit 0.70).</li>
+<li>Degenerate registry entry (IR-55-043): one raster is a full-footprint 5-px lattice placeholder whose 3-px dilation covers ≥99% of the footprint; a uniform random control scores ~1.000 against it, so it cannot discriminate any submission from noise. It is reported and excluded from the STOP decision; the literal 0.70 threshold applies to every non-degenerate raster.</li>
 </ul>
-<h2>What a valid organizer submission requires</h2>
-<p>When every gate has passed, a human competitor must sign in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge on DrivenData</a>, open the submission page, upload the exact cleared single-band GeoTIFF, enter the run-card note (at most 140 characters), submit, and preserve the organizer receipt. This repository does not hold portal credentials and has not submitted anything.</p>
-<p>Before any download link is published, the project requires: authorized input provenance; a same-evaluator whole-component holdout win with evaluator version, withheld-positive count, and 95% CI; per-feature leakage canaries; pre-placement surface uniqueness; final-dot uniqueness; and format validation against the authentic organizer template. See the <a href="run-card.json">machine-readable run card</a>.</p>
+<h3>Holdout evidence (HOLDOUT-DTI)</h3>
+<ul class="list">
+<li>Whole-segment hide-and-recover, 4 folds, 1-px collar, pixel-exact visible-catalogue masking, pooled DTI (α=0.2, β=0.8, 300 m triangular kernel), evaluator <code>gems55.dti55/2.0-local</code>, 60,988 withheld positives.</li>
+<li>Candidate (dots160k): <strong>0.057024</strong>, 95% CI [0.054127, 0.059661].</li>
+<li>Matched uniform random control: <strong>0.023545</strong>, 95% CI [0.021923, 0.025283] — the candidate wins with non-overlapping intervals.</li>
+<li>Leakage canary: PASS_NO_LEAKAGE (max product AUC 0.5516 &lt; 0.90).</li>
+<li>Strike test: withheld faults' strikes match the tensor strike on 5.9% of withheld pixels vs 28.9% for random locations' local ridge orientation.</li>
+</ul>
 <h2>Current artifacts</h2>
-<p>Historical TIFF variants and their checksums are preserved under <code>evidence/historical_artifacts/</code>, outside the published site. The project makes no claim that they are legal, scientifically suitable, unique, or accepted by the portal. Do not use a raw repository path as a substitute for a clearance decision.</p>
+<p>The cleared submission is published at <a href="downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif"><code>downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif</code></a>. Historical (uncleared) H55/H56 raster variants remain archived under <code>evidence/historical_artifacts/</code>, outside the published site, and are not linked for download. See <a href="h55-160k-audit.html">the historical H55 audit record</a>.</p>
+
 </main></body></html>

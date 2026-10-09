@@ -156,7 +156,11 @@ def write_submission(
         "crs": rasterio.crs.CRS.from_epsg(CRS_EPSG),
         "transform": grid.transform,
         "compress": compress,
+        # Match the organizer sample template: NaN is the out-of-bounds null.
+        "nodata": float("nan"),
     }
     with rasterio.open(out_path, "w", **profile) as dst:
         dst.write(a, 1)
+        dst.update_tags(AREA_OR_POINT="Area")
+        dst.update_tags(1, band_name="fault_prediction")
     return out_path

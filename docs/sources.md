@@ -31,6 +31,31 @@ These references motivate source-geometry hypotheses; they do not prove that a t
 | [GEMSDOE26](https://github.com/buffedlizard55-lab/GEMSDOE26) and [GEMSDOE54](https://github.com/buffedlizard55-lab/GEMSDOE54) | Listed in prior-art notes for DILCOND, magnetic-ridge, and cross-gradient methods. | Owner-maintained reports; exact code, pixel overlap, and reported scores are not independently validated here. |
 | [Registry manifest](../registry/registry.json) | Local manifest lists 56 prior raster entries. | `registry/rasters/` is absent, so no full current uniqueness scan can be performed. The historical report is not a fresh pass. |
 
+<!-- E1-2026-10-09 -->
+## E1 session (2026-10-09) — what changed in this checkout
+
+- **Competition data are present and pin-verified.** `gems-geodawn-numerical-features.tif`
+  (19-band float32 stack), `labels.tif`, and `sample_submission.tif` were fetched from the
+  owner-maintained sibling GitHub mirrors (the same files the prompt lists from the
+  competition site) with `GEMS_ALLOW_UNOFFICIAL_MIRROR=1`; SHA-256 pins are recorded in
+  `data/README.md`. They are mirror pins, not organizer-authenticated downloads.
+- **The registry raster corpus is present.** All 56 rasters listed in
+  `registry/registry.json` were fetched from the owner-maintained sibling repos into
+  `registry/rasters/` (44.4 MB) with byte sizes verified against the manifest
+  (`scripts/build_registry.py`). Uniqueness scans in this session are fresh full scans
+  of these local files.
+- **Independent-fault proxy.** `data/proxy/proxy_catalogue.tif` (sha256
+  `7563e187171f7210d70295f958b0b2714c1fa504afa35f9a4688fc99b1e1122a`) was fetched from the owner-maintained template
+  repo (GEMSDOE). It rasterises the USGS SGMC `SGMC_Structure` fault polylines
+  ([Data Series 1052](https://doi.org/10.3133/ds1052), data DOI
+  [10.5066/F7WH2N65](https://doi.org/10.5066/F7WH2N65)) on the competition grid; code 2 =
+  proxy fault with no training label within 300 m (61,664 px).
+  It is the template project's stand-in for the scored new-fault population and is used
+  here only as PROXY-DTI (never as a score).
+- **Official problem page re-fetched 2026-10-09:** test truth = private expert-labelled
+  NEW faults not in the USGS catalogue; metric and submission format confirmed as recorded
+  above. Consequence: catalogue pixels are masked pixel-exactly from the emission domain.
+
 ## Data files, pins, and legal boundary
 
 - Canonical paths are defined in [`src/gems55/io55.py`](../src/gems55/io55.py). The recorded SHA-256 pins are in [`data/README.md`](../data/README.md), and their limitations in [`data/SOURCES.md`](../data/SOURCES.md).

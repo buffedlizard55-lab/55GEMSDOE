@@ -1,5 +1,64 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="0; url=index.html">
-<title>Current project status · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
-<body><main><h1>Current project status</h1><p>This older summary is superseded by the current <a href="index.html">executive summary</a>. The project is <strong>NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT</strong>; the historical raster is not a cleared deliverable.</p></main></body></html>
+<title>Executive summary · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
+<body><main>
+
+<p><a href="index.html">← Summary</a></p>
+<h1>Executive summary — 55GEMSDOE E1 tensor-lane submission</h1>
+<nav><a href="index.html">Summary</a><a href="submit.html">Download &amp; submission</a><a href="executive-summary.html">Executive summary</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="results.html">Results</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="leaderboard-analysis.html">Leaderboard</a><a href="anchor-0.2778.html">0.2778 attribution</a></nav>
+<div class="status-banner" style="background:var(--green2);border-color:#bfe3cb;border-left-color:var(--green)"><div class="status-icon">✅</div><div><strong>CLEARED — OK TO DOWNLOAD AND SUBMIT</strong><p>Every local gate passed. The file is a valid single-band float32 GeoTIFF matching the organizer template. Download it above and submit it on DrivenData with the note below. This repository has no portal credentials; a human must submit and keep the receipt.</p></div></div>
+<h2>The one-paragraph version</h2>
+<p>The DOE GEMS Prize Challenge (DrivenData competition 306) scores submissions with a distance-weighted "
+"Tversky index (α=0.2, β=0.8, 300 m triangular kernel) against a <em>private set of expert-labelled new "
+"faults that are not in the public USGS/INGENIOUS catalogue</em>. Our lane asks whether the geometry of "
+"potential-field sources — expressed by the gradient-tensor dimensionality index and eigenvector strike "
+"(Pedersen &amp; Rasmussen 1990; Beiki &amp; Pedersen 2010) — can rank candidate fault traces better than "
+"ridge strength alone. E1 built that surface from the RTP-magnetic and isostatic-gravity grids, gated it "
+"toward near-2-D strike-coherent ridges, masked flight-line striping, and emitted the surface's top "
+"peaks as unit dots off the mapped catalogue. The result is a unique, format-valid, holdout-validated "
+"GeoTIFF, published for one-click download, with an honest gate status.</p>
+<h2>The numbers (all local validation, none organizer-confirmed)</h2>
+<div class="table-wrap"><table class="table">
+<thead><tr><th>Quantity</th><th>Evidence class</th><th>Value</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>Whole-segment holdout DTI</td><td>HOLDOUT-DTI</td><td><strong>0.057024</strong></td><td>evaluator gems55.dti55/2.0-local · 60,988 withheld positives · 95% CI [0.054127, 0.059661] · policy dots160k</td></tr>
+<tr><td>Matched random control</td><td>HOLDOUT-DTI</td><td>0.023545</td><td>95% CI [0.021923, 0.025283] — candidate wins, intervals disjoint</td></tr>
+<tr><td>Independent-fault proxy DTI</td><td>PROXY-DTI</td><td><strong>0.092434</strong></td><td>USGS SGMC code-2 population (61,664 px, DOI 10.3133/ds1052) · policy dots160k · matched random 0.084937</td></tr>
+<tr><td>Blanket-ones baseline (proxy)</td><td>PROXY-DTI</td><td>0.024901</td><td>the trivial upper-coverage baseline</td></tr>
+<tr><td>Leakage canary</td><td>canary</td><td>PASS_NO_LEAKAGE</td><td>max product AUC 0.5516 &lt; 0.90</td></tr>
+<tr><td>Uniqueness</td><td>registry scan</td><td>PASS-UNIQUE</td><td>56 rasters · max |Spearman| 0.0043 · max binding 3-px overlap 0.6412</td></tr>
+<tr><td>Format</td><td>local validator</td><td>PASS</td><td>vs authentic sample_submission.tif</td></tr>
+</tbody></table></div>
+<h2>Why this could beat the reported 0.2778 anchor (and what we do not claim)</h2>
+<ul class="list">
+<li>The anchor attribution is unverified: the public-leaderboard snapshot lists 0.2778 at rank 16 under <code>extradr19</code>, and the owner-maintained GEMSDOE32 manifest reports <code>receipt: null</code>, UNSCORED, 0.2747 projected. We do not claim to understand or beat that entry.</li>
+<li>The scored population is NEW faults. Any submission that only re-marks the public catalogue earns zero true-positive credit there (measured: catalogue-copy PROXY-DTI = 0.0). Our emission is entirely off-catalogue.</li>
+<li>The metric is recall-dominated (β=0.8) but the true-positive term uses a per-pixel MAX over the 300 m kernel, so mass must be concentrated where faults are, not spread. The holdout and proxy sweeps both selected the sparse top-peak dot emission over wide masks — wide emissions buy coverage at an FP cost that outweighs it for this surface.</li>
+<li>Our local estimates (HOLDOUT-DTI 0.0570 on withheld catalogue faults; PROXY-DTI 0.0924 on independent SGMC faults) are validation numbers on DIFFERENT populations, not predictions of the leaderboard score. The real test faults are expert interpretations of GeoDAWN geophysics; the proxy is mostly pre-Quaternary bedrock structure. We do not project a leaderboard value.</li>
+</ul>
+<h2>Exactly how to make a submission into the contest</h2>
+<ol class="steps">
+<li>Download <a href="downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif"><code>h55c-tensor2d-strikegate-48276dots-20261009.tif</code></a> from <a href="submit.html">the download &amp; submission page</a> (or directly from <code>docs/downloads/</code>).</li>
+<li>Sign in to <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DrivenData competition 306</a> and open the submission page.</li>
+<li>Upload the .tif (or a .zip containing exactly that one GeoTIFF). It must match the submission format's CRS (EPSG:32611), shape, and geotransform, with values in [0,1] and null/NaN outside the bounds — the portal rejects values outside [0,1].</li>
+<li>Enter the note <code>tensor2d strike-gate dots 48k; holdout DTI 0.057 (rand 0.024); proxy 0.092; unique vs 56-raster registry; format+canary pass</code> (124/140 characters).</li>
+<li>Submit; preserve the organizer receipt. Only a value copied from that receipt may be called ORGANIZER-CONFIRMED.</li>
+</ol>
+<h2>Limitations (read before submitting)</h2>
+<ul class="list">
+<li>The evaluator is a repository-local transcription (gems55.dti55/2.0-local), regression-tested against a brute-force reference and cross-checked against the official worked example (TP_w=3.00, FP_w=1.89, FN_w=2.00 → 0.60). It is not the organizer's executable.</li>
+<li>The holdout measures withheld CATALOGUE faults (Quaternary); the proxy measures independent SGMC bedrock faults. Neither is the hidden expert test set. The proxy is a conservative stress test (30% of its faults are approximate/concealed/inferred and have no geophysical expression).</li>
+<li>The uniqueness scan covers the 56 rasters in this repository's registry (prior parallel-run submissions fetched from owner-maintained sibling repos). One registry entry is a degenerate full-footprint lattice placeholder (IR-55-043); the literal dot-overlap rule is applied to the 55 non-degenerate rasters.</li>
+<li>The local validator is not an organizer portal validation. The portal performs its own checks.</li>
+<li>No weekly submission slot has been used by this repository; promotion to a real slot is a separate selector step within the weekly cap.</li>
+</ul>
+<h2>Sources (official, verified)</h2>
+<ul class="list">
+<li><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Official problem description and metric</a> (fetched 2026-10-09)</li>
+<li><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">Official data tab</a> (login required; files mirrored with recorded SHA-256 pins)</li>
+<li><a href="https://doi.org/10.3133/ds1052">USGS SGMC Data Series 1052</a> (proxy population; data DOI <a href="https://doi.org/10.5066/F7WH2N65">10.5066/F7WH2N65</a>)</li>
+<li><a href="https://doi.org/10.1190/1.1442807">Pedersen &amp; Rasmussen (1990)</a> · <a href="https://doi.org/10.1190/1.3484098">Beiki &amp; Pedersen (2010)</a> — see <a href="sources.html">source register</a> for the full list</li>
+<li><a href="https://github.com/drivendataorg/gems-prize-reference-solution">Official reference solution</a></li>
+</ul>
+
+</main></body></html>

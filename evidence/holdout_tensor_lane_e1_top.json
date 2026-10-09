@@ -1,0 +1,358 @@
+{
+  "evidence_class": "HOLDOUT-DTI",
+  "experiment": "E1 tensor-dimensionality lane: label-free surface + emission-policy holdout",
+  "evaluator_version": "gems55.dti55/2.0-local",
+  "evaluator_note": "repository-local transcription, regression-tested vs brute force; not the organizer executable",
+  "metric": {
+    "alpha": 0.2,
+    "beta": 0.8,
+    "kernel": "triangular",
+    "kernel_radius_m": 300.0,
+    "kernel_radius_px": 3.0
+  },
+  "holdout_protocol": {
+    "design": "whole 8-connected component hide-and-recover",
+    "n_folds": 4,
+    "buffer_px": 1,
+    "buffer_note": "collar around withheld truth excluded from emission; must be < 3 px (kernel radius)",
+    "visible_catalogue_masking": "pixel-exact (all catalogue pixels excluded from emission)",
+    "surface_refit_per_fold": "none (surface is label-free by construction: bands 2+13 only)",
+    "pooling": "TP_w/FP_w/FN_w summed across folds before the ratio"
+  },
+  "withheld_positive_count": 60988,
+  "catalogue_positive_count": 60988,
+  "leakage_canary": {
+    "limit": 0.9,
+    "auc_vs_catalogue_by_product": {
+      "score": 0.5255059898341249,
+      "ridge": 0.551645279130832,
+      "ridge_mag": 0.531869411787161,
+      "ridge_grav": 0.5323772140406006,
+      "dim": 0.5019710770218702,
+      "dim_inv": 0.5019710770218702,
+      "dim_eig": 0.5153132714335914,
+      "agree": 0.5227040346129226,
+      "plunge": 0.4872292416824133,
+      "dtheta": 0.47729596540634345,
+      "coh_x": 0.4952767673225504,
+      "coh_y": 0.4928977452797046
+    },
+    "verdict": "PASS_NO_LEAKAGE"
+  },
+  "arms": {
+    "continuous": {
+      "pooled_dti": 0.010692917607502208,
+      "ci95": [
+        0.009890244797634177,
+        0.011498070241751262
+      ],
+      "ci_method": "diagnostic percentile bootstrap of spatial-block sums of additive metric terms (block=100px, n_blocks=578, B=2000)",
+      "tp_w": 4042.7281119143804,
+      "fp_w": 1642381.8091008952,
+      "fn_w": 56945.27188808562,
+      "n_truth": 60988,
+      "per_fold": [
+        {
+          "fold": "segment_fold0",
+          "dti": 0.018097234446158864,
+          "tp_w": 1904.1889710166506,
+          "fp_w": 406835.2481230346,
+          "fn_w": 27435.81102898335,
+          "n_pred_pos": 3976376
+        },
+        {
+          "fold": "segment_fold1",
+          "dti": 0.007891673026000787,
+          "tp_w": 730.662191002353,
+          "fp_w": 411937.7151357265,
+          "fn_w": 11835.337808997647,
+          "n_pred_pos": 4004322
+        },
+        {
+          "fold": "segment_fold2",
+          "dti": 0.008074800478842882,
+          "tp_w": 726.6447154587204,
+          "fp_w": 411607.2811081156,
+          "fn_w": 8676.35528454128,
+          "n_pred_pos": 4010762
+        },
+        {
+          "fold": "segment_fold3",
+          "dti": 0.007545791426691179,
+          "tp_w": 681.2322344366562,
+          "fp_w": 412001.5647340184,
+          "fn_w": 8997.767765563343,
+          "n_pred_pos": 4009099
+        }
+      ]
+    },
+    "top10pct": {
+      "pooled_dti": 0.014523537104277152,
+      "ci95": [
+        0.013337677022414032,
+        0.015757264740306576
+      ],
+      "ci_method": "diagnostic percentile bootstrap of spatial-block sums of additive metric terms (block=100px, n_blocks=575, B=2000)",
+      "tp_w": 6601.284545387478,
+      "fp_w": 2022062.7104395437,
+      "fn_w": 54386.71545461252,
+      "n_truth": 60988,
+      "per_fold": [
+        {
+          "fold": "segment_fold0",
+          "dti": 0.024013726193148698,
+          "tp_w": 2984.764858603424,
+          "fp_w": 501125.81296763173,
+          "fn_w": 26355.235141396573,
+          "n_pred_pos": 504643
+        },
+        {
+          "fold": "segment_fold1",
+          "dti": 0.009709899861133835,
+          "tp_w": 1083.6707222137097,
+          "fp_w": 506675.96377033,
+          "fn_w": 11482.329277786292,
+          "n_pred_pos": 508057
+        },
+        {
+          "fold": "segment_fold2",
+          "dti": 0.01223201820505131,
+          "tp_w": 1335.49662274382,
+          "fp_w": 506954.4961458395,
+          "fn_w": 8067.50337725618,
+          "n_pred_pos": 508811
+        },
+        {
+          "fold": "segment_fold3",
+          "dti": 0.01094032383268385,
+          "tp_w": 1197.3523418265247,
+          "fp_w": 507306.43755574245,
+          "fn_w": 8481.647658173475,
+          "n_pred_pos": 508784
+        }
+      ]
+    },
+    "top20pct": {
+      "pooled_dti": 0.013469675141240913,
+      "ci95": [
+        0.012457070061663923,
+        0.014517425679908413
+      ],
+      "ci_method": "diagnostic percentile bootstrap of spatial-block sums of additive metric terms (block=100px, n_blocks=576, B=2000)",
+      "tp_w": 11584.851863013788,
+      "fp_w": 4044808.8289113315,
+      "fn_w": 49403.14813698621,
+      "n_truth": 60988,
+      "per_fold": [
+        {
+          "fold": "segment_fold0",
+          "dti": 0.024408099086861434,
+          "tp_w": 5491.495115072421,
+          "fp_w": 1002081.4821581193,
+          "fn_w": 23848.504884927577,
+          "n_pred_pos": 1009286
+        },
+        {
+          "fold": "segment_fold1",
+          "dti": 0.009085923160701564,
+          "tp_w": 1936.5814322763972,
+          "fp_w": 1013503.6943052178,
+          "fn_w": 10629.418567723602,
+          "n_pred_pos": 1016114
+        },
+        {
+          "fold": "segment_fold2",
+          "dti": 0.010067885025088565,
+          "tp_w": 2122.5984507262765,
+          "fp_w": 1014408.573345976,
+          "fn_w": 7280.4015492737235,
+          "n_pred_pos": 1017621
+        },
+        {
+          "fold": "segment_fold3",
+          "dti": 0.009635486074592676,
+          "tp_w": 2034.1768649386934,
+          "fp_w": 1014815.0791020181,
+          "fn_w": 7644.823135061307,
+          "n_pred_pos": 1017568
+        }
+      ]
+    },
+    "dots40k": {
+      "pooled_dti": 0.046198335102669054,
+      "ci95": [
+        0.043699918992805,
+        0.048489256195862585
+      ],
+      "ci_method": "diagnostic percentile bootstrap of spatial-block sums of additive metric terms (block=100px, n_blocks=575, B=2000)",
+      "tp_w": 3751.7512792593952,
+      "fp_w": 158344.56960954273,
+      "fn_w": 57236.24872074061,
+      "n_truth": 60988,
+      "per_fold": [
+        {
+          "fold": "segment_fold0",
+          "dti": 0.059352332763022035,
+          "tp_w": 1880.352731886458,
+          "fp_w": 39165.61417376177,
+          "fn_w": 27459.647268113542,
+          "n_pred_pos": 40000
+        },
+        {
+          "fold": "segment_fold1",
+          "dti": 0.035958703553957645,
+          "tp_w": 651.6403580648953,
+          "fp_w": 39693.90526794464,
+          "fn_w": 11914.359641935105,
+          "n_pred_pos": 40000
+        },
+        {
+          "fold": "segment_fold2",
+          "dti": 0.038660816533519986,
+          "tp_w": 602.784584405485,
+          "fp_w": 39743.29266971228,
+          "fn_w": 8800.215415594517,
+          "n_pred_pos": 40000
+        },
+        {
+          "fold": "segment_fold3",
+          "dti": 0.03901205835899087,
+          "tp_w": 616.9736049025569,
+          "fp_w": 39741.75749812403,
+          "fn_w": 9062.026395097444,
+          "n_pred_pos": 40000
+        }
+      ]
+    },
+    "dots160k": {
+      "pooled_dti": 0.057024356363412396,
+      "ci95": [
+        0.05412743306337412,
+        0.059660821082187364
+      ],
+      "ci_method": "diagnostic percentile bootstrap of spatial-block sums of additive metric terms (block=100px, n_blocks=576, B=2000)",
+      "tp_w": 5040.369562657717,
+      "fp_w": 192956.46459303,
+      "fn_w": 55947.63043734229,
+      "n_truth": 60988,
+      "per_fold": [
+        {
+          "fold": "segment_fold0",
+          "dti": 0.07550631910952034,
+          "tp_w": 2538.4021629847525,
+          "fp_w": 48193.632578031626,
+          "fn_w": 26801.597837015248,
+          "n_pred_pos": 49300
+        },
+        {
+          "fold": "segment_fold1",
+          "dti": 0.049235483840096995,
+          "tp_w": 979.5157908318437,
+          "fp_w": 48229.030677182505,
+          "fn_w": 11586.484209168157,
+          "n_pred_pos": 48679
+        },
+        {
+          "fold": "segment_fold2",
+          "dti": 0.04306953757442566,
+          "tp_w": 746.0168053165025,
+          "fp_w": 48248.06806700881,
+          "fn_w": 8656.983194683498,
+          "n_pred_pos": 48556
+        },
+        {
+          "fold": "segment_fold3",
+          "dti": 0.044227102282832075,
+          "tp_w": 776.4348035246185,
+          "fp_w": 48285.73327080706,
+          "fn_w": 8902.565196475382,
+          "n_pred_pos": 48603
+        }
+      ]
+    },
+    "random_matched_mass": {
+      "pooled_dti": 0.023544656682801396,
+      "ci95": [
+        0.021922881124979605,
+        0.025282778615982535
+      ],
+      "ci_method": "diagnostic percentile bootstrap of spatial-block sums of additive metric terms (block=100px, n_blocks=582, B=2000)",
+      "tp_w": 10727.834444991237,
+      "fp_w": 2023508.9260705886,
+      "fn_w": 50260.165555008774,
+      "n_truth": 60988,
+      "per_fold": [
+        {
+          "fold": "segment_fold0",
+          "dti": 0.04148059617364508,
+          "tp_w": 5175.832930090279,
+          "fp_w": 501350.2014488914,
+          "fn_w": 24164.167069909723,
+          "n_pred_pos": 504643
+        },
+        {
+          "fold": "segment_fold1",
+          "dti": 0.021066224419122835,
+          "tp_w": 2355.7273568752844,
+          "fp_w": 506504.5157934246,
+          "fn_w": 10210.272643124717,
+          "n_pred_pos": 508057
+        },
+        {
+          "fold": "segment_fold2",
+          "dti": 0.014794557910092772,
+          "tp_w": 1618.6602608783805,
+          "fp_w": 507815.1760240094,
+          "fn_w": 7784.33973912162,
+          "n_pred_pos": 508811
+        },
+        {
+          "fold": "segment_fold3",
+          "dti": 0.014390804001925129,
+          "tp_w": 1577.6138971472935,
+          "fp_w": 507839.03280426294,
+          "fn_w": 8101.386102852706,
+          "n_pred_pos": 508784
+        }
+      ]
+    }
+  },
+  "strike_test": {
+    "claim": "withheld faults' strikes match the tensor eigenvector strike more often than random locations match their local ridge orientation",
+    "rows": [
+      {
+        "fold": "segment_fold0",
+        "n_components_ge25px": 312,
+        "n_truth_px": 29340,
+        "frac_withheld_px_strike_match<20deg": 0.039297886843899114,
+        "frac_withheld_px_ridge_az_match<20deg": 0.2796523517382413,
+        "frac_random_px_ridge_az_match<20deg": 0.28888
+      },
+      {
+        "fold": "segment_fold1",
+        "n_components_ge25px": 137,
+        "n_truth_px": 12566,
+        "frac_withheld_px_strike_match<20deg": 0.05363679770810122,
+        "frac_withheld_px_ridge_az_match<20deg": 0.29914053795957346,
+        "frac_random_px_ridge_az_match<20deg": 0.288635
+      },
+      {
+        "fold": "segment_fold2",
+        "n_components_ge25px": 124,
+        "n_truth_px": 9403,
+        "frac_withheld_px_strike_match<20deg": 0.07423162820376475,
+        "frac_withheld_px_ridge_az_match<20deg": 0.33382962884185896,
+        "frac_random_px_ridge_az_match<20deg": 0.289245
+      },
+      {
+        "fold": "segment_fold3",
+        "n_components_ge25px": 112,
+        "n_truth_px": 9679,
+        "frac_withheld_px_strike_match<20deg": 0.0682921789441058,
+        "frac_withheld_px_ridge_az_match<20deg": 0.32957950201467096,
+        "frac_random_px_ridge_az_match<20deg": 0.287845
+      }
+    ]
+  },
+  "elapsed_s": 208.0
+}

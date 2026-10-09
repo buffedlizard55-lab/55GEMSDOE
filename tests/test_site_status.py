@@ -1,4 +1,14 @@
-"""Fail-closed regression checks for the reviewed project status and site."""
+"""Regression checks for the published project status and site (E1 cleared state).
+
+The 2026-10-09 E1 session generated a unique tensor-lane submission, validated it
+locally, and published it for download. These tests pin the site to the truth:
+  * the cleared submission file exists under docs/downloads/ and its sha256
+    matches status.json, run-card.json, and the submission evidence record;
+  * the site states OBVIOUSLY whether the file is OK to download and submit;
+  * every score-like number keeps its evidence-class label (HOLDOUT-DTI /
+    PROXY-DTI / PUBLIC-LEADERBOARD); no organizer receipt is claimed;
+  * no uncleared artifact (historical H55/H56 rasters, archives) is linked.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -24,36 +34,114 @@ class LinkCollector(HTMLParser):
             self.hrefs.extend(value for key, value in attrs if key.lower() == "href" and value)
 
 
+def _submission_record() -> dict:
+    subs = sorted((ROOT / "evidence").glob("submission_h55c-*.json"))
+    assert subs, "no E1 submission record found"
+    return json.loads(subs[-1].read_text())
+
+
 class SiteStatusTests(unittest.TestCase):
-    def test_current_status_and_run_card_are_fail_closed(self) -> None:
+    def test_current_status_and_run_card_are_cleared(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
         card = json.loads((DOCS / "run-card.json").read_text())
 
-        self.assertFalse(status["download_allowed"])
-        self.assertFalse(status["submit_allowed"])
-        self.assertFalse(status["submit_recommended"])
-        self.assertEqual(card["submission"]["status"], "DO_NOT_DOWNLOAD_OR_SUBMIT")
-        self.assertFalse(card["submission"]["file_link_published"])
+        self.assertTrue(status["download_allowed"])
+        self.assertTrue(status["submit_allowed"])
+        self.assertTrue(status["submit_recommended"])
+        self.assertEqual(status["overall_status"], "CLEARED_OK_TO_DOWNLOAD_AND_SUBMIT")
+        self.assertEqual(card["submission"]["status"], "CLEARED_OK_TO_DOWNLOAD_AND_SUBMIT")
+        self.assertTrue(card["submission"]["file_link_published"])
         self.assertIsNone(card["submission"]["organizer_receipt"])
-        self.assertIsNone(card["holdout_dti"]["value"])
-        self.assertIsNone(card["holdout_dti"]["ci95"])
-        self.assertEqual(card["budget"]["experiments_used_recorded"], 3)
-        self.assertEqual(card["budget"]["new_experiments_run_in_review"], 0)
-        self.assertFalse(card["budget"]["weekly_slot_used"])
+        self.assertFalse(card["submission"]["weekly_slot_used"])
+        self.assertEqual(card["verdict"], "PROMOTE")
 
-    def test_current_historical_raster_hash_is_archival_only(self) -> None:
+    def test_cleared_submission_file_exists_and_hash_matches_everywhere(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
         card = json.loads((DOCS / "run-card.json").read_text())
-        raster = ROOT / status["historical_raster"]["file"]
-        self.assertTrue(raster.is_file())
+        record = _submission_record()
+        raster = ROOT / status["submission"]["file"]
+        self.assertTrue(raster.is_file(), f"missing published raster {raster}")
+        self.assertEqual(raster.parent.name, "downloads")
         digest = hashlib.sha256(raster.read_bytes()).hexdigest()
-        self.assertEqual(digest, status["historical_raster"]["sha256"])
+        self.assertEqual(digest, status["submission"]["sha256"])
         self.assertEqual(digest, card["raster_sha256"]["value"])
-        self.assertEqual(status["historical_raster"]["role"], "UNCLEARED_HISTORICAL_ARTIFACT")
-        self.assertFalse(status["historical_raster"]["download_link_published"])
-        for item in status["historical_artifacts"]:
-            self.assertFalse(item["download_link_published"])
-            self.assertTrue((ROOT / item["primary_file"]).is_file())
+        self.assertEqual(digest, record["raster"]["sha256"])
+        self.assertEqual(raster.stat().st_size, status["submission"]["bytes"])
+        self.assertEqual(raster.stat().st_size, record["raster"]["bytes"])
+        self.assertTrue(record["cleared_for_download_and_submission"])
+        self.assertEqual(record["published_copy"], status["submission"]["file"])
+
+    def test_holdout_and_proxy_numbers_are_labeled(self) -> None:
+        card = json.loads((DOCS / "run-card.json").read_text())
+        hold = card["holdout_dti"]
+        self.assertEqual(hold["evidence_class"], "HOLDOUT-DTI")
+        self.assertTrue(hold["evaluator_version"])
+        self.assertEqual(hold["withheld_positive_count"], 60988)
+        self.assertIsNotNone(hold["value"])
+        self.assertEqual(len(hold["ci95"]), 2)
+        self.assertLess(hold["ci95"][0], hold["value"])
+        self.assertLess(hold["value"], hold["ci95"][1])
+        self.assertGreater(hold["value"], hold["matched_random_control"]["value"])
+        self.assertEqual(hold["leakage_canary"]["verdict"], "PASS_NO_LEAKAGE")
+        proxy = card["proxy_dti"]
+        self.assertEqual(proxy["evidence_class"], "PROXY-DTI")
+        self.assertIsNotNone(proxy["value"])
+        self.assertIsNone(card["score_attribution"]["organizer_confirmed_score_for_this_submission"])
+
+    def test_uniqueness_and_validator_gates_are_published(self) -> None:
+        card = json.loads((DOCS / "run-card.json").read_text())
+        reg = card["registry_comparisons"]
+        self.assertEqual(reg["surface_stage"]["verdict"], "PASS-UNIQUE")
+        self.assertEqual(reg["final_dot_stage"]["verdict"], "PASS-UNIQUE")
+        self.assertLessEqual(reg["surface_stage"]["max_abs_spearman"], 0.90)
+        self.assertLessEqual(reg["final_dot_stage"]["max_abs_spearman"], 0.90)
+        self.assertLessEqual(
+            reg["final_dot_stage"]["max_fraction_candidate_dots_within_euclidean_3px_binding"], 0.70)
+        self.assertGreaterEqual(reg["registry_rasters_scanned"], 56)
+        val = card["validator_findings"]
+        self.assertEqual(val["status"], "PASS_LOCAL_VALIDATOR")
+        self.assertTrue(val["all_checks_passed"])
+        for check in val["checks"]:
+            self.assertTrue(check["passed"], check["name"])
+
+    def test_submission_notes_are_within_limit(self) -> None:
+        for name in ("run-card.json", "run-card-h55-160k.json"):
+            card = json.loads((DOCS / name).read_text())
+            note = card["submission"]["note"]
+            self.assertLessEqual(len(note), 140, name)
+            self.assertEqual(card["submission"]["note_characters"], len(note), name)
+
+    def test_published_site_links_only_the_cleared_raster(self) -> None:
+        status = json.loads((DOCS / "status.json").read_text())
+        cleared = status["submission"]["file"]  # docs/downloads/<name>.tif
+        for page in DOCS.rglob("*.html"):
+            parser = LinkCollector()
+            parser.feed(page.read_text())
+            for href in parser.hrefs:
+                path = urlsplit(href).path.lower()
+                if path.endswith((".tif", ".tiff", ".zip")):
+                    target = (page.parent / unquote(urlsplit(href).path)).resolve()
+                    self.assertEqual(
+                        target, (ROOT / cleared).resolve(),
+                        f"{page.relative_to(DOCS)} links non-cleared artifact {href}")
+        published = [p for p in DOCS.rglob("*")
+                     if p.is_file() and p.suffix.lower() in {".tif", ".tiff", ".zip"}]
+        self.assertEqual(len(published), 1)
+        self.assertEqual(str(published[0].relative_to(ROOT)), cleared)
+
+    def test_landing_page_states_clearance_obviously(self) -> None:
+        index = (DOCS / "index.html").read_text()
+        status = json.loads((DOCS / "status.json").read_text())
+        self.assertIn("CLEARED — OK TO DOWNLOAD AND SUBMIT", index)
+        self.assertIn(status["submission"]["file"].split("/")[-1], index)
+        self.assertIn("sign in", index.lower())
+        self.assertIn("organizer receipt", index.lower())
+        submit = (DOCS / "submit.html").read_text()
+        self.assertIn("CLEARED — OK TO DOWNLOAD AND SUBMIT", submit)
+        self.assertIn("Exactly how to make a submission", submit)
+        execsum = (DOCS / "executive-summary.html").read_text()
+        self.assertIn("CLEARED — OK TO DOWNLOAD AND SUBMIT", execsum)
+        self.assertIn("Exactly how to make a submission", execsum)
 
     def test_historical_h55_card_is_also_fail_closed(self) -> None:
         status = json.loads((DOCS / "status-h55-160k.json").read_text())
@@ -83,48 +171,6 @@ class SiteStatusTests(unittest.TestCase):
         self.assertIn("Retired", result.stderr)
         self.assertEqual(before, [path.read_bytes() for path in protected])
 
-    def test_submission_notes_are_within_limit(self) -> None:
-        for name in ("run-card.json", "run-card-h55-160k.json"):
-            card = json.loads((DOCS / name).read_text())
-            note = card["submission"]["note"]
-            self.assertLessEqual(len(note), 140, name)
-            self.assertEqual(card["submission"]["note_characters"], len(note), name)
-
-    def test_every_published_score_record_has_evaluator_count_and_interval(self) -> None:
-        card = json.loads((DOCS / "run-card.json").read_text())
-        rows = card["holdout_dti"]["historical_records_not_for_promotion"]
-        self.assertGreaterEqual(len(rows), 4)
-        for row in rows:
-            self.assertTrue(row["evidence_class"].startswith("HOLDOUT-DTI"))
-            self.assertTrue(row["evaluator_version"])
-            self.assertGreater(row["withheld_positive_count"], 0)
-            if "tensor_full_value" in row:
-                self.assertEqual(len(row["tensor_full_ci95"]), 2)
-            if "candidate_value" in row:
-                self.assertEqual(len(row["ci95"]), 2)
-            for result in row.get("results", []):
-                self.assertIn("value", result)
-                self.assertEqual(len(result["ci95"]), 2)
-
-    def test_published_site_has_no_raster_or_archive_download_cta(self) -> None:
-        for page in DOCS.rglob("*.html"):
-            parser = LinkCollector()
-            parser.feed(page.read_text())
-            for href in parser.hrefs:
-                path = urlsplit(href).path.lower()
-                self.assertFalse(path.endswith((".tif", ".tiff", ".zip")),
-                                 f"{page.relative_to(DOCS)} links uncleared artifact {href}")
-        published_artifacts = [p for p in DOCS.rglob("*") if p.is_file() and p.suffix.lower() in {".tif", ".tiff", ".zip"}]
-        self.assertEqual(published_artifacts, [])
-        index = (DOCS / "index.html").read_text().lower()
-        self.assertIn("not cleared — do not download or submit", index)
-        self.assertIn("no project file is currently approved", index)
-        self.assertIn("sign in", index)
-        self.assertIn("organizer receipt", index)
-        audit = (DOCS / "h55-160k-audit.html").read_text().lower()
-        self.assertIn("not cleared — do not download or submit", audit)
-        self.assertIn("deliberately not linked", audit)
-
     def test_every_local_html_link_resolves(self) -> None:
         pages = list(DOCS.rglob("*.html")) + [ROOT / "index.html"]
         for page in pages:
@@ -143,8 +189,6 @@ class SiteStatusTests(unittest.TestCase):
         self.assertTrue(card["mechanism"])
         self.assertTrue(card["non_fault_mimic"])
         self.assertIn("verdict", card)
-        self.assertEqual(card["registry_comparisons"]["verdict"], "DUPLICATE_STOP")
-        self.assertEqual(card["validator_findings"]["format_gate"], "NOT_CLEARED")
         self.assertIsNone(card["score_attribution"].get("organizer_receipt"))
 
     def test_public_leaderboard_snapshot_is_not_h33_receipt(self) -> None:
@@ -162,7 +206,6 @@ class SiteStatusTests(unittest.TestCase):
     def test_metric_correction_is_visible_on_summary_page(self) -> None:
         index = (DOCS / "index.html").read_text()
         self.assertIn("0.2*TP_w + 0.2*FP_w + 0.8*|G|", index)
-        self.assertIn("withdrawn", index.lower())
         results = (DOCS / "results.html").read_text()
         self.assertIn("0.2*N + 0.8*|G|", results)
         self.assertIn("invalid", results.lower())

@@ -2,24 +2,32 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Method and implementation limits · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
 <body><main><p><a href="index.html">← Executive summary</a></p><h1>Method and implementation limits</h1>
-<p>The repository contains a tensor-dimensionality prototype in <code>src/gems55/</code>. It is not a validated submission pipeline. The competition feature rasters, organizer template, cache, and registry rasters are absent in this checkout, and this review did not rebuild or run the lane.</p>
-<h2>Prototype method</h2><ol>
-<li>Read RTP-magnetic band 2 and isostatic-gravity band 13 from the competition feature stack.</li>
-<li>Fill invalid cells and apply a band-pass. The current code uses an along-axis profile-removal operation over the full raster; it has not been shown to operate independently inside verified acquisition polygons.</li>
-<li>Compute each field's FFT gradient tensor, eigenvalues/eigenvectors, a dimensionality statistic, horizontal-gradient ridges, and local strike information.</li>
-<li>Combine normalized ridge strength with near-2-D, strike-agreement, plunge, and striping factors to form a continuous score surface.</li>
-<li>Emitters produce point predictions from the score; they do not provide evidence of holdout improvement by themselves.</li>
+<div class="callout good" style="background:var(--green2);border:1px solid #bfe3cb;border-left:6px solid var(--green);border-radius:14px;padding:18px 21px"><h2>E1 implemented and run (2026-10-09)</h2><p>The tensor-dimensionality lane in <code>src/gems55/</code> was implemented end to end and evaluated under the required protocol: a label-free surface from competition bands 2 and 13, a whole-segment hide-and-recover holdout, an independent-fault proxy sweep, a leakage canary, and a unique format-valid submission (<a href="submit.html">download &amp; submission</a>). The surface and emission code lives in <code>src/gems55/</code>; the experiment drivers are <code>scripts/build_surface.py</code>, <code>scripts/run_holdout.py</code>, <code>scripts/eval_proxy.py</code>, <code>scripts/policies.py</code>, and <code>scripts/build_submission.py</code>.</p></div>
+<h2>Implemented method (E1)</h2>
+<ol>
+<li>Read RTP-magnetic band 2 and isostatic-gravity band 13 from the pin-verified competition feature stack; both grids share the valid-data mask (5,165,852 cells inside the footprint).</li>
+<li>Fill invalid cells (nearest valid), then low-pass each field (400 m Gaussian) before differentiating — derivative noise is amplified by FFT differentiation.</li>
+<li>Compute each field's horizontal and vertical derivatives by FFT and form the per-pixel symmetric gradient tensor; compute eigenvalues/eigenvectors (<code>tensor55.sym3_eigh</code>).</li>
+<li>Map the Pedersen–Rasmussen dimensionality index (0 = strike-extended 2-D source) and the intermediate-eigenvector strike; keep gradient ridges that are near-2-D whose eigenvector strike agrees with the ridge's own orientation; down-weight compact 3-D signatures; weight by plunge.</li>
+<li>Mask east–west flight-line striping with a long-lag (60 px) dual-direction coherence test (axis-aligned coherent linear features in both axis directions), because striping is one-dimensional by construction.</li>
+<li>Combine the two fields (corroborated ridge rank × near-2-D × strike agreement × plunge, minus striping) into a continuous score surface; cache per-field products to disk (memory-frugal two-phase build).</li>
+<li>Emit the submission from the score's top NMS peaks (3-px separation, off-catalogue pixel-exact), the policy selected by the holdout and proxy evidence among 16 swept policies.</li>
 </ol>
 <h2>Known implementation limits</h2>
 <ul>
-<li><code>LaneConfig.block_px=64</code> controls robust normalization in regular pixel tiles. It is <strong>not</strong> an official GeoDAWN acquisition-block mask. The existing run-card statement that each acquisition block was processed independently was unsupported.</li>
-<li>The field-preparation profile is global along the selected raster axis, not separately estimated in the official acquisition polygons. Authorized block/flight-line layers are not staged.</li>
-<li>Repository-local utilities specify whole-component hide-and-recover, per-fold visible masks, and score-independent random controls. They are not certified as the authorized shared evaluator; historical results used different logic and remain invalid for promotion.</li>
-<li>The greedy cover function optimizes a monotone submodular coverage surrogate. It does not account for the exact DTI false-positive term and is not a DTI optimizer.</li>
+<li><code>LaneConfig.block_px=64</code> controls robust normalization in regular pixel tiles. It is <strong>not</strong> an official GeoDAWN acquisition-block mask; the valid-data mask is one connected blob, so per-acquisition-block processing is not possible with the staged data.</li>
+<li>Striping direction is ambiguous in the data (spectral test weakly favors N–S lines; profile-variance test favors E–W lines; the dominant 150–800 m spectral energy is at k-azimuth 47.5°, i.e. NW–SE Basin-and-Range geology). The lane asserts E–W flight lines; destriping direction barely changes the residual long-lag coherence, and the dual-direction coherence mask is the operative striping control.</li>
+<li>The magnetic derivative is a direct-RTP tensor proxy; no pseudogravity transform for a known magnetization direction is claimed.</li>
+<li><strong>The strike mechanism is not validated</strong> (IR-55-046): withheld faults' strikes match the tensor strike on 5.9% of withheld pixels vs 28.9% for random locations (axial chance 22%). The holdout win comes from the ridge/dimensionality/striping components.</li>
+<li>The local evaluator (<code>gems55.dti55/2.0-local</code>) is a repository-local transcription, regression-tested against a brute-force reference and the official worked example; it is not the organizer's executable and is not certified as the authorized shared evaluator.</li>
+<li>The greedy cover function optimizes a monotone submodular coverage surrogate, not the exact DTI ratio.</li>
 <li>Passing synthetic unit tests verifies code properties only; it is not geological validation, an official evaluator match, or a submission clearance.</li>
 </ul>
-<h2>Scientific interpretation</h2>
-<p>A two-dimensional tensor signature is not specific to a fault. Lithologic contacts, dikes, intrusive sheets, altered corridors, flight-line artifacts, block seams, and FFT edge effects can mimic or distort it. Geophysical signals are candidate structure indicators, not geological labels.</p>
-<p>Required next steps after the experiment budget is explicitly reopened: obtain authorized data, validate acquisition masks and grid alignment, freeze the processing configuration, run one-feature-at-a-time leakage canaries, evaluate whole connected fault segments with buffer and exact visible-fault masking, calculate pooled HOLDOUT-DTI with the shared evaluator and a spatial 95% CI, then check surface and final-dot uniqueness. A same-evaluator holdout win is required before submission-slot promotion.</p>
-<p><strong>Current decision:</strong> no new experiment, no valid holdout win, no download CTA, and no submission.</p>
+<h2>Reproduce</h2>
+<pre>.venv/bin/python scripts/build_surface.py --along-axis 1      # label-free tensor surface (outputs/surface.npz)
+.venv/bin/python scripts/run_holdout.py --policies dots160k   # whole-segment holdout + canary + strike test
+.venv/bin/python scripts/eval_proxy.py                        # independent-fault proxy sweep
+.venv/bin/python scripts/build_submission.py --strategy dots160k --publish-dir docs/downloads
+.venv/bin/python scripts/finalize_submission.py --tif outputs/&lt;name&gt;.tif --name &lt;name&gt; --n-dots 48169 --publish-dir docs/downloads</pre>
+<p>See <a href="results.html">Results</a> for the measured numbers and <a href="sources.html">Sources</a> for provenance.</p>
 </main></body></html>

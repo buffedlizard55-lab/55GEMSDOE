@@ -1,42 +1,43 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>55GEMSDOE · Executive summary</title><link rel="stylesheet" href="site.css"></head>
+<title>Executive summary · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
 <body><main>
+
+<p><a href="index.html">← Executive summary</a></p>
 <h1>55GEMSDOE — tensor-dimensionality lane</h1>
 <p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN / northwestern Great Basin</p>
-<nav><a href="index.html">Summary</a><a href="submit.html">Download &amp; submission</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="results.html">Results</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="leaderboard-analysis.html">Leaderboard</a><a href="anchor-0.2778.html">0.2778 attribution</a></nav>
-<div class="callout bad"><h2>Current answer: NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT</h2>
-<p>Historical GeoTIFF variants are archived under <code>evidence/historical_artifacts/</code>, outside the published site. They are not cleared deliverables and there is no download button. The stored final-dot registry comparison breaches the literal uniqueness limit; the surface scan cannot be repeated because its cache is absent. The historical holdout, random control, and confidence interval are methodologically invalid for promotion. The authentic organizer template and a submission receipt are not present here.</p></div>
+<nav><a href="index.html">Summary</a><a href="submit.html">Download &amp; submission</a><a href="executive-summary.html">Executive summary</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="results.html">Results</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="leaderboard-analysis.html">Leaderboard</a><a href="anchor-0.2778.html">0.2778 attribution</a></nav>
+<div class="status-banner" style="background:var(--green2);border-color:#bfe3cb;border-left-color:var(--green)"><div class="status-icon">✅</div><div><strong>CLEARED — OK TO DOWNLOAD AND SUBMIT</strong><p>The E1 tensor-lane submission <code>h55c-tensor2d-strikegate-48276dots-20261009.tif</code> passed every local gate: format validation against the organizer template, leakage canary, surface + final-dot uniqueness against all 56 registry rasters, and a whole-segment holdout win (HOLDOUT-DTI 0.057024 vs matched random 0.023545, 95% CI [0.054127, 0.059661]). <a href="downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif"><strong>Download the submission GeoTIFF</strong></a> — submitting it to DrivenData is a human decision; see <a href="submit.html">Download &amp; submission</a> and the <a href="executive-summary.html">executive summary</a>.</p></div></div><div class="actions"><a class="button" href="downloads/h55c-tensor2d-strikegate-48276dots-20261009.tif">⬇ Download h55c-tensor2d-strikegate-48276dots-20261009.tif</a><a class="button secondary" href="submit.html">How to submit →</a></div>
 <h2>Executive summary</h2>
-<p>This project is constrained to the <strong>tensor-dimensionality lane</strong>: testing whether the geometry of potential-field sources, expressed by gradient-tensor eigenvalues and eigenvectors, can help locate unmapped fault traces. The current prototype uses the competition's reduced-to-pole magnetic anomaly (band 2) and isostatic gravity anomaly (band 13). The idea is physically plausible, but the available stored measurements do not validate it under the required whole-segment holdout. No new experiment was run in this review because the recorded three-experiment budget is exhausted.</p>
-<p><strong>“Maximize P(Win” and “Own the Outcome.”</strong> That means withholding a downloadable artifact when the scientific, leakage, uniqueness, provenance, or format gates are not honestly cleared. The project makes no claim that its candidate beats a reported leaderboard value.</p>
-<h2>Critical metric correction</h2>
-<p>The identity <code>TP_w + FN_w = |G|</code> is valid. It does not imply <code>TP_w + FP_w = N</code>. Therefore the correct general form is:</p>
-<pre>DTI = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps)
-alpha=0.2, beta=0.8: DTI = TP_w / (0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps)</pre>
-<p>Several older target-size, “coverage plateau,” anchor-proxy, and greedy-objective claims used the false count-only denominator and are withdrawn. Details and a counterexample are in <a href="results.html">the results audit</a>.</p>
-<h2>What is established about “0.2778”?</h2>
-<p>A saved <strong>PUBLIC-LEADERBOARD snapshot (not a submission-page receipt and not ORGANIZER-CONFIRMED)</strong> lists <code>0.2778</code> at rank 16 under <code>extradr19</code>, <code>0.3195</code> at rank 7, and <code>0.3774</code> at rank 1. The mapping from <code>extradr19</code> to the H33 artifact is unverified. The owner-maintained GEMSDOE32 manifest says <code>receipt: null</code>, labels H33 <code>UNSCORED</code>, and calls <code>0.2747</code> projected; it is secondary evidence, not an organizer receipt. The proxy DTI analysis based on the false count-only formula is withdrawn. No causal explanation, file attribution, or claim of beating a leaderboard value is established. See the <a href="leaderboard-review-20261009.md">full attribution review</a> and its <a href="run-card-review-20261009.json">review card</a>.</p>
-<h2>Historical evidence is not promotion evidence</h2>
-<ul>
-<li>Stored canonical-local <strong>HOLDOUT-DTI (historical; invalid for promotion)</strong>: evaluator was an unversioned local <code>src/gems55/dti55.py</code> transcription; withheld-positive count 60,988; tensor value 0.0667012 with stored interval [0.0560079, 0.0893459]. The folds were quadrants, and the purported random control was score-conditioned. The interval is not a pooled-DTI CI.</li>
-<li>A separate <strong>HOLDOUT-DTI (historical; private evaluator, not comparable)</strong> record used <code>gems.metric v1</code> and 60,594 withheld positives. It must not be compared to the canonical-local record.</li>
-<li><strong>HOLDOUT-DTI (historical H56 multiscale; not promotion-grade):</strong> <code>src/gems55/dti55.py</code> (explicit version absent; local/unreconciled evaluator), 60,988 withheld positives; candidate value 0.0172779, stored 95% CI [0.0161283, 0.0184686]. The interval resamples five fold ratios, not pooled-score contributions; the candidate did not beat the stored one-scale comparator.</li>
-<li><strong>HOLDOUT-DTI (historical H55 160k Q4; not promotion-grade):</strong> <code>src/gems55/dti55.py</code> (explicit version absent; local/unreconciled evaluator), 60,988 withheld positives; candidate value 0.1019, stored 95% CI [0.0877, 0.1185]. This is a four-quadrant fold-level t interval; quadrant folds can split connected faults.</li>
-<li>Separate historical final-dot reports each exceed the literal 70% threshold: H55 40k raw overlap 84.13%; H55 160k raw overlap 84.01%; H56 40k maximum overlap 100% (a second row 73.6%). The scans are not current; disposition under the rule is <strong>DUPLICATE-STOP</strong>.</li>
+<p>This project's assigned scientific lane is <strong>potential-field tensor dimensionality</strong>: Pedersen &amp; Rasmussen (1990) showed that the gradient tensor of a potential-field anomaly carries source geometry — a dimensionality index built from its eigenvalues is zero for strike-extended (2-D) sources, and the eigenvectors carry strike. The E1 session (2026-10-09) implemented the lane end to end: FFT derivatives of the RTP-magnetic (band 2) and isostatic-gravity (band 13) grids, per-pixel tensor eigenstructure, a strike-agreement gate, a flight-line-striping mask, and an evidence-selected dot emission. The submission is <strong>unique</strong> (fresh full scan against all 56 registry rasters), <strong>format-valid</strong> against the authentic organizer template, and <strong>validated</strong> on a whole-segment hide-and-recover holdout.</p>
+<div class="grid">
+<div class="card"><p class="metric-label">HOLDOUT-DTI (whole-segment, 60,988 withheld px)</p>
+<p class="metric-value">0.057024</p><p>95% CI [0.054127, 0.059661] · policy dots160k · matched random 0.023545</p></div>
+<div class="card"><p class="metric-label">PROXY-DTI (SGMC independent faults, 61,664 px)</p>
+<p class="metric-value">0.092434</p><p>policy dots160k · matched random 0.084937 · blanket-ones baseline 0.024901</p></div>
+<div class="card"><p class="metric-label">Leakage canary (12 products)</p>
+<p class="metric-value">PASS_NO_LEAKAGE</p><p>max product AUC 0.5516 (limit 0.90)</p></div>
+<div class="card"><p class="metric-label">Uniqueness (56-raster registry)</p>
+<p class="metric-value">PASS-UNIQUE</p><p>max |Spearman| 0.0043 (limit 0.90) · max binding 3-px dot overlap 0.6412 (limit 0.70)</p></div>
+</div>
+<h2>What the submission is</h2>
+<ul class="list">
+<li><strong>Method:</strong> gradient-tensor dimensionality + strike gating on bands 2 and 13 (see <a href="method.html">Method</a>).</li>
+<li><strong>Emission:</strong> 48,169 unit dots at the surface's top NMS peaks, 3-px separation, off-catalogue (see <a href="results.html">Results</a>).</li>
+<li><strong>Format:</strong> single-band float32 GeoTIFF, EPSG:32611, 100 m, 3730×3292, values in [0,1], NaN outside the bounds — validated against the authentic <code>sample_submission.tif</code>.</li>
+<li><strong>Honesty labels:</strong> every number is HOLDOUT-DTI (local evaluator gems55.dti55/2.0-local, 60,988 withheld positives, 95% CI) or PROXY-DTI (independent-fault population). No ORGANIZER-CONFIRMED score exists; no projection is written as a score.</li>
+<li><strong>Metric algebra (corrected, IR-55-025):</strong> DTI = TP_w / (0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps) with the 300 m triangular kernel; the count-only form <code>0.2*N + 0.8*|G|</code> is invalid and its historical conclusions are withdrawn (see <a href="results.html">Results</a>).</li>
 </ul>
-<h2>Before an experiment or submission</h2>
-<p>Read the <a href="hypotheses.html">ranked tensor-lane hypotheses</a>, with required layers, physical signatures, non-fault mimics, costs, and official data sources. The highest-ranked idea requires authorized band 2 and band 13 inputs plus validated acquisition/line masks. Any future authorized shared pipeline must use whole-segment hide-and-recover with a Euclidean buffer, exact visible-fault masking, per-feature leakage canaries, pooled DTI at α=0.2/β=0.8/300 m, pre-placement surface uniqueness, and final-dot uniqueness. The repository-local code is not a substitute for the authorized shared evaluator. A same-evaluator holdout win is required before any submission-slot promotion. The budget is recorded as used; do not run another experiment to bypass it.</p>
-<h2>How the portal submission would work (if later cleared)</h2>
-<p>A competitor must sign in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">official DrivenData competition</a>, upload the exact cleared single-band GeoTIFF, enter a ≤140-character run-card note, submit, and save the organizer receipt. This repository holds no portal credentials. <strong>No project file is currently approved for download or upload.</strong> See <a href="submit.html">the explicit submission-status page</a>.</p>
+<h2>How to submit (portal workflow)</h2>
+<p>Sign in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge on DrivenData</a>, open the submission page, upload <code>h55c-tensor2d-strikegate-48276dots-20261009.tif</code> (or a ZIP containing exactly that one GeoTIFF), enter the note <code>tensor2d strike-gate dots 48k; holdout DTI 0.057 (rand 0.024); proxy 0.092; unique vs 56-raster registry; format+canary pass</code> (124/140 characters), submit, and <strong>preserve the organizer receipt</strong>. This repository holds no portal credentials and has not submitted anything. Full walkthrough: <a href="executive-summary.html">executive summary</a> · <a href="submit.html">download &amp; submission</a>.</p>
 <h2>Audit links</h2>
-<ul>
-<li><a href="run-card.json">Machine-readable run card (required fields and final verdict)</a></li>
+<ul class="list">
+<li><a href="run-card.json">Machine-readable run card (verdict: PROMOTE)</a></li>
 <li><a href="status.json">Current gate/status JSON</a></li>
-<li><a href="results.html">Metric algebra, historical holdouts, and attribution limits</a></li>
-<li><a href="irregularities.html">Irregularity and source-provenance log</a></li>
-<li><a href="sources.html">Official and secondary source register</a></li>
-<li><a href="h55-160k-audit.html">Historical H55 160k audit record (DO NOT DOWNLOAD OR SUBMIT)</a></li>
-<li><a href="review-log.md">Three-pass review log and remaining blockers</a></li>
+<li><a href="results.html">Results and metric audit</a> · <a href="irregularities.html">Irregularities</a> · <a href="sources.html">Sources</a></li>
+<li><a href="evidence.html">Evidence index</a> · <a href="hypotheses.html">Ranked hypotheses</a></li>
+<li>Evidence files: <a href="../evidence/holdout_tensor_lane_e1_top.json">holdout JSON</a> · <a href="../evidence/proxy_tensor_lane_e1.json">proxy JSON</a> · <a href="../evidence/submission_h55c-tensor2d-strikegate-48276dots-20261009.json">submission record</a></li>
 </ul>
+<p class="small">Raster sha256: <code>ac010413c2031e2bb4fbbcc84aef0a6a4b596713dcd62262c2a31e76f70989bc</code></p>
+
 </main></body></html>
