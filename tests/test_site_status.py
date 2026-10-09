@@ -1,4 +1,4 @@
-"""Regression checks for honest download/submit status and local site links."""
+"""Fail-closed regression checks for the reviewed project status and site."""
 from __future__ import annotations
 
 import hashlib
@@ -20,93 +20,100 @@ class LinkCollector(HTMLParser):
         self.hrefs: list[str] = []
 
     def handle_starttag(self, tag: str, attrs) -> None:
-        if tag == "a":
-            self.hrefs.extend(value for key, value in attrs if key == "href" and value)
+        if tag.lower() == "a":
+            self.hrefs.extend(value for key, value in attrs if key.lower() == "href" and value)
 
 
 class SiteStatusTests(unittest.TestCase):
-    """Guardrails for honest download/submit status.
-
-    Revised 2026-10-09.  The previous version asserted that no TIF may exist, which
-    was correct for a session that produced no raster but contradicts the owner's
-    standing requirement for an obvious, downloadable, validated submission.  The
-    intent is kept and strengthened: any published TIF must exist on disk, must
-    match the SHA-256 in the run card, must have passed the validator, and the site
-    must state plainly whether it is OK to download and submit.
-    """
-
-    def test_status_and_run_card_agree_with_the_published_raster(self) -> None:
+    def test_current_status_and_run_card_are_fail_closed(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
         card = json.loads((DOCS / "run-card.json").read_text())
 
-        self.assertEqual(status["overall_status"], "format_valid_uniqueness_blocked_negative")
-        current = status["current_checkout_revalidation"]
-        self.assertEqual(current["status"], "STATIC_TIF_CHECKS_PASS_FULL_GATES_BLOCKED")
-        self.assertEqual(current["static_tif_check"], "PASS")
-        self.assertIn("full_template_match", current)
-        self.assertEqual(current["holdout_rerun"], "BLOCKED_MISSING_FEATURE_CACHE_AND_LABELS")
-        self.assertEqual(current["registry_uniqueness_rerun"], "BLOCKED_MISSING_REGISTRY_RASTERS")
-        self.assertEqual(card["verdict"], "negative")
-        self.assertFalse(card["submission"]["weekly_slot_used"])
-        self.assertFalse(card["submission"]["submit_allowed"])
-        # An audit download is allowed, but format validity is not submit clearance.
-        self.assertTrue(status["download_allowed"])
-        self.assertFalse(status["submit_recommended"])
+        self.assertFalse(status["download_allowed"])
         self.assertFalse(status["submit_allowed"])
-        self.assertIsNone(status["organizer_confirmed_score"])
+        self.assertFalse(status["submit_recommended"])
+        self.assertEqual(card["submission"]["status"], "DO_NOT_DOWNLOAD_OR_SUBMIT")
+        self.assertFalse(card["submission"]["file_link_published"])
+        self.assertIsNone(card["submission"]["organizer_receipt"])
+        self.assertIsNone(card["holdout_dti"]["value"])
+        self.assertIsNone(card["holdout_dti"]["ci95"])
+        self.assertEqual(card["budget"]["experiments_used_recorded"], 3)
+        self.assertEqual(card["budget"]["new_experiments_run_in_review"], 0)
+        self.assertFalse(card["budget"]["weekly_slot_used"])
 
-        rel = status["submission_tif"]
-        tif = (ROOT / rel)
-        self.assertTrue(tif.exists(), f"status.json advertises a missing file: {rel}")
-        digest = hashlib.sha256(tif.read_bytes()).hexdigest()
-        self.assertEqual(card["raster_sha256"], digest)
-        self.assertEqual(status["sha256"], digest)
-        self.assertEqual(card["submission"]["file"], rel)
-
-        vout = card["validator_output"]
-        self.assertEqual(vout["status"], "PASS")
-        self.assertEqual(vout["checks_failed"], 0)
-        self.assertGreaterEqual(vout["checks_passed"], 12)
-
-    def test_submission_note_is_within_project_limit(self) -> None:
-        card = json.loads((DOCS / "run-card.json").read_text())
-        note = card["submission"]["note"]
-        self.assertLessEqual(len(note), 140)
-        self.assertEqual(card["submission"]["note_characters"], len(note))
-
-    def test_every_published_tif_is_validated_and_disclosed(self) -> None:
-        """No TIF may be served unless its hash is on record and the site says what it is."""
-        card = json.loads((DOCS / "run-card.json").read_text())
+    def test_current_historical_raster_hash_is_archival_only(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
-        recorded = {card["raster_sha256"]}
-        downloads = DOCS / "downloads"
-        primaries = [p for p in downloads.glob("*-zeros.tif")] if downloads.exists() else []
-        self.assertTrue(primaries, "no primary submission TIF is published")
-        for p in primaries:
-            self.assertIn(hashlib.sha256(p.read_bytes()).hexdigest(), recorded,
-                          f"{p.name} is served but its SHA-256 is not in the run card")
-        # every download link on the index must point at a file that exists
-        index = (DOCS / "index.html").read_text()
-        parser = LinkCollector()
-        parser.feed(index)
-        for href in parser.hrefs:
-            if href.lower().endswith((".tif", ".zip")):
-                self.assertTrue((DOCS / href).exists(), f"index links a missing download: {href}")
+        card = json.loads((DOCS / "run-card.json").read_text())
+        raster = ROOT / status["historical_raster"]["file"]
+        self.assertTrue(raster.is_file())
+        digest = hashlib.sha256(raster.read_bytes()).hexdigest()
+        self.assertEqual(digest, status["historical_raster"]["sha256"])
+        self.assertEqual(digest, card["raster_sha256"]["value"])
+        self.assertEqual(status["historical_raster"]["role"], "UNCLEARED_HISTORICAL_ARTIFACT")
+        self.assertFalse(status["historical_raster"]["download_link_published"])
+        for item in status["historical_artifacts"]:
+            self.assertFalse(item["download_link_published"])
+            self.assertTrue((ROOT / item["primary_file"]).is_file())
 
-    def test_site_states_plainly_whether_it_is_ok_to_submit(self) -> None:
-        """The owner's requirement: it must be OBVIOUS whether the file may be submitted."""
-        index = (DOCS / "index.html").read_text()
-        low = index.lower()
-        self.assertIn("not cleared to submit", low)
-        self.assertIn("do not spend a drivendata slot", low)
-        self.assertIn("download audit .tif", low)
-        self.assertIn("negative", low)
-        # the format verdict and the strict uniqueness/science verdict must both appear
-        self.assertIn("12/12 pass", low)
-        self.assertIn("duplicate-stop", low)
+    def test_historical_h55_card_is_also_fail_closed(self) -> None:
+        status = json.loads((DOCS / "status-h55-160k.json").read_text())
+        card = json.loads((DOCS / "run-card-h55-160k.json").read_text())
+        self.assertFalse(status["download_allowed"])
+        self.assertFalse(status["submit_allowed"])
+        self.assertFalse(status["download_link_published"])
+        self.assertEqual(card["submission"]["status"], "DO_NOT_DOWNLOAD_OR_SUBMIT")
+        self.assertFalse(card["submission"]["file_link_published"])
+        holdout = card["holdout_dti"]
+        self.assertTrue(holdout["evidence_class"].startswith("HOLDOUT-DTI"))
+        self.assertTrue(holdout["evaluator_version"])
+        self.assertEqual(holdout["withheld_positive_count"], 60988)
+        self.assertEqual(len(holdout["candidate"]["ci95"]), 2)
+        self.assertEqual(status["sha256"], card["raster_sha256"]["value"])
+
+    def test_submission_notes_are_within_limit(self) -> None:
+        for name in ("run-card.json", "run-card-h55-160k.json"):
+            card = json.loads((DOCS / name).read_text())
+            note = card["submission"]["note"]
+            self.assertLessEqual(len(note), 140, name)
+            self.assertEqual(card["submission"]["note_characters"], len(note), name)
+
+    def test_every_published_score_record_has_evaluator_count_and_interval(self) -> None:
+        card = json.loads((DOCS / "run-card.json").read_text())
+        rows = card["holdout_dti"]["historical_records_not_for_promotion"]
+        self.assertGreaterEqual(len(rows), 4)
+        for row in rows:
+            self.assertTrue(row["evidence_class"].startswith("HOLDOUT-DTI"))
+            self.assertTrue(row["evaluator_version"])
+            self.assertGreater(row["withheld_positive_count"], 0)
+            if "tensor_full_value" in row:
+                self.assertEqual(len(row["tensor_full_ci95"]), 2)
+            if "candidate_value" in row:
+                self.assertEqual(len(row["ci95"]), 2)
+            for result in row.get("results", []):
+                self.assertIn("value", result)
+                self.assertEqual(len(result["ci95"]), 2)
+
+    def test_published_site_has_no_raster_or_archive_download_cta(self) -> None:
+        for page in DOCS.rglob("*.html"):
+            parser = LinkCollector()
+            parser.feed(page.read_text())
+            for href in parser.hrefs:
+                path = urlsplit(href).path.lower()
+                self.assertFalse(path.endswith((".tif", ".tiff", ".zip")),
+                                 f"{page.relative_to(DOCS)} links uncleared artifact {href}")
+        published_artifacts = [p for p in DOCS.rglob("*") if p.is_file() and p.suffix.lower() in {".tif", ".tiff", ".zip"}]
+        self.assertEqual(published_artifacts, [])
+        index = (DOCS / "index.html").read_text().lower()
+        self.assertIn("not cleared — do not download or submit", index)
+        self.assertIn("no project file is currently approved", index)
+        self.assertIn("sign in", index)
+        self.assertIn("organizer receipt", index)
+        audit = (DOCS / "h55-160k-audit.html").read_text().lower()
+        self.assertIn("not cleared — do not download or submit", audit)
+        self.assertIn("deliberately not linked", audit)
 
     def test_every_local_html_link_resolves(self) -> None:
-        pages = list(DOCS.glob("*.html")) + [ROOT / "index.html"]
+        pages = list(DOCS.rglob("*.html")) + [ROOT / "index.html"]
         for page in pages:
             parser = LinkCollector()
             parser.feed(page.read_text())
@@ -117,68 +124,36 @@ class SiteStatusTests(unittest.TestCase):
                 target = (page.parent / unquote(url.path)).resolve()
                 self.assertTrue(target.exists(), f"{page.relative_to(ROOT)} -> {href}")
 
-    def test_run_card_labels_holdout_evaluation(self) -> None:
-        # H56 is committed prior-run evidence, not rerun in this checkout. Every
-        # reported DTI arm shares the exact evaluator/positive-count metadata and CI.
+    def test_run_card_has_complete_scientific_claim_fields(self) -> None:
         card = json.loads((DOCS / "run-card.json").read_text())
-        holdout = card["holdout_dti"]
-        self.assertEqual(holdout["evidence_class"], "HOLDOUT-DTI")
-        self.assertEqual(holdout["status"], "RUN")
-        self.assertTrue(holdout["evaluator_version"])
-        self.assertIsInstance(holdout["withheld_positive_count"], int)
-        arms = [holdout, holdout["matched_random_control"], holdout["current_best_comparator"]]
-        arms.extend(holdout["other_arms"].values())
-        for arm in arms:
-            self.assertIn("value", arm)
-            self.assertEqual(len(arm["ci95"]), 2)
-            self.assertLessEqual(arm["ci95"][0], arm["value"])
-            self.assertLessEqual(arm["value"], arm["ci95"][1])
-        self.assertEqual(card["current_checkout_revalidation"]["status"],
-                         "STATIC_TIF_CHECKS_PASS_FULL_GATES_BLOCKED")
-        self.assertFalse(card["submission"]["submit_allowed"])
-        self.assertFalse(card["organizer_confirmed_scores"])
-        snapshot = card["public_leaderboard_snapshot"]
-        self.assertEqual(snapshot["evidence_class"], "PUBLIC-LEADERBOARD-SNAPSHOT_NOT_SUBMISSION_PAGE_RECEIPT")
-        self.assertFalse(snapshot["h33_artifact_mapping_verified"])
+        self.assertTrue(card["hypothesis"]["name"])
+        self.assertTrue(card["mechanism"])
+        self.assertTrue(card["non_fault_mimic"])
+        self.assertIn("verdict", card)
+        self.assertEqual(card["registry_comparisons"]["verdict"], "DUPLICATE_STOP")
+        self.assertEqual(card["validator_findings"]["format_gate"], "NOT_CLEARED")
+        self.assertIsNone(card["score_attribution"].get("organizer_receipt"))
 
-    def test_h55_archived_dti_scores_and_sweep_ci_metadata(self) -> None:
-        card = json.loads((DOCS / "run-card-h55-160k.json").read_text())
-        h = card["holdout_dti"]
-        self.assertEqual(h["evidence_class"], "HOLDOUT-DTI")
-        self.assertTrue(h["evaluator_version"])
-        self.assertEqual(h["withheld_positive_count"], 60988)
-        arms = [h, h["uniform_random_control"], h["B15_secondary"]["tensor_full"],
-                h["B15_secondary"]["random"]]
-        for arm in arms:
-            self.assertIn("value", arm)
-            self.assertEqual(len(arm["ci95"]), 2)
+    def test_public_leaderboard_snapshot_is_not_h33_receipt(self) -> None:
+        card = json.loads((DOCS / "run-card.json").read_text())
+        status = json.loads((DOCS / "status.json").read_text())
+        snapshot = json.loads((ROOT / "evidence/leaderboard_snapshot_20261009.json").read_text())
+        self.assertTrue(card["score_attribution"]["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        self.assertTrue(status["leaderboard_attribution"]["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        self.assertEqual(status["leaderboard_attribution"]["h33_account_mapping"], "UNVERIFIED")
+        self.assertTrue(snapshot["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        rank16 = next(row for row in snapshot["rows"] if row["rank"] == 16)
+        self.assertEqual(rank16["participant"], "extradr19")
+        self.assertEqual(rank16["best_public_dw_tversky"], 0.2778)
 
-        for name in ("exp9_distance_band_v1_n40000.json", "exp10_mass_sweep_v1.json"):
-            evidence = json.loads((ROOT / "evidence" / name).read_text())
-            meta = evidence["review_metadata"]
-            self.assertEqual(meta["evidence_class"], "HOLDOUT-DTI")
-            self.assertTrue(meta["evaluator_version"])
-            self.assertEqual(meta["withheld_positive_count"], 60988)
-            def check_fold_scores(x):
-                if isinstance(x, dict):
-                    if "per_fold_dti" in x:
-                        self.assertEqual(len(x["ci95"]), 2)
-                        self.assertIn("ci95_method", x)
-                    for value in x.values():
-                        check_fold_scores(value)
-                elif isinstance(x, list):
-                    for value in x:
-                        check_fold_scores(value)
-            check_fold_scores(evidence)
-
-    def test_retired_h55_card_generator_fails_closed(self) -> None:
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "scripts/make_final_card.py")],
-            capture_output=True, text=True, check=False,
-        )
-        self.assertEqual(result.returncode, 2)
-        self.assertIn("is retired", result.stderr)
-        self.assertIn("must not overwrite", result.stderr)
+    def test_metric_correction_is_visible_on_summary_page(self) -> None:
+        index = (DOCS / "index.html").read_text()
+        self.assertIn("0.2*TP_w + 0.2*FP_w + 0.8*|G|", index)
+        self.assertIn("withdrawn", index.lower())
+        results = (DOCS / "results.html").read_text()
+        self.assertIn("0.2*N + 0.8*|G|", results)
+        self.assertIn("invalid", results.lower())
+        self.assertIn("pooled-score contribution uncertainty", results.lower())
 
 
 if __name__ == "__main__":

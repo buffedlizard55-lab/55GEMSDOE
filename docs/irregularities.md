@@ -1,86 +1,44 @@
-# Irregularities and review flags
+# Irregularities, corrections, and open blockers
 
-These are explicit blockers or caveats, not hidden assumptions.
+**Current review status: 2026-10-09 UTC.** No competition raster data were downloaded, no geological experiment was rerun, and no submission slot was used. The experiment budget is recorded as exhausted. Historical evidence is retained where useful, but methodologically invalid results are not promotion evidence.
 
-1. **Public leaderboard observed; no submission receipt/artifact mapping.** On
-   2026-10-09 the official public leaderboard rendered a ranked table. The dated
-   snapshot in `evidence/leaderboard_snapshot_20261009.json` shows 0.3774 at rank 1,
-   0.3195 at rank 7, and 0.2778 at rank 16. The public rows do not identify raster
-   names or hashes. The H33 sibling page labels its candidate `UNSCORED` and its
-   0.2747 figure as a projection; mapping H33 to the 0.2778 row is unverified.
-   Per the run protocol, no leaderboard row is treated as an
-   `ORGANIZER-CONFIRMED` submission-page receipt, and the current run-card receipt
-   list remains empty. The earlier “Loading…” note is stale.
-2. **Strict uniqueness is saturated.** The new surface has max absolute Spearman
-   0.0223 against 56 registry rasters, but final-dot overlap within 3 px is 1.000
-   for the spacing-5 lattice and 0.736 for another prior raster. The literal
-   `>70%` stop rule therefore returns `DUPLICATE-STOP`; chance-adjusted overlap is
-   diagnostic only.
-3. **Holdout correction.** The historical quadrant evaluator was not the required
-   whole-segment hide-and-recover design. H56 uses five seeded whole-segment or
-   lattice folds, a 3 px buffer, per-fold visible-fault masking, and pooled DTI
-   components.
-4. **Data provenance.** Local payload hashes match a sibling GitHub bridge
-   manifest. The DrivenData data tab is login-gated in this environment;
-   organizer-authenticated bytes are not claimed. Do not redistribute payloads.
-5. **Acquisition blocks.** USGS documents four blocks and flight paths, but exact
-   official block polygons are not aligned in the local competition grid. True
-   block-separated FFT processing is a next-session task, not a current result.
-6. **Pseudogravity wording.** The direct RTP tensor is a constrained proxy. A
-   complete magnetic-to-pseudogravity transform requires an explicit
-   magnetization-direction convention; the pseudogravity candidate remains
-   unimplemented.
-7. **Portal range behavior.** The all-finite `-zeros.tif` removes NaN from the
-   local range check and passes the repository validator. The official format page
-   still says outside data should be null or NaN. No organizer receipt confirms
-   that this encoding is accepted, and the strict uniqueness stop is independent
-   of the range result.
-8. **Experiment cap reached.** Baseline, H56 multiscale, and gravity-only arms
-   were run. No further tuning should be done in this session.
+## Blocking findings
 
-## Final-pass irregularities (tensor-lane session, 2026-10-09; IDs IR-55-025 to IR-55-033)
+| ID | Severity | Finding | Evidence / disposition |
+|---|---|---|---|
+| IR-55-025 | **Critical — corrected** | The project incorrectly simplified `DTI` to `TP_w/(0.2*N + 0.8*|G|)`. `TP_w+FN_w=|G|` is valid, but `TP_w+FP_w=N` is not a general identity. | Correct denominator: `(1-beta)*TP_w + alpha*FP_w + beta*|G| + eps`; for α=.2/β=.8: `.2*TP_w + .2*FP_w + .8*|G| + eps`. Added the one-truth/two-prediction counterexample regression test. All count-only target-size, anchor, and coverage-plateau conclusions are withdrawn. |
+| IR-55-026 | **High — corrected** | `breakeven_credit` used the wrong threshold; its old test encoded the error. | Under its explicitly isolated single-match assumptions with α+β=1, the conditional threshold is `w > alpha*DTI_now`. The helper is documented as a heuristic, not a generic per-dot rule; test expects 0.06 at DTI 0.3 with α=.2. |
+| IR-55-027 | **High — corrected** | `greedy_cover` documentation claimed it optimized DTI and invoked a DTI-level `1−1/e` guarantee. | It maximizes a coverage surrogate and ignores the separate false-positive term. Its guarantee applies only to that surrogate; this is now explicit in code. |
+| IR-55-028 | **High — local utility only; shared-tool reconciliation open** | `make_folds` withheld quadrants, so connected faults crossing boundaries could be partly visible. A prior “segment holdout” split traces on a 20-pixel lattice. | The remaining repository-local `make_segment_folds` assigns whole 8-connected components spatially and buffers by Euclidean distance. It is not certified as the authorized shared evaluator; historical runs remain invalid and no promotion use is allowed before reconciliation. |
+| IR-55-029 | **High — local utility only; shared-tool reconciliation open** | The random arm applied `score > 0` before its random branch. | The repository-local random utility samples uniformly from eligible pixels independent of the score. It is not certified as the authorized shared evaluator. Existing control results remain invalid; no experiment was rerun. |
+| IR-55-030 | **High — gate failure** | The historical final-dot registry report records 84.13% within-3-pixel overlap for one reference, above the literal 70% threshold. The old `PASS-UNIQUE-CONTROL-ADJUSTED` used an unapproved chance/density adjustment. | Verdict changed to `DUPLICATE-STOP`. No exception is permitted. The registry raster directory and candidate surface cache are absent, so a fresh surface/final scan cannot be performed. |
+| IR-55-031 | **High — unresolved** | Historical whole-project format claims were based on a custom local validator and a `zeros`-outside raster; the authentic organizer sample/footprint is absent from this checkout. The validator also mislabeled a shape check as a resolution check. | Local metadata inspection is partial, not an organizer format pass. The validator now checks actual resolution and enforces null/NaN outside the template footprint. The corrected validator was not run because the template is absent. |
+| IR-55-032 | **High — corrected / provenance boundary** | `scripts/prepare_data.py` expected `training_features.tif`, whereas `io55.py` and the sibling downloader use `gems-geodawn-numerical-features.tif`; preparation also imported a legacy private writer implementation. | Preparation now uses canonical `io55.py` paths, SHA-256, and grid checks; the historical dictionary no longer refers to `training_features.tif`. Pins are explicitly labeled sibling-mirror references, not official provenance. The old docs generator is retired, the mirror downloader is opt-in only, and no data were downloaded. |
+| IR-55-033 | **High — corrected** | Site pages linked a TIFF and said it was safe to download, while other pages said no file was available; this also conflicted with the fail-closed project instruction. | All download CTAs have been removed. The site now clearly says **NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT**. The historical artifact remains unlinked for traceability. |
+| IR-55-034 | **High — unresolved** | The H33 `0.2778` attribution has no organizer receipt in this checkout. | A saved PUBLIC-LEADERBOARD snapshot (not a receipt) lists `0.2778` at rank 16 under `extradr19`; the mapping to H33 is unverified. A read-only owner-maintained GEMSDOE32 manifest reports `receipt: null`, labels H33 `UNSCORED`, and calls `0.2747` projected. No causal explanation or leaderboard beat is established; anchor-proxy DTI conclusions using the false closed form are withdrawn. |
+| IR-55-035 | **High — unresolved** | Stored holdout evidence does not satisfy the required promotion protocol. | Canonical-local record: HOLDOUT-DTI, unversioned pre-audit `src/gems55/dti55.py`, 60,988 withheld positives, tensor 0.0667012 with stored interval [0.0560079, 0.0893459]; quadrant components may split, random arm was score-conditioned, and interval was over folds. Private `gems.metric v1` results use 60,594 positives and a different evaluator. Neither clears promotion. |
+| IR-55-036 | **Medium — corrected in code/documentation** | The merged lane module described 64-pixel normalization tiles as acquisition blocks and called the direct-RTP tensor an exact pseudogravity construction. | `block_px=64` is a fixed pixel tile, not an official acquisition polygon; no verified block masks are staged. The magnetic derivative is documented as a direct-RTP tensor proxy only; no pseudogravity transform for a known magnetization direction is claimed. |
+| IR-55-037 | **High — budget** | The run record says all three experiment slots were used. | No geological experiment was run in this review. Any future experiment requires an explicitly reopened budget; do not rerun to work around data, code, or gate failures. |
+| IR-55-038 | **High — corrected in repository** | The tracked `gems/` tree duplicated evaluator, writer, tensor, and holdout behavior and was imported by a legacy runner/tests, conflicting with the no-private-fork rule. | Removed the duplicate package, retired `scripts/run_tensor_lane.py` and other data-dependent experiment/writer/status generators, and rewrote affected tests to target the sole repository-local `src/gems55/` implementation. The local implementation is not certified as the authorized shared/organizer evaluator; no promotion use is allowed before reconciliation. The old separate-fork score records remain historical and non-comparable. |
+| IR-55-039 | **Medium — registry evidence differs** | Current artifact status refers to historical 56-raster scans, while older E1/E3 JSON files report 632 registry rasters for different candidate files. | These are different candidates and legacy registry snapshots/workflows; the 632-raster JSON records are now marked `SUPERSEDED_HISTORICAL_NOT_PROMOTION_EVIDENCE`. Do not combine their counts or treat either as a fresh current scan. No complete local registry raster corpus is available. |
+| IR-55-040 | **High — H56 result not promotion-grade** | A prior main-branch record reports H56 multiscale HOLDOUT-DTI from a local evaluator with five fold-resampled intervals. | Preserve as **HOLDOUT-DTI (historical; not promotion-grade)** with evaluator source, 60,988 withheld positives, and stored intervals in `docs/results.md`. The evaluator is not reconciled with the authorized shared template, and the 95% CI resamples fold DTI values rather than pooled-score contributions. The candidate also did not beat its stored one-scale comparator. No rerun was made. |
+| IR-55-041 | **High — H55 final-pass protocol invalid for promotion** | The archived H55 160k result uses Q4 quadrant folds as primary; its reported interval is over four fold ratios, and the control interval is absent from the final card. | Label the candidate value only as historical HOLDOUT-DTI with local evaluator, 60,988 withheld positives, and its stored fold-level interval. Do not repeat the raw control as a score, compare it with segment-fold records, or promote it. The recorded 3-experiment budget is exhausted. |
+| IR-55-042 | **High — historical download status corrected** | Merged main-branch records had audit TIFF/ZIP download links and `download_allowed: true` despite a negative holdout/duplicate stop and the user's fail-closed requirement. | Moved all H55/H56 raster variants out of `docs/downloads/` into `evidence/historical_artifacts/`; disabled the H55 audit-page/card generators and the already-used `exp8`–`exp10` entry points; current and historical status JSONs set download and submit to false; no TIFF/ZIP link is published. The files remain historical evidence only. |
 
-Earlier fixes in this session, recorded before the merge (pre-merge register IR-55-001…024 is in commit 28919e5): per-fold leakage canary (IR-55-017), segment-fold leak with withheld = full footprint (IR-55-018), and the registry rebuild from `registry.json` (IR-55-016).
+## Data and source provenance
 
-- **IR-55-025 (Medium). Validator resolution check was shape-based.** The "resolution is 100 m" check compared the shape, not the pixel size. Fixed once in `scripts/validate_submission.py`: the check now reads |a| and |e| from the transform. Both encodings pass (12/12 zeros, 11/11 NaN twin). Done.
-- **IR-55-026 (Low). Feature-raster naming mismatch.** `prepare_data.py` and `run_tensor_lane.py` looked for `training_features.tif`, but the file on disk is `gems-geodawn-numerical-features.tif`. The same sha256 pin applies. Fixed once in both scripts. `prepare_data.py` exits 0 with all three pins OK. Done.
-- **IR-55-027 (Medium). Sidecar selection picked the lexicographically last file.** "160000" sorts before "40000". The historical H55 card is `docs/run-card-h55-160k.json`; its DTI metadata was reviewed and its legacy generator `scripts/make_final_card.py` now fails closed because it would overwrite reviewed secondary-score CIs and require absent competition rasters. The stale `evidence/runcard.json` remains superseded.
-- **IR-55-028 (High). Striping axis is unreconciled.** ScienceBase (Glen & Earney 2024, doi 10.5066/P93LGLVQ) says flight lines run at azimuth 90° (E–W). The lane masks rows (E–W lines). `evidence/striping_diagnostic.json` reports N–S on real RTP data, but its own coherence numbers are equal (0.185 along x, 0.187 along y). A crude high-pass test here (row-means std 6.3 vs column-means std 8.9; y/x gradient RMS 0.77) leans N–S. If the striping is N–S, the lane's 21% mask is on the wrong axis. Open: the flight-line shapefile (not reachable from the sandbox) would settle it. Do not cite the lane striping mask until then.
-- **IR-55-029 (Medium). Two striping counts from two detectors.** 86,947 px (129 rows, z>4, `gems/tensor.py`, `docs/results/tensor_lane_results.json`) and 1,105,919 px (21.4%, coherence-based `gems55` mask, thresh 0.55, lag 60 px, `data/cache/lane_v1.meta.json`). These are not a miscount. Both are reported; the shipped audit file uses the 1,105,919-px mask.
-- **IR-55-030 (Medium, blocking for submit). Literal uniqueness stop on the audit file.** `scripts/verify_unique.py` returns REVIEW. The raw 3-px statistic is 0.8401 against the spacing-5 lattice `13GEMSDOE…lattice-s5` (206,895 dots). A random control on that lattice scores 0.8389 (excess +0.0012). Spearman max 0.014, Jaccard max 0.031. Under the shared 70% rule this is DUPLICATE-STOP. It is chance-level overlap, not a copy. Owner decision required; no submit clearance. Evidence: `evidence/uniqueness_160000dots.json`.
-- **IR-55-031 (Medium). The secondary protocol disagrees with the primary.** The historical Q4 primary is negative at the selected dot budget; the distance-banded B=15 px secondary comparison is positive, but cannot rescue the preregistered decision. All cited DTI arms are **HOLDOUT-DTI** from `src/gems55/dti55.py`, use 60,988 withheld positives, and now carry 95% fold-level CIs in `docs/run-card-h55-160k.json` and the augmented `evidence/exp9_distance_band_v1_n40000.json` / `evidence/exp10_mass_sweep_v1.json`. CI intervals are Student-t over stored per-fold DTI values; per-fold values were rounded to six decimals and the intervals are approximate. No experiment was rerun for this correction.
-- **IR-55-032 (Medium). The holdout arm is not the shipped emitter.** exp10 restricts emission to each fold's withheld domain, excludes striping outright, and uses per-fold seeds. The shipped writer (`scripts/submission_writer.py`) uses the full footprint, down-weights striping by 0.25, and uses seed 55. The holdout therefore does not score the shipped file exactly. Disclosed; a full-footprint holdout needs a different protocol.
-- **IR-55-033 (Low–Medium). Zeros versus NaN outside the footprint.** The rules say "null or nan". The earlier site chose zeros on the basis of the portal's [0, 1] range check. That reasoning is not verified against the portal. Confirm on the portal before relying on either encoding; the NaN twin is published for comparison only.
-- **Superseded file.** The 40k audit file (`…40000dots-20261009T052235Z`, sha256 b7c7225d…) was removed from `docs/downloads/` on `main` by the parallel session. It is reproducible from `scripts/submission_writer.py --n-dots 40000` and its sidecar is `evidence/submission_h55-tensor2d-strikegate-40000dots-20261009T052235Z.json`.
+- The authorized source is the [official DrivenData data tab](https://www.drivendata.org/competitions/306/competition-doe-gems/data/), which requires login and acceptance of terms. The feature stack, labels, sample template, cache, and registry raster corpus are absent from this checkout.
+- The historical download script queried owner-maintained sibling GitHub repositories. Those copies are not authenticated organizer downloads, even when a Git blob or SHA-256 matches a sibling manifest. The script now requires explicit `GEMS_ALLOW_UNOFFICIAL_MIRROR=1`; that opt-in does not establish permission or provenance.
+- `data/README.md` and `data/SOURCES.md` identify the recorded SHA-256 values as mirror-derived pins. Do not compare SHA-1 Git blob IDs with SHA-256 digests as if they were one algorithm.
+- The public [USGS GeoDAWN release](https://doi.org/10.5066/P93LGLVQ) is an official external source for survey context and may contain block/flight metadata. It is not a substitute for the competition's authorized feature files. Nothing from it was downloaded in this review.
 
-## IR-55-034 — retracted anchor algebra and stale leaderboard claims (High)
+## Evidence and score-label policy
 
-The one-off `exp5_anchor_forensics.py`, `exp6_anchor_mechanism.py`,
-`exp7_anchor_verdict.py`, `build_anchor_page.py`, and the associated anchor page
-used the shortcut `DTI = TP_w/(0.2N + 0.8|G|)`. The official definitions imply
-`TP_w + FN_w = |G|`, but they do **not** imply `TP_w + FP_w = N`: TP is a
-max-over-predictions operation performed separately for each truth pixel, while
-FP is separately summed over prediction pixels. Thus the historic catalogue-proxy
-DTI values, target-score bounds, inferred hidden-truth size, and conclusions that
-depend on them are retracted. `evidence/anchor_forensics.json`,
-`anchor_mechanism.json`, and `anchor_verdict.json` carry an explicit retraction
-marker; scripts 5–7 fail closed; the public-facing analysis page has been replaced.
-The same invalid denominator also appeared in the `greedy_cover` helper's docstring
-and in the old exp10 sweep rationale; these now state that expected-credit placement
-is only a heuristic and that all DTI comparisons use the full exact formula. No
-holdout was rerun and no historical score was promoted. Exact DTI must be computed
-by `src/gems55/dti55.py` under the canonical whole-segment holdout if it is to be
-compared as a score. A regression test exercises a two-pixel truth example where
-the shortcut fails.
+- Every reported model-performance result is either **HOLDOUT-DTI** with evaluator version, withheld-positive count, and stored 95% interval, or **ORGANIZER-CONFIRMED** copied from a receipt. The dated leaderboard snapshot is separately labeled **PUBLIC-LEADERBOARD (not a submission receipt, not ORGANIZER-CONFIRMED)**; it cannot establish that a public entry belongs to H33. The owner's projected value is not a score.
+- A projected score is never a score. There is no organizer-confirmed score in the inspected checkout.
+- The historical anchor analysis summed nearest-fault kernel weights at prediction cells and labeled that quantity `TP_w`; it is not official `TP_w`, which is a maximum over predictions summed at truth pixels. Its naive ratio and inferred hidden-truth-size table were invalidated.
+- The corrected DTI evaluator, whole-component fold utility, random arm, and 10-km spatial block bootstrap have synthetic regression coverage. They were not run on competition data and do not produce a current HOLDOUT-DTI result.
 
-Separately, the official public leaderboard was accessible on this review and a
-dated snapshot is saved. Its score rows cannot be mapped to H33's raster because
-neither the public table nor the sibling webpage exposes a matching submission
-receipt/hash. H33's sibling page calls its candidate unscored and labels 0.2747 a
-projection. Do not claim its score is 0.2778 without the receipt. See
-`docs/leaderboard-analysis.md` and the `PUBLIC-LEADERBOARD-SNAPSHOT` evidence file.
+## Current disposition
 
-**Status:** fixed in analysis/docs/tests; no leaderboard score is recorded as a
-submission receipt; no new experiment or slot was used. The competition payloads,
-cached feature surface, and prior registry rasters are absent from this checkout,
-so the corrected anchor analysis itself has not been rerun.
+The existing TIFF is an uncleared historical artifact, not a promised deliverable. There is no download button, no valid promotion HOLDOUT-DTI, no literal uniqueness pass, no organizer format validation, no current receipt, and no reason to use a weekly competition slot. Keep the status **NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT** until every gate is honestly met.

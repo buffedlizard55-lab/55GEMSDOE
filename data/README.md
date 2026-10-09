@@ -1,19 +1,19 @@
-# data/ — competition payloads (NOT committed)
+# `data/` — competition payloads (not committed)
 
-Everything in this folder except this README and `SOURCES.md` is **gitignored on purpose**. The competition
-rasters are licensed to registered DrivenData competitors; we have not found a rules clause that permits
-redistribution (see `docs/irregularities.md` #4). Do not commit them.
+The raster payloads are ignored by Git. The authorized source is the [official DrivenData data tab](https://www.drivendata.org/competitions/306/competition-doe-gems/data/), which requires an eligible account and acceptance of the competition terms. This repository does not contain those files at present.
 
-| File | Source | sha256 (as pinned by the sibling repo; see SOURCES.md) |
+| Canonical filename (from `src/gems55/io55.py`) | SHA-256 reference pin | Provenance status |
 |---|---|---|
-| `training_features.tif` | `gems-geodawn-numerical-features.tif` | `4371c82e3b8339b807bdffcf4ef59a225520fe2988d521be208ae33743123bc5` |
-| `labels.tif` | `existing_faults.tif` | `7ba308ccdc4418b31a178f4f1ef21aaa6e152e4028f2f6f64b01f7eb25ae4093` |
-| `sample_submission.tif` | `example_submission.tif` | `2176d08e485aa2cd2860ce8df539db4faf4d76163b38a4dd8c30a40454d35cbc` |
+| `gems-geodawn-numerical-features.tif` | `4371c82e3b8339b807bdffcf4ef59a225520fe2988d521be208ae33743123bc5` | Owner-maintained sibling-mirror pin; not independently matched to organizer bytes |
+| `labels.tif` | `7ba308ccdc4418b31a178f4f1ef21aaa6e152e4028f2f6f64b01f7eb25ae4093` | Owner-maintained sibling-mirror pin; not independently matched to organizer bytes |
+| `sample_submission.tif` | `2176d08e485aa2cd2860ce8df539db4faf4d76163b38a4dd8c30a40454d35cbc` | Owner-maintained sibling-mirror pin; not independently matched to organizer bytes |
 
-Verified in this session: the three files reassemble from the sibling repo's committed parts and match the
-pins in that repo's `data/bridge/manifest.json`. **The pins themselves are not independently verified against
-DrivenData** (the official data tab was not reachable from this sandbox).
+The hash pins came from an owner-maintained sibling-repository manifest. They are SHA-256 integrity references, not an organizer signature, legal authorization, or proof of source. See [`SOURCES.md`](SOURCES.md). No mirror download was performed for this review.
 
-To place them yourself (after logging in to DrivenData and accepting the rules):
-download the three files from the data tab into this folder under the names above, then run
-`python scripts/prepare_data.py`.
+After obtaining the files through the official data tab and placing them under the canonical names above, run:
+
+```bash
+python scripts/prepare_data.py
+```
+
+That check verifies file hashes against the listed mirror pins and checks the canonical grid contract. If an authorized organizer download differs from a mirror pin, stop and verify the discrepancy against the official source before changing a pin; do not silently overwrite it.

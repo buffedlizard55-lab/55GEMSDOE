@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Strict lane-drift/uniqueness check against every registry raster.
+"""Fail-closed uniqueness check against the complete manifest-listed registry.
 
-The protocol is deliberately fail-closed:
-  * continuous candidate surface: absolute Spearman rho > 0.90 => stop;
-  * final positive dots: >70% within 3 pixels of one registry raster => stop.
-
-A chance-adjusted overlap is reported as a diagnostic because dense historical
-rasters can make the raw test saturate, but it NEVER changes the strict verdict.
-No registry pixel is copied into a candidate.
+Rules: absolute dense Spearman rank correlation > 0.90 with any registry raster,
+or (final-dot stage only) > 70% of candidate dots within a Euclidean 3-pixel disk
+of one prior raster's dots, is DUPLICATE-STOP. Control-adjusted overlap never
+clears a raw threshold. A PASS requires the authentic footprint and every
+manifest raster to be present and successfully compared.
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -26,155 +23,188 @@ sys.path.insert(0, str(ROOT / "src"))
 from gems55 import io55  # noqa: E402
 
 REG = ROOT / "registry" / "rasters"
+MANIFEST = ROOT / "registry" / "registry.json"
 EVID = ROOT / "evidence"
+RHO_LIMIT = 0.90
+OVERLAP_LIMIT = 0.70
+RADIUS_PX = 3.0
 
 
-def sha256(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as fh:
-        for block in iter(lambda: fh.read(1 << 20), b""):
-            h.update(block)
-    return h.hexdigest()
-
-
-def read_surface(path: Path, key: str) -> np.ndarray:
-    if path.suffix == ".npz":
+def read_candidate(path: Path, array_key: str) -> np.ndarray:
+    if path.suffix.lower() == ".npz":
         with np.load(path) as z:
-            if key not in z:
-                raise KeyError(f"{key!r} not found in {path}")
-            return np.asarray(z[key], dtype=np.float32)
+            if array_key not in z.files:
+                raise KeyError(f"array key {array_key!r} absent from {path}; keys={z.files}")
+            return np.asarray(z[array_key])
+    if path.suffix.lower() == ".npy":
+        return np.asarray(np.load(path, mmap_mode="r"))
     with rasterio.open(path) as src:
-        return src.read(1).astype(np.float32)
+        if src.count != 1:
+            raise ValueError(f"candidate must have one band, got {src.count}")
+        return src.read(1)
 
 
-def rho_sample(a: np.ndarray, b: np.ndarray, mask: np.ndarray, rng: np.random.Generator) -> float:
-    idx = np.flatnonzero(mask.ravel())
-    if idx.size > 300_000:
-        idx = rng.choice(idx, 300_000, replace=False)
-    if idx.size < 10:
-        return float("nan")
-    r = stats.spearmanr(a.ravel()[idx], b.ravel()[idx]).statistic
-    return float(r) if np.isfinite(r) else float("nan")
+def disk(radius_px: float) -> np.ndarray:
+    r = int(np.ceil(radius_px))
+    yy, xx = np.ogrid[-r : r + 1, -r : r + 1]
+    return (yy * yy + xx * xx) <= radius_px * radius_px + 1e-9
+
+
+def compare(candidate_path: Path, *, stage: str, array_key: str) -> dict:
+    result = {
+        "evidence_class": "REGISTRY-UNIQUENESS-CHECK",
+        "candidate": str(candidate_path),
+        "stage": stage,
+        "thresholds": {"abs_spearman": RHO_LIMIT, "final_dot_fraction_within_3px": OVERLAP_LIMIT},
+        "verdict": "BLOCKED_INCOMPLETE",
+        "comparisons": [],
+        "missing_registry_rasters": [],
+        "invalid_registry_rasters": [],
+    }
+
+    if not MANIFEST.is_file():
+        result["block_reason"] = f"registry manifest missing: {MANIFEST}"
+        return result
+    try:
+        manifest = json.loads(MANIFEST.read_text())
+    except Exception as exc:
+        result["block_reason"] = f"registry manifest unreadable: {exc}"
+        return result
+    if not isinstance(manifest, dict) or not manifest:
+        result["block_reason"] = "registry manifest is empty or not a mapping"
+        return result
+    result["manifest_raster_count"] = len(manifest)
+
+    if not io55.TEMPLATE_TIF.is_file():
+        result["block_reason"] = "authentic sample template/footprint is missing"
+        return result
+    try:
+        grid, _template = io55.read_template()
+        footprint = np.asarray(grid.footprint, dtype=bool)
+    except Exception as exc:
+        result["block_reason"] = f"could not read authoritative template footprint: {exc}"
+        return result
+
+    try:
+        ours = read_candidate(candidate_path, array_key)
+    except Exception as exc:
+        result["block_reason"] = f"could not read candidate: {type(exc).__name__}: {exc}"
+        return result
+    if ours.shape != grid.shape:
+        result["block_reason"] = f"candidate shape {ours.shape} != template shape {grid.shape}"
+        return result
+    if not np.isfinite(np.asarray(ours[footprint], dtype=np.float64)).all():
+        result["block_reason"] = "candidate contains non-finite values inside the authoritative footprint"
+        return result
+
+    candidate_dots = np.isfinite(ours) & (ours > 0.0)
+    if np.any(candidate_dots & ~footprint):
+        result["block_reason"] = "candidate has positive predictions outside the authoritative footprint"
+        return result
+    n_candidate_dots = int(candidate_dots.sum())
+    result["candidate_positive_count"] = n_candidate_dots
+    if stage == "final" and n_candidate_dots == 0:
+        result["block_reason"] = "final-dot candidate has no positive cells"
+        return result
+
+    expected = set(manifest.keys())
+    available = {p.name: p for p in REG.glob("*.tif")} if REG.is_dir() else {}
+    missing = sorted(name for name in expected if name not in available)
+    result["missing_registry_rasters"] = missing
+    if not REG.is_dir():
+        result["block_reason"] = f"registry raster directory missing: {REG}"
+        return result
+
+    footprint_idx = footprint.ravel()
+    structure = disk(RADIUS_PX)
+    for name in sorted(expected & set(available)):
+        path = available[name]
+        try:
+            with rasterio.open(path) as src:
+                if src.count != 1:
+                    raise ValueError(f"band count is {src.count}, expected one")
+                ref = src.read(1)
+        except Exception as exc:
+            result["invalid_registry_rasters"].append({"raster": name, "error": str(exc)})
+            continue
+        if ref.shape != grid.shape:
+            result["invalid_registry_rasters"].append(
+                {"raster": name, "error": f"shape {ref.shape} != {grid.shape}"}
+            )
+            continue
+        ref_in = np.asarray(ref[footprint], dtype=np.float64)
+        ours_in = np.asarray(ours[footprint], dtype=np.float64)
+        if not np.isfinite(ref_in).all():
+            result["invalid_registry_rasters"].append(
+                {"raster": name, "error": "non-finite values inside footprint"}
+            )
+            continue
+        rho = float(stats.spearmanr(ours_in, ref_in).statistic)
+        if not np.isfinite(rho):
+            result["invalid_registry_rasters"].append(
+                {"raster": name, "error": "Spearman correlation undefined"}
+            )
+            continue
+
+        rec = {"raster": name, "spearman": rho, "abs_spearman": abs(rho)}
+        if stage == "final":
+            ref_dots = ref > 0.0
+            if np.any(ref_dots & ~footprint):
+                result["invalid_registry_rasters"].append(
+                    {"raster": name, "error": "positive registry cells outside footprint"}
+                )
+                continue
+            near = ndimage.binary_dilation(ref_dots, structure=structure)
+            frac = float(near[candidate_dots].mean())
+            rec["fraction_candidate_dots_within_euclidean_3px"] = frac
+            rec["jaccard"] = float(np.count_nonzero(candidate_dots & ref_dots) /
+                                   max(np.count_nonzero(candidate_dots | ref_dots), 1))
+        result["comparisons"].append(rec)
+
+    result["scanned_registry_raster_count"] = len(result["comparisons"])
+    all_scanned = (
+        not result["missing_registry_rasters"]
+        and not result["invalid_registry_rasters"]
+        and len(result["comparisons"]) == len(manifest)
+    )
+    result["complete_registry_scan"] = bool(all_scanned)
+    max_rho = max((r["abs_spearman"] for r in result["comparisons"]), default=None)
+    result["max_abs_spearman"] = max_rho
+    max_overlap = None
+    if stage == "final":
+        max_overlap = max((r["fraction_candidate_dots_within_euclidean_3px"]
+                           for r in result["comparisons"]
+                           if "fraction_candidate_dots_within_euclidean_3px" in r), default=None)
+    result["max_fraction_candidate_dots_within_euclidean_3px"] = max_overlap
+
+    duplicate = (max_rho is not None and max_rho > RHO_LIMIT) or (
+        stage == "final" and max_overlap is not None and max_overlap > OVERLAP_LIMIT
+    )
+    if duplicate:
+        result["verdict"] = "DUPLICATE-STOP"
+    elif all_scanned and max_rho is not None and (stage != "final" or max_overlap is not None):
+        result["verdict"] = "PASS-UNIQUE"
+    else:
+        result["verdict"] = "BLOCKED_INCOMPLETE"
+        result["block_reason"] = "not every registry raster was validly compared; fail closed"
+    return result
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("tif", type=Path)
-    ap.add_argument("--surface", type=Path, default=None,
-                    help="pre-placement continuous surface (.npz or GeoTIFF)")
-    ap.add_argument("--surface-key", default="score")
+    ap.add_argument("candidate", type=Path)
+    ap.add_argument("--stage", choices=("surface", "final"), default="final")
+    ap.add_argument("--array-key", default="score", help="key for .npz candidate surfaces")
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args()
 
-    grid, _ = io55.read_template()
-    with rasterio.open(args.tif) as src:
-        ours = src.read(1).astype(np.float32)
-        if (src.height, src.width) != grid.shape:
-            raise SystemExit("candidate shape does not match the official template")
-    dots = np.nan_to_num(ours, nan=0.0) > 0
-    n_ours = int(dots.sum())
-    yy, xx = np.nonzero(dots)
-    surface = read_surface(args.surface, args.surface_key) if args.surface else ours
-    if surface.shape != grid.shape:
-        raise SystemExit("surface shape does not match the official template")
-    surface = np.nan_to_num(surface, nan=0.0, posinf=0.0, neginf=0.0)
-
-    rng = np.random.default_rng(0)
-    rows: list[dict] = []
-    registry_files = sorted(REG.glob("*.tif"))
-    for path in registry_files:
-        with rasterio.open(path) as src:
-            if (src.width, src.height) != (grid.width, grid.height):
-                continue
-            ref = src.read(1).astype(np.float32)
-        ref = np.nan_to_num(ref, nan=0.0)
-        ref_pos = ref > 0
-        if not ref_pos.any():
-            continue
-        close = ndimage.distance_transform_edt(~ref_pos)
-        overlap = float(np.mean(close[yy, xx] <= 3.0)) if n_ours else float("nan")
-        inter = int((dots & ref_pos).sum())
-        union = int((dots | ref_pos).sum())
-        srho = rho_sample(surface, ref, grid.footprint, rng)
-        crho = rho_sample(ours, ref, grid.footprint, rng)
-        rows.append({
-            "raster": path.name,
-            "sha256": sha256(path),
-            "registry_positive_px": int(ref_pos.sum()),
-            "jaccard": round(inter / max(union, 1), 6),
-            "final_dot_overlap_within_3px": round(overlap, 4),
-            "surface_spearman": None if not np.isfinite(srho) else round(srho, 4),
-            "final_binary_spearman": None if not np.isfinite(crho) else round(crho, 4),
-            "strict_duplicate_flag": bool(
-                (np.isfinite(srho) and abs(srho) > 0.90) or
-                (np.isfinite(overlap) and overlap > 0.70)
-            ),
-        })
-
-    max_overlap = max((r["final_dot_overlap_within_3px"] for r in rows), default=float("nan"))
-    max_abs_surface = max(
-        (abs(r["surface_spearman"]) for r in rows if r["surface_spearman"] is not None),
-        default=float("nan"),
-    )
-    max_binary = max(
-        (abs(r["final_binary_spearman"]) for r in rows if r["final_binary_spearman"] is not None),
-        default=float("nan"),
-    )
-    # Diagnostic only; never used to override strict_duplicate_flag.
-    ctrl = np.zeros(grid.shape, dtype=bool)
-    pool = np.flatnonzero(grid.footprint.ravel() & ~dots.ravel())
-    if n_ours and pool.size >= n_ours:
-        ctrl.ravel()[rng.choice(pool, n_ours, replace=False)] = True
-    cy, cx = np.nonzero(ctrl)
-    for row in rows:
-        with rasterio.open(REG / row["raster"]) as src:
-            ref_pos = np.nan_to_num(src.read(1), nan=0.0) > 0
-        row["random_control_overlap_within_3px"] = round(
-            float(ndimage.binary_dilation(ref_pos, iterations=3)[cy, cx].mean()), 4
-        ) if n_ours else None
-        row["overlap_excess_over_random_control"] = round(
-            row["final_dot_overlap_within_3px"] - row["random_control_overlap_within_3px"], 4
-        ) if n_ours else None
-
-    duplicate_rows = [r for r in rows if r["strict_duplicate_flag"]]
-    if not rows:
-        verdict = "NO-REGISTRY-FAIL-CLOSED"
-    elif duplicate_rows:
-        verdict = "DUPLICATE-STOP"
-    else:
-        verdict = "PASS-UNIQUE"
-    out = {
-        "candidate": args.tif.name,
-        "candidate_sha256": sha256(args.tif),
-        "candidate_positive_px": n_ours,
-        "surface_source": str(args.surface) if args.surface else args.tif.name,
-        "registry_rasters_scanned": len(rows),
-        "max_abs_surface_spearman": None if not np.isfinite(max_abs_surface) else round(max_abs_surface, 4),
-        "max_abs_final_binary_spearman": None if not np.isfinite(max_binary) else round(max_binary, 4),
-        "max_final_dot_overlap_within_3px": None if not np.isfinite(max_overlap) else round(max_overlap, 4),
-        "thresholds": {"abs_surface_spearman": 0.90, "final_dot_overlap_within_3px": 0.70},
-        "strict_duplicate_rows": len(duplicate_rows),
-        "strict_verdict": verdict,
-        "verdict": verdict,
-        "control_adjusted_overlap_is_diagnostic_only": True,
-        "rows": sorted(rows, key=lambda r: -r["final_dot_overlap_within_3px"]),
-    }
-    dest = args.out or (EVID / "uniqueness.json")
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(json.dumps(out, indent=2))
-    print(json.dumps({k: v for k, v in out.items() if k != "rows"}, indent=2))
-    for row in out["rows"][:8]:
-        print(
-            f"  {row['raster'][:58]:58s} n={row['registry_positive_px']:7d} "
-            f"overlap={row['final_dot_overlap_within_3px']:.3f} "
-            f"control={row['random_control_overlap_within_3px']:.3f} "
-            f"surface_rho={row['surface_spearman']} "
-            f"DUP={row['strict_duplicate_flag']}"
-        )
-    print("VERDICT:", verdict)
-    print("wrote", dest)
-    # A duplicate or unavailable registry is a deliberate non-zero stop signal.
-    raise SystemExit(0 if verdict == "PASS-UNIQUE" else 2)
+    result = compare(args.candidate, stage=args.stage, array_key=args.array_key)
+    EVID.mkdir(exist_ok=True)
+    out_path = args.out or EVID / f"uniqueness_{args.stage}.json"
+    out_path.write_text(json.dumps(result, indent=2) + "\n")
+    print(json.dumps(result, indent=2))
+    print(f"wrote {out_path}")
+    sys.exit(0 if result["verdict"] == "PASS-UNIQUE" else (2 if result["verdict"] == "DUPLICATE-STOP" else 1))
 
 
 if __name__ == "__main__":

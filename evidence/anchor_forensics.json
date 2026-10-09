@@ -6,7 +6,7 @@
     ],
     "footprint_px": 5167373,
     "catalogue_px": 60988,
-    "sum_kernel_credit": 211157.84092758718
+    "sum_kernel_credit": "INVALID_AS_METRIC_COMPONENT; historical sum over grid of pointwise max-kernel field"
   },
   "anchors": {
     "h33-2-b2 (0.2778)": {
@@ -17,15 +17,15 @@
       "n_distinct_values": 1,
       "dots_on_catalogue_px": 0,
       "catalogue_truth_covered_within_3px_frac": 0.1724929494326753,
-      "TP_w_vs_visible_catalogue": 277.93795319758345,
-      "mean_credit_per_dot": 0.007381365942465168,
-      "catalogue_proxy_DTI": 0.0049348727157372966,
-      "organizer_confirmed_DTI": 0.2778,
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 277.93795319758345,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.007381365942465168,
+      "legacy_naive_ratio_not_DTI": 0.0049348727157372966,
+      "user_reported_value_not_confirmed": 0.2778,
       "nn_px_mean": 15.021093038196017,
       "nn_px_p10": 4.123105625617661,
       "nn_px_p90": 29.832867780352597,
-      "implied_G_if_private_credit_equals_proxy": -8162.879260270052,
-      "inflation_factor_vs_proxy": 56.29324523692303
+      "score_receipt": null,
+      "current_score_attribution": "NOT ORGANIZER-CONFIRMED"
     },
     "poisson300m-offcat (0.2600)": {
       "n_dots": 44090,
@@ -35,15 +35,15 @@
       "n_distinct_values": 1,
       "dots_on_catalogue_px": 0,
       "catalogue_truth_covered_within_3px_frac": 0.48237358168820094,
-      "TP_w_vs_visible_catalogue": 3954.7811237275546,
-      "mean_credit_per_dot": 0.08969791616528815,
-      "catalogue_proxy_DTI": 0.06864938314078424,
-      "organizer_confirmed_DTI": 0.26,
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 3954.7811237275546,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.08969791616528815,
+      "legacy_naive_ratio_not_DTI": 0.06864938314078424,
+      "user_reported_value_not_confirmed": 0.26,
       "nn_px_mean": 15.149451594671815,
       "nn_px_p10": 4.123105625617661,
       "nn_px_p90": 29.5296461204668,
-      "implied_G_if_private_credit_equals_proxy": 7990.8707871517045,
-      "inflation_factor_vs_proxy": 3.7873610527103976
+      "score_receipt": null,
+      "current_score_attribution": "NOT ORGANIZER-CONFIRMED"
     },
     "efd28-repro (unconfirmed)": {
       "n_dots": 44090,
@@ -53,31 +53,38 @@
       "n_distinct_values": 1,
       "dots_on_catalogue_px": 0,
       "catalogue_truth_covered_within_3px_frac": 0.48237358168820094,
-      "TP_w_vs_visible_catalogue": 3954.7811237275546,
-      "mean_credit_per_dot": 0.08969791616528815,
-      "catalogue_proxy_DTI": 0.06864938314078424,
-      "organizer_confirmed_DTI": null,
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 3954.7811237275546,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.08969791616528815,
+      "legacy_naive_ratio_not_DTI": 0.06864938314078424,
+      "user_reported_value_not_confirmed": null,
       "nn_px_mean": 15.26768943931401,
       "nn_px_p10": 4.0,
-      "nn_px_p90": 29.154759474226502
+      "nn_px_p90": 29.154759474226502,
+      "score_receipt": null,
+      "current_score_attribution": "NOT ORGANIZER-CONFIRMED"
     }
   },
   "random_controls": {
     "37654": {
-      "TP_w": 951.8738275019604,
-      "catalogue_proxy_DTI": 0.01690080870972139,
-      "mean_credit_per_dot": 0.02527948763748766
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 951.8738275019604,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.02527948763748766,
+      "legacy_naive_ratio_not_DTI": 0.01690080870972139,
+      "status": "descriptive diagnostic only; not an exact DTI control"
     },
     "44090": {
-      "TP_w": 1139.4980252818893,
-      "catalogue_proxy_DTI": 0.01978006723467219,
-      "mean_credit_per_dot": 0.02584481799233135
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 1139.4980252818893,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.02584481799233135,
+      "legacy_naive_ratio_not_DTI": 0.01978006723467219,
+      "status": "descriptive diagnostic only; not an exact DTI control"
     }
   },
-  "_review_status": {
-    "state": "RETRACTED_METHOD_ERROR",
-    "reason": "RETRACTED: prior proxy-DTI and target-score calculations assumed TP_w + FP_w = N. The official metric defines TP_w and FP_w separately; that identity is not generally valid. Do not cite numeric DTI, inferred hidden-label size, or conclusions derived from those fields. Re-run only through the canonical whole-segment holdout evaluator.",
-    "retracted_utc": "2026-10-09T18:48:54Z",
-    "replacement": "docs/leaderboard-analysis.md and scripts/evaluate_holdout.py"
+  "review_status": "SUPERSEDED_INVALID_METRIC_PROXY_AND_UNCONFIRMED_SCORE_ATTRIBUTION",
+  "review_note": "Historical raster diagnostics only. Per-prediction nearest-catalogue kernel weights are not the metric TP_w (which is a max over predictions, summed over truth pixels), and the naive denominator that produced the old catalogue_proxy_DTI is algebraically invalid. No organizer receipt ties a leaderboard value to either raster. Exact catalogue-proxy DTI was not recomputed because authorized data and registry rasters are absent.",
+  "invalidated_derived_fields": {
+    "fields": [
+      "implied_G_if_private_credit_equals_proxy",
+      "inflation_factor_vs_proxy"
+    ],
+    "reason": "They were derived from the false count-only denominator and a quantity mislabeled TP_w."
   }
 }

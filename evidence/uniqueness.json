@@ -12,7 +12,7 @@
   "max_frac3px_excess_over_random_control": 0.0399,
   "max_frac_within_3px_density_matched": 0.6694,
   "n_density_matched": 43,
-  "verdict": "PASS-UNIQUE-CONTROL-ADJUSTED",
+  "verdict": "DUPLICATE-STOP-LITERAL-THRESHOLD",
   "top10": [
     {
       "raster": "GEMSDOE42__gems42-xscale-worm-persistence-20261006T000541Z-nan.tif",
@@ -808,5 +808,17 @@
       "frac3px_excess_over_control": -0.0007,
       "density_ratio_vs_ours": 2.584
     }
-  ]
+  ],
+  "review_status": "DUPLICATE_STOP_LITERAL_THRESHOLD",
+  "literal_rule": {
+    "max_fraction_within_3px_limit": 0.7,
+    "reported_raw_max_fraction_within_3px": 0.8413,
+    "result": "FAIL"
+  },
+  "prior_control_adjusted_verdict": "INVALID_FOR_CLEARANCE",
+  "review_note": "The raw reported overlap exceeds the literal 70% limit. The older density-matched/control-adjusted field does not override that rule. The 56-raster files and candidate surface are absent, so these measurements were not independently recomputed during this review. Separate older 632-raster records refer to different candidates and registry snapshots.",
+  "required_follow_up": "Do not publish or submit this raster. Re-run strict surface and final-dot checks on the complete registry only after a genuinely new candidate and cache exist.",
+  "evidence_class": "HISTORICAL_REGISTRY_CHECK_NOT_RERUN",
+  "overlap_definition": "fraction of candidate positive cells with Euclidean distance <= 3 pixels to any positive cell in one prior raster",
+  "promotion_use": "PROHIBITED"
 }

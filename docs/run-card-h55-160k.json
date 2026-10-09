@@ -1,135 +1,94 @@
 {
-  "project": "55GEMSDOE",
-  "hypothesis": "Gradient ridges on RTP-magnetic and isostatic-gravity grids cannot separate a strike-extended fault or contact from a compact intrusion or vent, because both produce ridges. The potential-field gradient tensor can: its dimensionality index is zero for strictly two-dimensional sources and its intermediate eigenvector carries strike. Gating ridges on being near-2-D AND on eigenvector strike agreeing with the ridge's own orientation should therefore preferentially retain unmapped, elongated, less conspicuous traces.",
-  "mechanism": "FFT gradient tensor of bands 2 (RTP mag) and 13 (isostatic gravity) after nearest-neighbour NaN fill, along-track micro-levelling and a 400 m - 6 km band-pass; Tzz derived as -(Txx+Tyy) so the tensor is exactly traceless; closed-form 3x3 eigen-decomposition; dimensionality I = 27 e3^2 / (4 (-e2)^3) (I=0 2-D, I=1 3-D, both endpoints unit-tested); strike = azimuth of the intermediate eigenvector; score = corroborated ridge rank x (1-I) x exp(-(dtheta/25deg)^2) x plunge weight x survey-line mask.",
-  "non_fault_process_that_could_mimic_it": "Airborne survey-line striping. It is measured here to run north-south, not east-west as the lane brief asserts (IR-55-04). Analytically a field varying only across the flight lines has eigenvalues (|f''|,0,-|f''|) - indistinguishable from a 2-D source striking along the lines - so the tensor cannot reject it and it must be masked geometrically. Secondary mimics: lithologic contacts and dike swarms (genuinely 2-D but not faults) and basin-margin alluvial edges.",
-  "generated_by": "Historical output from scripts/make_final_card.py; score metadata corrected in this review from stored fold arrays (no experiment rerun).",
-  "verdict": "negative",
-  "verdict_reason": "The pre-registered primary Q4 protocol is negative versus its matched random control at the selected N; its HOLDOUT-DTI estimates, evaluator, withheld-positive count, and CIs are recorded under holdout_dti. The positive B15 secondary does not rescue the primary. No weekly slot.",
-  "submission": {
-    "file": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
-    "name": "h55-tensor2d-strikegate-160000dots-20261009T164334Z",
-    "note": "DO NOT SUBMIT (audit). h55 tensor-dimensionality lane; negative primary HOLDOUT-DTI. Literal duplicate-stop.",
-    "note_characters": 108,
-    "weekly_slot_used": false,
-    "n_dots": 160000,
-    "crs": "EPSG:32611",
-    "shape": [
-      3730,
-      3292
-    ],
-    "cell_m": 100,
-    "values": "0 or 1 (binary dots), float32, single band, zeros outside footprint"
+  "schema": "55gemsdoe.historical-run-card.v1",
+  "run_id": "55GEMSDOE-H55-160K-HISTORICAL-AUDIT-2026-10-09",
+  "review_status": "HISTORICAL_RECORD_ONLY_NOT_PROMOTION_EVIDENCE",
+  "hypothesis": {
+    "rank": 1,
+    "name": "Tensor dimensionality and strike coherence",
+    "statement": "A strike-extended potential-field source may be more fault-like than a compact intrusion or vent; the tensor eigenstructure is a source-geometry hypothesis, not proof of faulting.",
+    "required_layers": [
+      {"band": 2, "name": "reduced-to-pole magnetic anomaly"},
+      {"band": 13, "name": "isostatic gravity anomaly"}
+    ]
   },
-  "raster_sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
-  "nan_twin": {
-    "file": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-nan.tif",
-    "sha256": "c3185ec459f84c5fd9a9c117f4611c25ec754e1a113c12139baca60e29501d74"
-  },
-  "zip": {
-    "file": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip",
-    "sha256": "3c0cc3f4efd858716c9b4c6fe8568f1bc9aa324d54ca7a6fd932831f5a14d9a6"
-  },
+  "mechanism": "The historical candidate used FFT gradient tensors of bands 2 and 13, eigenvalue dimensionality, intermediate-eigenvector strike, ridge agreement, and a survey-line mask. This describes the archived run; it is not a newly implemented or revalidated experiment.",
+  "non_fault_mimic": [
+    "airborne survey-line striping and leveling residuals",
+    "lithologic contacts and dike swarms",
+    "compact intrusions, vents, and hydrothermal systems",
+    "acquisition seams, edge effects, and FFT boundary artifacts"
+  ],
   "holdout_dti": {
-    "evidence_class": "HOLDOUT-DTI",
-    "status": "RUN",
-    "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-    "protocol": "Q4 contiguous-quadrant hide-and-recover (PRIMARY), per-fold visible-only faults, 3 px buffer; secondary B=15 px distance-banded whole-segment folds (exp9/exp10).",
-    "value": 0.1019,
-    "value_meaning": "tensor_full at N=160000, Q4, fold-pooled DTI",
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "status": "INVALID_FOR_PROMOTION",
+    "evaluator_version": "src/gems55/dti55.py; the original run record contains no explicit evaluator-version identifier; local implementation not reconciled with the authorized shared evaluator",
     "withheld_positive_count": 60988,
-    "ci95": [
-      0.0877,
-      0.1185
+    "parameters": {"alpha": 0.2, "beta": 0.8, "triangular_kernel_radius_m": 300, "n_dots": 160000},
+    "candidate": {
+      "arm": "tensor_full",
+      "protocol": "Q4 contiguous-quadrant primary holdout",
+      "value": 0.1019,
+      "ci95": [0.0877, 0.1185],
+      "ci95_method": "fold-level t interval over four quadrant-fold DTI values (df=3); not a pooled-score contribution interval"
+    },
+    "protocol_details": "The archived record describes a 3-pixel buffer and per-fold visible-only labels; the primary Q4 protocol is quadrant-based. B=15 px was a separate secondary protocol and is not substituted for the required whole-segment protocol.",
+    "control_comparison": {
+      "status": "OMITTED_FROM_SCORE_SUMMARY",
+      "reason": "The raw exp10 evidence contains a control value but the final run card has no corresponding 95% CI. It is not presented here as a standalone HOLDOUT-DTI result."
+    },
+    "invalid_reasons": [
+      "quadrant folds can split connected mapped faults",
+      "the evaluator is local and not reconciled with the authorized shared evaluator",
+      "the reported interval is over fold ratios rather than pooled-score contributions",
+      "no promotion-grade result or same-evaluator win is established"
     ],
-    "ci95_method": "Student-t 95% interval across 4 Q4 per-fold DTI values (df=3); pooled-components DTI is the point estimate; indicative.",
-    "uniform_random_control": {
-      "evidence_class": "HOLDOUT-DTI",
-      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-      "withheld_positive_count": 60988,
-      "protocol": "Q4 primary, N=160000, four buffered quadrant folds",
-      "value": 0.16268402704607413,
-      "ci95": [
-        0.095892,
-        0.251167
-      ],
-      "ci95_method": "Student-t 95% interval over 4 recorded per-fold DTI values (df=3); fold values stored rounded to 6 decimals, interval approximate."
-    },
-    "tensor_minus_random": -0.0705,
-    "signflip_p_two_sided_Q4": 0.125,
-    "folds_beating_random_Q4": "0/4",
-    "B15_secondary": {
-      "evidence_class": "HOLDOUT-DTI",
-      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-      "withheld_positive_count": 60988,
-      "protocol": "Distance-banded whole-segment holdout, B=15 px, N=160000, ten folds; secondary only.",
-      "tensor_full": {
-        "value": 0.023839710601390767,
-        "ci95": [
-          0.022891,
-          0.024782
-        ],
-        "ci95_method": "Student-t 95% interval over 10 recorded per-fold DTI values (df=9); fold values stored rounded to 6 decimals, interval approximate."
-      },
-      "random": {
-        "value": 0.021196785103013028,
-        "ci95": [
-          0.019939,
-          0.022449
-        ],
-        "ci95_method": "Student-t 95% interval over 10 recorded per-fold DTI values (df=9); fold values stored rounded to 6 decimals, interval approximate."
-      },
-      "signflip_p_two_sided": 0.00390625,
-      "interpretation": "Positive secondary comparison; it does not change the pre-registered negative primary Q4 verdict."
-    },
-    "leakage_canary": "per-fold mean AUC of single lane features <= 0.90 in exp8/exp9 (max 0.555 at B=15, ridge). The visible-distance control reached 0.899 at B=3 (below 0.90) and 0.654 at B=15; it is a control, not a lane feature.",
-    "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)",
-    "additional_historical_score_details": {
-      "evidence_class": "HOLDOUT-DTI",
-      "evaluator_version": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-      "withheld_positive_count": 60988,
-      "file": "evidence/exp10_mass_sweep_v1.json",
-      "note": "Per-arm values from the stored mass sweep have fold-based 95% CIs added under review_metadata; no experiment was rerun."
+    "source": "evidence/exp10_mass_sweep_v1.json"
+  },
+  "registry_comparisons": {
+    "evidence_class": "HISTORICAL_REGISTRY-CHECK; NOT RE-RUN",
+    "reported_rasters_scanned": 56,
+    "max_abs_dense_spearman": 0.014,
+    "max_jaccard": 0.031456,
+    "max_fraction_candidate_dots_within_3px_raw": 0.8401,
+    "literal_overlap_limit": 0.70,
+    "verdict": "DUPLICATE_STOP",
+    "explanation": "The raw historical final-dot overlap exceeds the literal 70% stop limit. A chance-adjusted comparison does not override that rule. The registry corpus and continuous surface cache are absent, so no fresh uniqueness result is claimed."
+  },
+  "raster_sha256": {
+    "value": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
+    "file": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
+    "artifact_status": "UNCLEARED_HISTORICAL_ARTIFACT; NOT PUBLISHED OR CLEARED FOR DOWNLOAD/SUBMISSION",
+    "related_archived_files": {
+      "nan_twin": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-nan.tif",
+      "nan_twin_sha256": "c3185ec459f84c5fd9a9c117f4611c25ec754e1a113c12139baca60e29501d74",
+      "zip": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.zip",
+      "zip_sha256": "3c0cc3f4efd858716c9b4c6fe8568f1bc9aa324d54ca7a6fd932831f5a14d9a6"
     }
   },
-  "validator_output": {
-    "tool": "scripts/validate_submission.py (re-reads written bytes with rasterio)",
-    "status": "PASS",
-    "zeros_status": "PASS",
-    "checks_passed": 12,
-    "checks_failed": 0,
-    "nan_twin_status": "PASS",
-    "nan_twin_checks_passed": 11,
-    "dots_on_mapped_catalogue_px": 0,
-    "dots_outside_footprint": 0
+  "validator_findings": {
+    "status": "NOT_CLEARED; ORGANIZER_VALIDATION_NOT_ESTABLISHED",
+    "historically_reported_local_result": "The source run card reports 12/12 local structural checks after re-reading the written bytes; this audit did not rerun the validator.",
+    "official_template_present": false,
+    "validate_submission_rerun_in_this_review": false,
+    "uniqueness_gate": "DUPLICATE_STOP",
+    "format_gate": "NOT_CLEARED"
   },
-  "uniqueness": {
-    "tool": "scripts/verify_unique.py vs registry/rasters (56 prior scored rasters)",
-    "verdict": "REVIEW",
-    "n_registry": 56,
-    "max_abs_spearman_dense": 0.014,
-    "max_jaccard": 0.031456,
-    "max_frac_within_3px_raw": 0.8401,
-    "raw_max_reference": "13GEMSDOE__13gems_20261001_r13-lattice-s5_v2_nan-outside.tif (206,895-dot spacing-5 lattice)",
-    "raw_max_reference_random_control_frac_within_3px": 0.8389,
-    "excess_over_random_control_for_that_reference": 0.0012,
-    "brief_threshold_frac_within_3px": 0.7,
-    "literal_70pct_rule": "TRIPPED on the raw statistic (0.8401 > 0.70)",
-    "interpretation": "Chance-level density overlap with a dense lattice (random control 0.839). Not a copy: Spearman max 0.014, Jaccard max 0.031, excess over control +0.0012. Flagged for owner decision; not cleared as a clean PASS."
+  "submission": {
+    "status": "DO_NOT_DOWNLOAD_OR_SUBMIT",
+    "name": "h55-tensor2d-strikegate-160000dots-20261009T164334Z",
+    "note": "DO NOT DOWNLOAD OR SUBMIT — historical h55 160k audit only; no valid holdout or uniqueness clearance.",
+    "note_characters": 101,
+    "note_limit_characters": 140,
+    "file_link_published": false,
+    "organizer_receipt": null,
+    "weekly_slot_used": false
   },
-  "striping": {
-    "lane_mask_px": 1105919,
-    "lane_mask_definition": "gems55 coherence-based mask (build_lane, thresh 0.55, lag 60 px)",
-    "older_count_px": 86947,
-    "older_count_definition": "gems/tensor.py row-median z>4 (129 rows); a different detector, not a miscount",
-    "axis_status": "UNRECONCILED (see docs/irregularities.md IR-55-028)"
+  "score_attribution": {
+    "evidence_class": "PUBLIC-LEADERBOARD snapshot (not a submission-page receipt; not ORGANIZER-CONFIRMED)",
+    "organizer_receipt": null,
+    "snapshot_file": "evidence/leaderboard_snapshot_20261009.json",
+    "reported_leaderboard_values": "The capture lists 0.2778 at rank 16 under extradr19, 0.3195 at rank 7, and 0.3774 at rank 1; none is tied by receipt/hash to this H55 artifact. Mapping of extradr19 to H33 is unverified."
   },
-  "archive_superseded": {
-    "file": "docs/downloads/archive-superseded/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
-    "reason": "Superseded by the pre-registered N* = 160000 file. Same negative holdout verdict at N=40000.",
-    "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368"
-  },
-  "organizer_score_status": "none exists for this file (organiser-confirmed score: not available)",
-  "weekly_slot_selection": "separate selector step; not performed (no holdout win)",
-  "review_status": "HISTORICAL_AUDIT_ONLY; score CIs augmented from recorded per-fold arrays; no rerun."
+  "budget": {"experiments_used_recorded": 3, "experiment_limit": 3, "new_experiments_run_in_this_review": 0},
+  "verdict": "NOT_CLEARED_DUPLICATE_STOP_NO_VALID_HOLDOUT_NO_ORGANIZER_RECEIPT"
 }

@@ -14,7 +14,7 @@ from gems55 import dti55, io55, tensor55  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
-# Grid contract (measured from the organiser rasters, not from memory)
+# Expected grid contract (data-dependent assertions skip when local rasters are absent)
 # --------------------------------------------------------------------------- #
 DATA_OK = (io55.TEMPLATE_TIF.exists() and io55.LABELS_TIF.exists() and io55.FEATURES_TIF.exists())
 needs_data = pytest.mark.skipif(not DATA_OK, reason="competition rasters not present")
@@ -88,6 +88,47 @@ def test_dti_empty_prediction_is_zero():
     assert r.dti == pytest.approx(0.0, abs=1e-9)
 
 
+def test_metric_algebra_does_not_reduce_to_predicted_pixel_count():
+    """A nearby false positive disproves the invalid 0.2*N denominator."""
+    truth = np.zeros((11, 11), dtype=bool)
+    truth[5, 5] = True
+    pred = np.zeros_like(truth, dtype=np.float64)
+    pred[5, 5] = 1.0
+    pred[5, 6] = 1.0  # 1 px from truth: kernel credit 2/3, FP weight 1/3
+
+    r = dti55.dti(pred, truth)
+    assert r.tp_w == pytest.approx(1.0)
+    assert r.fn_w == pytest.approx(0.0)
+    assert r.fp_w == pytest.approx(1.0 / 3.0)
+    assert r.tp_w + r.fn_w == pytest.approx(float(r.n_truth))
+
+    exact = r.tp_w / (0.2 * r.tp_w + 0.2 * r.fp_w + 0.8 * r.n_truth + dti55.EPS)
+    invalid_count_only = r.tp_w / (0.2 * r.n_pred_pos + 0.8 * r.n_truth + dti55.EPS)
+    assert r.dti == pytest.approx(exact, abs=1e-12)
+    assert r.dti == pytest.approx(0.9375, abs=1e-12)
+    assert invalid_count_only == pytest.approx(5.0 / 6.0, abs=1e-12)
+    assert r.dti != pytest.approx(invalid_count_only, abs=1e-3)
+
+
+def test_contribution_maps_sum_to_exact_metric_components_and_bootstrap():
+    truth = np.zeros((24, 26), dtype=bool)
+    truth[7, 8:11] = True
+    truth[17, 19] = True
+    pred = np.zeros_like(truth, dtype=np.float64)
+    pred[7, 9] = 1.0
+    pred[17, 20] = 0.75
+
+    result = dti55.dti(pred, truth)
+    tp, fp, fn = dti55.weighted_contribution_maps(pred, truth)
+    assert tp.sum() == pytest.approx(result.tp_w, abs=1e-12)
+    assert fp.sum() == pytest.approx(result.fp_w, abs=1e-12)
+    assert fn.sum() == pytest.approx(result.fn_w, abs=1e-12)
+    ci1 = dti55.block_bootstrap_ci(tp, fp, fn, block_px=8, n_boot=100, seed=5)
+    ci2 = dti55.block_bootstrap_ci(tp, fp, fn, block_px=8, n_boot=100, seed=5)
+    assert ci1 == ci2
+    assert 0.0 <= ci1["ci95"][0] <= ci1["ci95"][1] <= 1.0
+
+
 def test_dti_kernel_offsets_are_the_3px_triangular_kernel():
     offs = dti55.kernel_offsets(3.0)
     assert len(offs) == 29  # dx^2+dy^2 <= 9
@@ -97,30 +138,68 @@ def test_dti_kernel_offsets_are_the_3px_triangular_kernel():
     assert min(edge) == pytest.approx(0.0, abs=1e-12)
 
 
-def test_isolated_pixel_breakeven_credit_is_monotone_and_derived():
-    # With alpha + beta = 1, the independent-one-pixel approximation is alpha * DTI.
+def test_breakeven_credit_is_conditional_and_uses_correct_threshold():
     assert dti55.breakeven_credit(0.0) == 0.0
     assert dti55.breakeven_credit(0.3) < dti55.breakeven_credit(0.5)
+    # alpha=.2, beta=.8, and under the helper's isolated single-match assumptions.
     assert dti55.breakeven_credit(0.3) == pytest.approx(0.06, abs=1e-12)
-    # For alpha + beta != 1, exercise the full documented denominator.
-    assert dti55.breakeven_credit(0.3, alpha=0.2, beta=0.6) == pytest.approx(0.2 * 0.3 / 0.94)
     with pytest.raises(ValueError):
-        dti55.breakeven_credit(float("nan"))
+        dti55.breakeven_credit(1.01)
 
 
-def test_tp_plus_fp_is_not_prediction_mass_for_adjacent_truth_pixels():
-    """Official TP is maxed per truth pixel; FP is defined per prediction pixel."""
-    truth = np.zeros((15, 15), dtype=bool)
-    truth[7, 7:9] = True
-    pred = np.zeros((15, 15), dtype=np.float32)
-    pred[7, 7] = 1.0
-    result = dti55.dti(pred, truth)
-    assert result.tp_w == pytest.approx(1.0 + 2.0 / 3.0)
-    assert result.fp_w == pytest.approx(0.0)
-    assert result.tp_w + result.fp_w > pred.sum()
-    # This refutes the shortcut TP+FP=N, which would produce a different DTI.
-    shortcut = result.tp_w / (0.2 * float(pred.sum()) + 0.8 * int(truth.sum()))
-    assert result.dti != pytest.approx(shortcut)
+def test_random_dots_ignore_candidate_score_support():
+    score = np.zeros((8, 9), dtype=np.float32)
+    score[0, 0] = 1.0
+    eligible = np.ones_like(score, dtype=bool)
+    dots = __import__("gems55.holdout55", fromlist=["emit_dots"]).emit_dots(
+        score, eligible, 50, random=True, seed=2026
+    )
+    assert int(dots.sum()) == 50
+    assert np.count_nonzero(dots & (score == 0)) == 49
+
+
+def test_segment_folds_never_split_connected_components_and_buffer_visible_labels():
+    from gems55 import holdout55
+
+    labels = np.zeros((40, 60), dtype=np.int8)
+    footprint = np.ones_like(labels, dtype=bool)
+    # One 8-connected line crosses the spatial-bin boundary; it must be withheld whole.
+    labels[18, 5:56] = 1
+    labels[18, 25] = 1
+    # A second component helps populate another fold.
+    labels[31, 40:48] = 1
+
+    folds = holdout55.make_segment_folds(labels, footprint, n_folds=4, buffer_px=2)
+    assert folds
+    coverage = np.zeros_like(labels, dtype=np.int8)
+    for fold in folds:
+        coverage += fold.truth.astype(np.int8)
+        # The visible catalogue cannot enter the Euclidean 2-pixel buffer.
+        yy, xx = np.ogrid[-2:3, -2:3]
+        disk = yy * yy + xx * xx <= 4
+        expanded = __import__("scipy.ndimage", fromlist=["binary_dilation"]).binary_dilation(
+            fold.truth, structure=disk
+        )
+        assert not np.any(fold.visible & expanded)
+    assert np.array_equal(coverage.astype(bool), labels == 1)
+    assert np.all(coverage[18, 5:56] == 1)
+    assert np.all(coverage[31, 40:48] == 1)
+
+
+def test_make_segment_folds_rejects_mismatched_shapes():
+    from gems55 import holdout55
+
+    with pytest.raises(ValueError, match="shape"):
+        holdout55.make_segment_folds(np.zeros((3, 4)), np.ones((4, 3), dtype=bool))
+
+
+def test_make_segment_folds_fails_without_two_occupied_bins():
+    from gems55 import holdout55
+
+    labels = np.zeros((20, 20), dtype=np.int8)
+    labels[10, 8:12] = 1
+    with pytest.raises(ValueError, match="fewer than two spatial bins"):
+        holdout55.make_segment_folds(labels, np.ones_like(labels, dtype=bool), n_folds=4)
 
 
 # --------------------------------------------------------------------------- #
@@ -251,7 +330,7 @@ def test_angular_difference_is_undirected():
 # --------------------------------------------------------------------------- #
 # Submission writer
 # --------------------------------------------------------------------------- #
-def test_write_submission_enforces_the_contract(tmp_path):
+def test_write_submission_enforces_range_and_uses_nan_outside_by_default(tmp_path):
     import rasterio
 
     fp = np.zeros((io55.HEIGHT, io55.WIDTH), dtype=bool)
@@ -259,21 +338,23 @@ def test_write_submission_enforces_the_contract(tmp_path):
     grid = io55.Grid(io55.HEIGHT, io55.WIDTH, io55.CRS_EPSG, io55.TRANSFORM, fp)
     a = np.zeros(grid.shape, dtype=np.float32)
     a[100, 100] = 1.0          # inside the footprint
-    a[0, 0] = 5.0              # outside the footprint -> must be forced to 0
-    # a value > 1 inside the footprint must be rejected (portal range check)
+    a[0, 0] = 5.0              # outside the footprint -> overwritten with NaN
+    # A value > 1 inside the footprint must be rejected.
+    bad = a.copy()
+    bad[100, 100] = 2.0
     with pytest.raises(ValueError):
-        io55.write_submission(a * 2.0, tmp_path / "bad.tif", grid)
-    p = io55.write_submission(a, tmp_path / "ok.tif", grid, outside="zeros")
+        io55.write_submission(bad, tmp_path / "bad.tif", grid)
+    bad_nan = a.copy()
+    bad_nan[100, 100] = np.nan
+    with pytest.raises(ValueError):
+        io55.write_submission(bad_nan, tmp_path / "bad_nan.tif", grid)
+    p = io55.write_submission(a, tmp_path / "ok.tif", grid)
     with rasterio.open(p) as src:
         got = src.read(1)
         assert src.count == 1 and src.dtypes[0] == "float32"
         assert src.crs.to_epsg() == 32611
         assert tuple(src.transform)[:6] == tuple(io55.TRANSFORM)[:6]
-        assert np.all(np.isfinite(got))
-        assert got.min() >= 0.0 and got.max() <= 1.0
-        assert got[0, 0] == 0.0
-    # NaN twin keeps NaN exactly outside the footprint
-    p2 = io55.write_submission(a, tmp_path / "ok_nan.tif", grid, outside="nan")
-    with rasterio.open(p2) as src:
-        got = src.read(1)
+        assert np.isfinite(got[fp]).all()
+        assert got[fp].min() >= 0.0 and got[fp].max() <= 1.0
+        assert np.isnan(got[0, 0])
         assert np.array_equal(np.isnan(got), ~fp)
