@@ -29,6 +29,7 @@ class LinkAudit(HTMLParser):
 
 
 def main() -> None:
+    status = json.loads((DOCS / "status.json").read_text())
     card = json.loads((DOCS / "run-card.json").read_text())
     h55_status_path = DOCS / "status-h55-160k.json"
     h55_status = json.loads(h55_status_path.read_text()) if h55_status_path.exists() else None
