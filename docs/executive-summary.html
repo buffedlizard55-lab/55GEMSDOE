@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Executive summary and exact GeoTIFF upload guide for 55GEMSDOE.">
+  <meta name="theme-color" content="#10271e">
+  <title>Executive summary — 55GEMSDOE</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./index.html">Home</a><a href="./hypotheses.html">Hypotheses</a><a href="./sources.html">Sources</a><a href="./irregularities.html">Audit flags</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Executive summary · submission steps</div>
+        <h1>How to make a GEMS submission</h1>
+        <p class="lead">The portal accepts a single-band GeoTIFF or a ZIP containing exactly one GeoTIFF. This page explains the required checks and the upload steps. It does not upload anything for you.</p>
+        <div class="status-banner" role="alert">
+          <div class="status-icon" aria-hidden="true">⛔</div>
+          <div><strong>Current answer: DO NOT SUBMIT.</strong><p>This project has not produced or validated a candidate TIFF. No file or download link is available. The following is a future-use guide, not approval of any prior artifact.</p></div>
+        </div>
+        <div class="actions"><a class="button secondary" href="./index.html">← Back to project status</a><a class="button secondary" href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Official format rules</a><a class="button secondary" href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">Official Prize Rules PDF</a></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Clearance comes before download</h2>
+        <p class="section-intro">A future file will be offered here only after every research and packaging gate passes. A new name or a format-valid file alone is not enough.</p>
+        <ol class="steps">
+          <li><strong>Validate the prediction scientifically.</strong><br>Use the canonical whole-segment, buffered hide-and-recover evaluator. Recompute catalogue-derived features from visible faults only, mask visible-fault pixels exactly, and report pooled `HOLDOUT-DTI` with evaluator/version, withheld-positive count, and paired 95% CI. Check each feature alone for leakage and test tensor-strike agreement against random ridges.</li>
+          <li><strong>Check the lane and registry twice.</strong><br>Compare the continuous surface before placing dots, then compare final dots. Stop if absolute rank-correlation exceeds 0.90 or more than 70% of dots fall within 3 pixels of one registry raster. The full registry and shared checker are not present in this checkout, so this gate has not run.</li>
+          <li><strong>Write with the canonical submission writer and verify bytes.</strong><br>Do not make a private replacement. Re-open the final TIFF after writing and compare it to the authentic sample/template: one band, float32, matching CRS, shape, bounds, transform, and resolution; values in [0,1] throughout the scored footprint; no NaN/Inf or invalid nodata sentinel inside that footprint; null/NaN outside the bounds as the competition specifies. Record the file SHA-256 and validator receipt.</li>
+          <li><strong>Publish the exact artifact details.</strong><br>The landing page should show the download link, unique submission name, short identifying note (this project limits notes to 140 characters), holdout card, uniqueness receipt, and validator output together. A projection must never be called a score. The current page correctly has no download link.</li>
+          <li><strong>Upload only after the separate selector approves a slot.</strong><br>Do not spend a weekly slot directly from the experiment step. The selector must confirm that the candidate beats the current comparable holdout best and that the weekly cap permits promotion.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap two-col">
+        <article class="card">
+          <h2>Portal steps when an approved TIFF exists</h2>
+          <p class="small">The screen wording below follows the submission form text supplied in the project request; this session did not log into or submit to DrivenData.</p>
+          <ol class="list">
+            <li>Open the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS competition page</a> and choose <strong>Submit</strong> / <strong>New submission</strong>.</li>
+            <li>Under <strong>File to submit</strong>, choose the approved `.tif` file. A `.zip` is acceptable only if it contains a single GeoTIFF.</li>
+            <li>In <strong>Note (optional)</strong>, paste the published unique submission name and the short approved comment. Never substitute an owner-reported score or model projection for the method note.</li>
+            <li>Re-check the filename and comment; select <strong>Create</strong> to send the submission.</li>
+            <li>Save the organizer's receipt and record its exact value as `ORGANIZER-CONFIRMED`. A public leaderboard row without a receipt linking it to the file is not file attribution.</li>
+          </ol>
+        </article>
+        <aside class="warning">
+          <strong>Do not try this with an unvalidated file.</strong>
+          <p>The user previously saw “Predicted values must be in range [0, 1]”. Without the rejected TIFF and matching sample, this review cannot diagnose that exact upload. Possible causes include a real out-of-range value, infinity, or NaN inside the scored footprint. Verify the whole footprint and the exact grid; do not infer the cause from a filename.</p>
+          <p>The official problem page permits null/NaN outside the submitted bounds, but the scored interior still must contain valid probability/confidence values in [0,1]. Follow the authentic sample and canonical writer.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Submission-page fields</h2>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Field</th><th>What will go there</th><th>Current value</th></tr></thead>
+            <tbody>
+              <tr><td>File to submit</td><td>One cleared single-band float32 GeoTIFF (or a ZIP with one TIFF).</td><td><strong>None — no file generated.</strong></td></tr>
+              <tr><td>Note (optional)</td><td>Unique name plus a short method identifier, at most 140 characters for this project.</td><td><span class="code">NOT-CREATED</span> · No validated candidate exists; do not upload.</td></tr>
+              <tr><td>Organizer receipt</td><td>Saved receipt that links submission to the organizer's displayed score.</td><td>None.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small source-note">The official <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem and submission specification</a> is the authority. See <a href="./sources.html">source verification notes</a> and the machine-readable <a href="./run-card.json">negative run card</a>.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · no current download · no slot used</p><p><a href="./index.html">Home</a> · <a href="./hypotheses.html">Hypotheses</a> · <a href="./sources.html">Sources</a> · <a href="../README.md">Persistent brief</a></p></div></footer>
+</body>
+</html>
