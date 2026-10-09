@@ -11,7 +11,7 @@ PRE-REGISTERED before this file was first run (see docs/hypotheses.md, section H
 
   Arms (matched N per protocol):
     random       uniform over the eligible set                 (control)
-    tensor_full  lane score alone                              (reference, prior run 0.0667)
+    tensor_full  lane score alone                              (reference; prior DTI values live only in labelled evidence)
     H-A-500      lane score x exp(-d_vis / 5 px)     PRIMARY candidate
     H-A-1500     lane score x exp(-d_vis / 15 px)    secondary
     prox-500     exp(-d_vis / 5 px) alone            ablation (no tensor gate)
@@ -54,6 +54,7 @@ from pathlib import Path
 
 import numpy as np
 from scipy import ndimage
+from scipy.stats import t as student_t
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -73,11 +74,15 @@ def aggregate(per_fold: list[dict]) -> dict:
     tp = sum(p["tp_w"] for p in per_fold)
     fp = sum(p["fp_w"] for p in per_fold)
     fn = sum(p["fn_w"] for p in per_fold)
-    d = [p["dti"] for p in per_fold]
+    d = np.asarray([p["dti"] for p in per_fold], dtype=np.float64)
+    half = float(student_t.ppf(0.975, len(d) - 1) * d.std(ddof=1) / np.sqrt(len(d)))
+    mean = float(d.mean())
     return {
         "fold_pooled_dti": tp / (tp + dti55.ALPHA * fp + dti55.BETA * fn + dti55.EPS),
-        "fold_mean_dti": float(np.mean(d)),
-        "per_fold_dti": [round(x, 6) for x in d],
+        "fold_mean_dti": mean,
+        "per_fold_dti": [round(float(x), 6) for x in d],
+        "ci95": [mean - half, mean + half],
+        "ci95_method": f"Student-t 95% interval over {len(d)} per-fold DTI values (df={len(d)-1}); pooled-components DTI is the point estimate; per-fold values are stored to 6 decimals.",
         "n_withheld_truth": int(sum(p["n_truth"] for p in per_fold)),
         "n_dots": int(sum(p["n_dots"] for p in per_fold)),
     }

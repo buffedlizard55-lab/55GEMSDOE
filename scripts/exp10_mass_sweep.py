@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Experiment 10 (E3 of this session, the LAST experiment in the budget): dot-mass sweep.
 
-WHY.  The official metric is DTI = TP_w / (0.2 N + 0.8 |G|) on a dot raster, so the
-dot count N is itself a decision.  A dot raises DTI when its expected kernel credit
-exceeds the break-even alpha*DTI/(1+alpha*DTI) (dti55.breakeven_credit).  At holdout
-DTI of 0.008 that bar is ~0.0016 credit per dot; at 0.07 it is ~0.014.  So the best
-N is not obvious and must be measured, not guessed from leaderboard rows.
+WHY.  The official metric is DTI = TP_w / (TP_w + alpha*FP_w + beta*FN_w + eps),
+with TP_w, FP_w, and FN_w separately defined.  In general TP_w + FP_w is not the
+number of positive prediction pixels: a prediction can contribute to multiple truth
+pixels or to none.  Therefore dot count N is measured through the exact shared
+`dti55` evaluator; no per-dot break-even shortcut or leaderboard projection is used.
 
 PRE-REGISTERED (written before the first run):
   N in {20000, 40000, 80000, 160000} total dots, split equally over folds.

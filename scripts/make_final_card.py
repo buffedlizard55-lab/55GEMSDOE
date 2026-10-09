@@ -6,6 +6,7 @@ artifact as an audit download despite a negative holdout and duplicate stop. The
 reviewed, fail-closed cards are committed in ``docs/run-card.json`` and
 ``docs/status.json``. Do not regenerate them from the historical local evidence.
 """
+
 from __future__ import annotations
 
 

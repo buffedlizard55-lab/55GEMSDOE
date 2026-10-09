@@ -19,7 +19,13 @@
             0.106863
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 40000
+          "n_dots": 40000,
+          "ci95": [
+            0.021163392168731185,
+            0.15390160783126883
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 4
         },
         "tensor_full": {
           "fold_pooled_dti": 0.06659348188046123,
@@ -34,7 +40,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": -0.01334661449359945,
           "diff_vs_random_signflip_p_two_sided": 0.5,
-          "folds_beating_random": "2/4"
+          "folds_beating_random": "2/4",
+          "ci95": [
+            0.041870236661231304,
+            0.10650176333876868
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 4
         },
         "H-A-500": {
           "fold_pooled_dti": 0.05214875418331114,
@@ -49,7 +61,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": -0.028581743188650057,
           "diff_vs_random_signflip_p_two_sided": 0.125,
-          "folds_beating_random": "0/4"
+          "folds_beating_random": "0/4",
+          "ci95": [
+            0.016649368465679888,
+            0.1012526315343201
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 4
         },
         "H-A-1500": {
           "fold_pooled_dti": 0.06483091131075501,
@@ -64,7 +82,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": -0.013091851538429598,
           "diff_vs_random_signflip_p_two_sided": 0.375,
-          "folds_beating_random": "1/4"
+          "folds_beating_random": "1/4",
+          "ci95": [
+            0.03415979561817159,
+            0.11472220438182842
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 4
         },
         "prox-500": {
           "fold_pooled_dti": 0.027949045895550105,
@@ -79,7 +103,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": -0.05622723666194345,
           "diff_vs_random_signflip_p_two_sided": 0.125,
-          "folds_beating_random": "0/4"
+          "folds_beating_random": "0/4",
+          "ci95": [
+            0.01103551487013403,
+            0.05157548512986597
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 4
         },
         "prox-1500": {
           "fold_pooled_dti": 0.029469819662845426,
@@ -94,7 +124,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": -0.05461542266670255,
           "diff_vs_random_signflip_p_two_sided": 0.125,
-          "folds_beating_random": "0/4"
+          "folds_beating_random": "0/4",
+          "ci95": [
+            0.01623047719906354,
+            0.04960402280093647
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 4
         }
       },
       "leakage_canary_auc_mean": {
@@ -168,7 +204,13 @@
             0.007501
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 40000
+          "n_dots": 40000,
+          "ci95": [
+            0.006234769500320269,
+            0.008453030499679728
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 10
         },
         "tensor_full": {
           "fold_pooled_dti": 0.0094013612991518,
@@ -189,7 +231,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": 0.0020601849304228053,
           "diff_vs_random_signflip_p_two_sided": 0.013671875,
-          "folds_beating_random": "8/10"
+          "folds_beating_random": "8/10",
+          "ci95": [
+            0.008698410767703602,
+            0.010109989232296397
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 10
         },
         "H-A-500": {
           "fold_pooled_dti": 0.027486558042548324,
@@ -210,7 +258,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": 0.02013924710932521,
           "diff_vs_random_signflip_p_two_sided": 0.001953125,
-          "folds_beating_random": "10/10"
+          "folds_beating_random": "10/10",
+          "ci95": [
+            0.026460244193418355,
+            0.028506155806581637
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 10
         },
         "H-A-1500": {
           "fold_pooled_dti": 0.02770211460590844,
@@ -231,7 +285,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": 0.020356897170883223,
           "diff_vs_random_signflip_p_two_sided": 0.001953125,
-          "folds_beating_random": "10/10"
+          "folds_beating_random": "10/10",
+          "ci95": [
+            0.026408186303324567,
+            0.028993413696675442
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 10
         },
         "prox-500": {
           "fold_pooled_dti": 0.014952944004758951,
@@ -252,7 +312,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": 0.007613903300721684,
           "diff_vs_random_signflip_p_two_sided": 0.001953125,
-          "folds_beating_random": "10/10"
+          "folds_beating_random": "10/10",
+          "ci95": [
+            0.014523836575974652,
+            0.015391963424025348
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 10
         },
         "prox-1500": {
           "fold_pooled_dti": 0.014952944004758951,
@@ -273,7 +339,13 @@
           "n_dots": 40000,
           "diff_vs_random_mean": 0.007613903300721684,
           "diff_vs_random_signflip_p_two_sided": 0.001953125,
-          "folds_beating_random": "10/10"
+          "folds_beating_random": "10/10",
+          "ci95": [
+            0.014523836575974652,
+            0.015391963424025348
+          ],
+          "ci95_method": "Student-t 95% interval over stored per-fold DTI values (df=n_folds-1); point estimate is fold-pooled; per-fold values rounded to 6 decimals, interval approximate.",
+          "ci95_n_folds": 10
         }
       },
       "leakage_canary_auc_mean": {
@@ -386,5 +458,13 @@
     }
   },
   "promote": false,
-  "seconds": 249.0
+  "seconds": 249.0,
+  "review_metadata": {
+    "review_status": "HISTORICAL_VISIBLE_PRIOR_GATE_NOT_CURRENT_PROMOTION",
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py (exact official DTI, alpha=0.2, beta=0.8, 300 m triangular kernel)",
+    "withheld_positive_count": 60988,
+    "ci95_policy": "Student-t 95% interval over each stored per-fold DTI vector. The point estimate remains fold-pooled components. Stored fold values were rounded to 6 decimals; intervals are approximate.",
+    "no_experiment_rerun": true
+  }
 }

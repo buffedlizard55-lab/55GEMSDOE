@@ -15,7 +15,13 @@
             0.06319
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 20000
+          "n_dots": 20000,
+          "ci95": [
+            0.005720171056936618,
+            0.09820432894306337
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_full": {
           "fold_pooled_dti": 0.045908144827883204,
@@ -27,7 +33,13 @@
             0.061154
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 20000
+          "n_dots": 20000,
+          "ci95": [
+            0.01118865251749647,
+            0.09882484748250352
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_minus_random_mean": 0.0030446563347320743,
         "tensor_minus_random_signflip_p_two_sided": 0.25,
@@ -45,7 +57,13 @@
             0.106863
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 40000
+          "n_dots": 40000,
+          "ci95": [
+            0.021163392168731185,
+            0.15390160783126883
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_full": {
           "fold_pooled_dti": 0.06659348188046123,
@@ -57,7 +75,13 @@
             0.082381
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 40000
+          "n_dots": 40000,
+          "ci95": [
+            0.041870236661231304,
+            0.10650176333876868
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_minus_random_mean": -0.01334661449359945,
         "tensor_minus_random_signflip_p_two_sided": 0.5,
@@ -75,7 +99,13 @@
             0.156468
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 80000
+          "n_dots": 80000,
+          "ci95": [
+            0.05271635277296356,
+            0.2181321472270365
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_full": {
           "fold_pooled_dti": 0.08889390094328901,
@@ -87,7 +117,13 @@
             0.089269
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 80000
+          "n_dots": 80000,
+          "ci95": [
+            0.07679256751974702,
+            0.10588293248025298
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_minus_random_mean": -0.04408668474659935,
         "tensor_minus_random_signflip_p_two_sided": 0.25,
@@ -105,7 +141,13 @@
             0.196695
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 160000
+          "n_dots": 160000,
+          "ci95": [
+            0.0958917140408687,
+            0.25116678595913133
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_full": {
           "fold_pooled_dti": 0.10194963079852716,
@@ -117,7 +159,13 @@
             0.102169
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 160000
+          "n_dots": 160000,
+          "ci95": [
+            0.08765718887572024,
+            0.11846331112427977
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 4
         },
         "tensor_minus_random_mean": -0.0704691411971729,
         "tensor_minus_random_signflip_p_two_sided": 0.125,
@@ -143,7 +191,13 @@
             0.005262
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 20000
+          "n_dots": 20000,
+          "ci95": [
+            0.00358701702661127,
+            0.005619182973388731
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_full": {
           "fold_pooled_dti": 0.005101015520241178,
@@ -161,7 +215,13 @@
             0.003968
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 20000
+          "n_dots": 20000,
+          "ci95": [
+            0.004514971329704003,
+            0.0056926286702959975
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_minus_random_mean": 0.0005007038772047833,
         "tensor_minus_random_signflip_p_two_sided": 0.384765625,
@@ -185,7 +245,13 @@
             0.007035
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 40000
+          "n_dots": 40000,
+          "ci95": [
+            0.007016809099929205,
+            0.008480390900070793
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_full": {
           "fold_pooled_dti": 0.009199143100404997,
@@ -203,7 +269,13 @@
             0.008358
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 40000
+          "n_dots": 40000,
+          "ci95": [
+            0.008550200141751986,
+            0.009853399858248017
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_minus_random_mean": 0.0014531566334105618,
         "tensor_minus_random_signflip_p_two_sided": 0.0078125,
@@ -227,7 +299,13 @@
             0.014587
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 80000
+          "n_dots": 80000,
+          "ci95": [
+            0.013106970240368871,
+            0.01573482975963113
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_full": {
           "fold_pooled_dti": 0.01536288457927622,
@@ -245,7 +323,13 @@
             0.01402
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 80000
+          "n_dots": 80000,
+          "ci95": [
+            0.014560360188548276,
+            0.016162239811451724
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_minus_random_mean": 0.000940581550104012,
         "tensor_minus_random_signflip_p_two_sided": 0.1953125,
@@ -269,7 +353,13 @@
             0.021194
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 160000
+          "n_dots": 160000,
+          "ci95": [
+            0.019938886020069654,
+            0.022449313979930347
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_full": {
           "fold_pooled_dti": 0.023839710601390767,
@@ -287,7 +377,13 @@
             0.023842
           ],
           "n_withheld_truth": 60988,
-          "n_dots": 160000
+          "n_dots": 160000,
+          "ci95": [
+            0.022891489068535005,
+            0.024782310931464997
+          ],
+          "ci95_method": "Student-t 95% interval over recorded per-fold DTI values (df=n_folds-1); point estimate is pooled components; per-fold values were stored rounded to 6 decimals.",
+          "ci95_n_folds": 10
         },
         "tensor_minus_random_mean": 0.002642979982893238,
         "tensor_minus_random_signflip_p_two_sided": 0.00390625,
@@ -300,5 +396,23 @@
     "label": "NEGATIVE",
     "reason": "tensor_full(N*) must beat random(N*) on Q4 and on B15 with p<0.05"
   },
-  "seconds": 307.1
+  "seconds": 307.1,
+  "review_metadata": {
+    "review_status": "HISTORICAL_HOLDOUT_EVIDENCE_CI_AUGMENTED_FROM_STORED_FOLDS",
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+    "withheld_positive_count": 60988,
+    "ci95_policy": "For each arm with recorded per_fold_dti, calculate a two-sided Student-t 95% interval across those fold values. The pooled-components DTI remains the point estimate. Per-fold arrays were originally recorded to 6 decimals; CIs are therefore approximate.",
+    "computed_at_utc": "2026-10-09T18:57:44Z",
+    "no_experiment_rerun": true,
+    "metric_parameters": {
+      "alpha": 0.2,
+      "beta": 0.8,
+      "kernel_radius_m": 300
+    },
+    "ci_protocols": {
+      "Q4_primary": "4 buffered quadrant folds (df=3)",
+      "distance_banded": "10 whole-segment folds (df=9)"
+    }
+  }
 }

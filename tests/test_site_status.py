@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 import unittest
 from html.parser import HTMLParser
 from pathlib import Path
@@ -67,6 +69,19 @@ class SiteStatusTests(unittest.TestCase):
         self.assertEqual(holdout["withheld_positive_count"], 60988)
         self.assertEqual(len(holdout["candidate"]["ci95"]), 2)
         self.assertEqual(status["sha256"], card["raster_sha256"]["value"])
+
+    def test_retired_h55_card_generator_fails_closed_without_writing(self) -> None:
+        protected = [DOCS / "run-card.json", DOCS / "status.json"]
+        before = [path.read_bytes() for path in protected]
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "make_final_card.py")],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Retired", result.stderr)
+        self.assertEqual(before, [path.read_bytes() for path in protected])
 
     def test_submission_notes_are_within_limit(self) -> None:
         for name in ("run-card.json", "run-card-h55-160k.json"):
