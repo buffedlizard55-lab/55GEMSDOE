@@ -2,7 +2,7 @@
 
 ## Finding
 
-No organizer-confirmed score or file-to-score attribution is established in this checkout. A saved **PUBLIC-LEADERBOARD (not a submission-page receipt, not ORGANIZER-CONFIRMED)** snapshot lists **0.2778** at rank 16 under participant `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1. The capture is [`evidence/leaderboard_snapshot_20261009.json`](../evidence/leaderboard_snapshot_20261009.json); it establishes what appeared on that captured public page, not which raster was submitted or whether any row belongs to H33.
+No organizer-confirmed score or file-to-score attribution is established in this checkout. A saved **PUBLIC-LEADERBOARD (not a submission-page receipt, not ORGANIZER-CONFIRMED)** snapshot lists **0.2778** at rank 17 under participant `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1. The capture is [`evidence/leaderboard_snapshot_20261009.json`](../evidence/leaderboard_snapshot_20261009.json); it establishes what appeared on that captured public page, not which raster was submitted or whether any row belongs to H33.
 
 A read-only GitHub API check of the owner-maintained [GEMSDOE32 submissions manifest](https://github.com/buffedlizard55-lab/GEMSDOE32/blob/main/docs/downloads/submissions_manifest.json) reports the H33 artifact as `role: PRIMARY`, `receipt: null`, and its note ends `projected 0.2747; UNSCORED`. The manifest is a secondary owner-generated artifact audit, not an organizer receipt. The association between the public participant `extradr19` and the owner artifact H33 is unverified.
 
