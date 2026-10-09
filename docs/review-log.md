@@ -21,9 +21,10 @@
 - Reviewed the final changed paths for formula/source/status consistency and ran `git diff --check`.
 - Audited the merged lane-code claims line by line: corrected fixed 64-pixel normalization tiles versus actual acquisition-block polygons and clarified direct-RTP tensor processing as a proxy, not a known-direction pseudogravity transform. Updated the published evidence/irregularities pages to match the reconciled historical records.
 - Reconciled PR #10 with updated `main` history through `aa783f5`, including the dated public-leaderboard snapshot, without rerunning any data-dependent work. Preserved H56/H55 evidence as historical, moved every raster/archive outside the published `docs/` tree, and corrected status cards to forbid download and submission. Rewrote the incoming leaderboard analysis to withdraw invalid anchor-proxy DTI values and avoid unsupported attribution.
+- Final score-label pass updated the canonical and H55 run cards plus current status JSON: public-page rows are marked `PUBLIC-LEADERBOARD`, separated from submission receipts, and explicitly not mapped to H33 without evidence.
 - Retired the merged `exp8`–`exp10` entry points and the unsafe H55 audit-page/run-card generators. The committed result JSON is retained as historical evidence; no experiment was executed.
-- `./.venv/bin/python -m pytest -q`: **39 passed, 2 skipped** (data-dependent raster tests skipped because the authorized feature/label/template rasters are absent). Three non-failing Rasterio affine warnings occurred in synthetic writer tests.
-- `./.venv/bin/python -m unittest discover -s tests -v`: **9 passed**.
+- `./.venv/bin/python -m pytest -q`: **40 passed, 2 skipped** (data-dependent raster tests skipped because the authorized feature/label/template rasters are absent). Three non-failing Rasterio affine warnings occurred in synthetic writer tests.
+- `./.venv/bin/python -m unittest discover -s tests -v`: **10 passed**.
 - `scripts/make_runcard.py`: all run-card field, note-length, no-receipt, null-holdout, and uncleared-artifact checks passed.
 - `scripts/build_site.py`: status gates passed and all 13 HTML pages had no GeoTIFF/ZIP download links; no raster/archive file is physically under `docs/`.
 - `compileall`, shell syntax check, `git diff --cached --check`, and JSON parsing (33 files under `docs/` and `evidence/`) passed. Archived primary TIFF SHA-256 values match the status manifest; both current and review run cards forbid download/submission.

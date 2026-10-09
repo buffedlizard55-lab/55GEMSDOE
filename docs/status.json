@@ -158,14 +158,18 @@
     }
   ],
   "leaderboard_attribution": {
-    "evidence_class": "USER-REPORTED / NOT ORGANIZER-CONFIRMED",
+    "evidence_class": "PUBLIC-LEADERBOARD snapshot (not a submission-page receipt; not ORGANIZER-CONFIRMED)",
+    "snapshot_file": "evidence/leaderboard_snapshot_20261009.json",
     "reported_values": [
       0.2778,
       0.3195,
       0.3774
     ],
+    "rank_0_2778": 16,
+    "participant_0_2778": "extradr19",
+    "h33_account_mapping": "UNVERIFIED",
     "h33_0_2778_attribution": "UNSUPPORTED",
-    "reason": "No organizer submission receipt tying the score to the H33 raster/hash is present. The owner-maintained GEMSDOE32 manifest records receipt=null and labels the H33 file UNSCORED with projected 0.2747."
+    "reason": "The captured public page row has no raster/hash identity. No organizer submission receipt ties it to the H33 raster. The owner-maintained GEMSDOE32 manifest records receipt=null and labels H33 UNSCORED with projected 0.2747."
   },
   "next_gate": "Do not download, submit, run an experiment, or spend a slot. Reopen work only after explicitly authorized inputs, budget, shared evaluator/writer/checker reconciliation, a same-evaluator holdout win with pooled-score 95% CI, leakage, pre-placement and final-dot uniqueness, and organizer-template validation are available.",
   "historical_artifacts": [
