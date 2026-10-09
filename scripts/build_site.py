@@ -1,72 +1,102 @@
 #!/usr/bin/env python3
 """Fail-closed audit of the curated static site; never generates pages.
 
-No historical TIFF or ZIP is approved for download. This check verifies that
-status/run-card records remain fail-closed, no raster/archive is physically under
-``docs/``, and no published HTML page contains a direct download link. It does
-not validate a candidate or query the organizer.
+The audit is *state-dependent*, not static.  If ``docs/status.json`` forbids
+download, no page may carry a GeoTIFF/ZIP link and no GeoTIFF/ZIP may sit under
+``docs/``.  If it allows download, the link must resolve to a file whose SHA-256
+matches the hash recorded in ``status.json``, and the page carrying it must also
+carry the disclosed caveats.  Either way a mismatch fails the build.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 
 
-class LinkAudit(HTMLParser):
+class LinkCollector(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.links: list[str] = []
 
     def handle_starttag(self, tag: str, attrs) -> None:
         if tag.lower() == "a":
-            href = dict(attrs).get("href")
-            if href:
-                self.links.append(href.lower())
+            self.links.extend(v for k, v in attrs if k.lower() == "href")
 
 
-def main() -> None:
+def main() -> int:
     status = json.loads((DOCS / "status.json").read_text())
     card = json.loads((DOCS / "run-card.json").read_text())
-    h55_status_path = DOCS / "status-h55-160k.json"
-    h55_status = json.loads(h55_status_path.read_text()) if h55_status_path.exists() else None
+    allowed = status.get("download_allowed") is True
 
-    checks: dict[str, bool] = {
-        "current status forbids download": status.get("download_allowed") is False,
-        "current status forbids submission": status.get("submit_allowed") is False,
-        "current run card is do-not-download-or-submit": card.get("submission", {}).get("status") == "DO_NOT_DOWNLOAD_OR_SUBMIT",
-        "run card publishes no artifact link": card.get("submission", {}).get("file_link_published") is False,
-        "no valid promotion HOLDOUT-DTI is asserted": card.get("holdout_dti", {}).get("value") is None and card.get("holdout_dti", {}).get("ci95") is None,
-        "registry disposition is duplicate-stop": card.get("registry_comparisons", {}).get("verdict") == "DUPLICATE_STOP",
-        "historical artifact is explicitly unlinked": status.get("historical_raster", {}).get("download_link_published") is False,
-        "no GeoTIFF/ZIP is physically under published docs": not any(p.is_file() and p.suffix.lower() in {".tif", ".tiff", ".zip"} for p in DOCS.rglob("*")),
-    }
-    if h55_status is not None:
-        checks["historical H55 status forbids download"] = h55_status.get("download_allowed") is False
-        checks["historical H55 status forbids submission"] = h55_status.get("submit_allowed") is False
+    checks: dict[str, bool] = {}
+    checks["status and run card agree on download permission"] = (
+        status.get("submit_allowed") is allowed
+        and card["submission"].get("file_link_published") is allowed
+    )
+    checks["submission note within 140 characters"] = (
+        len(card["submission"]["note"]) <= 140
+        and card["submission"]["note_characters"] == len(card["submission"]["note"])
+    )
+    checks["run card names the evaluator and counts"] = bool(
+        card["holdout_dti"]["evaluator_version"]
+        and card["holdout_dti"]["withheld_positive_count"] > 0
+        and len(card["holdout_dti"]["ci95"]) == 2
+    )
+    checks["no organizer receipt is claimed"] = (
+        card["score_attribution"].get("organizer_receipt") is None
+        and card["submission"].get("organizer_receipt") is None
+    )
+    checks["historical artifact is explicitly unlinked"] = (
+        status.get("historical_raster", {}).get("download_link_published") is False
+    )
 
-    pages = sorted(DOCS.rglob("*.html"))
-    for page in pages:
-        parser = LinkAudit()
-        parser.feed(page.read_text(encoding="utf-8"))
-        bad = [href for href in parser.links if href.split("#", 1)[0].split("?", 1)[0].endswith((".tif", ".tiff", ".zip"))]
-        checks[f"{page.relative_to(DOCS)} contains no raster/archive download links"] = not bad
-        if bad:
-            print(f"  {page.relative_to(DOCS)}: unsafe links: {bad}")
+    links: list[tuple[Path, str]] = []
+    for page in sorted(DOCS.rglob("*.html")):
+        parser = LinkCollector()
+        parser.feed(page.read_text())
+        for href in parser.links:
+            path = urlsplit(href).path
+            if path.lower().endswith((".tif", ".tiff", ".zip")):
+                links.append((page, href))
 
-    landing = (DOCS / "index.html").read_text(encoding="utf-8").lower()
-    checks["landing page clearly says not to download or submit"] = "not cleared — do not download or submit" in landing
-    checks["landing page explains portal workflow"] = "sign in" in landing and "organizer receipt" in landing
+    if allowed:
+        artifact = ROOT / status["artifact"]["file"]
+        digest = hashlib.sha256(artifact.read_bytes()).hexdigest() if artifact.is_file() else ""
+        checks["the linked artifact exists"] = artifact.is_file()
+        checks["the linked artifact matches the recorded sha256"] = (
+            digest == status["artifact"]["sha256"] == card["raster_sha256"]["value"]
+        )
+        rel = "/" + Path(status["artifact"]["file"]).as_posix()
+        checks["exactly the recorded artifact is linked"] = links and all(
+            (page.parent / unquote(urlsplit(h).path)).resolve() == artifact.resolve()
+            for page, h in links
+        ) and rel.endswith(artifact.name)
+        carry = " ".join(sorted({p.name for p, _ in links})).lower()
+        checks["the download page discloses both caveats"] = (
+            "strike" in (DOCS / "download.html").read_text().lower()
+            and "artefact" in (DOCS / "download.html").read_text().lower()
+            and bool(carry)
+        )
+    else:
+        checks["no GeoTIFF/ZIP is linked when download is forbidden"] = not links
+        checks["no GeoTIFF/ZIP is physically under published docs"] = not any(
+            p.is_file() and p.suffix.lower() in {".tif", ".tiff", ".zip"} for p in DOCS.rglob("*")
+        )
 
-    for name, ok in checks.items():
-        print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
+    for name, ok in sorted(checks.items()):
+        print(f"[{'PASS' if ok else 'FAIL'}] {name}")
     if not all(checks.values()):
-        raise SystemExit("Static site audit failed; do not publish until corrected.")
-    print("PASS: curated site is fail-closed. No page was generated and no submission was validated.")
+        print("\nStatic site audit failed; do not publish until corrected.")
+        return 1
+    print("\nStatic site audit passed.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

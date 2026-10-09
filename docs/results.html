@@ -1,24 +1,78 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Results and evidence status · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
-<body><main><p><a href="index.html">← Executive summary</a></p><h1>Results and evidence status</h1>
-<div class="callout bad"><h2>No valid promotion result</h2><p>The current review corrected code and reports and ran regression tests only. No geological experiment, data download, or competition submission occurred. The recorded three-experiment budget is exhausted.</p></div>
-<h2>Correct DTI algebra</h2>
-<p>From <code>TP_w + FN_w = |G|</code>, the official denominator becomes:</p>
-<pre>DTI = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps)
-alpha=0.2, beta=0.8: denominator = 0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps</pre>
-<p>There is no general identity <code>TP_w + FP_w = N</code>, so <code>0.2*N + 0.8*|G|</code> is invalid. A regression case with one truth pixel, a matching unit dot, and another unit dot one pixel away gives <code>TP_w=1</code>, <code>FP_w=1/3</code>, <code>FN_w=0</code>, and exact DTI <code>0.9375</code>; the false count-only formula gives <code>5/6</code>. Old target-size tables, “coverage plateau” claims, and anchor conclusions based on that formula are withdrawn.</p>
-<h2>Historical HOLDOUT-DTI — invalid for promotion</h2>
-<table><tr><th>Evidence class / evaluator</th><th>Withheld positives</th><th>Recorded result</th><th>Why it cannot clear a candidate</th></tr>
-<tr><td><strong>HOLDOUT-DTI (historical; invalid for promotion)</strong><br>Unversioned local <code>src/gems55/dti55.py</code> transcription, pre-audit</td><td>60,988</td><td>Tensor pooled record 0.0667012; stored fold-bootstrap interval [0.0560079, 0.0893459]</td><td>Quadrant folds can split connected components; stored interval bootstraps fold DTI rather than pooled-score contributions.</td></tr>
-<tr><td><strong>HOLDOUT-DTI control (historical; invalid control)</strong><br>Same evaluator/count</td><td>60,988</td><td>Score-conditioned random-control record 0.0757293; stored interval [0.0571125, 0.1213942]</td><td><code>emit_dots</code> filtered the control by candidate <code>score &gt; 0</code>; it was not uniform over the eligible holdout domain.</td></tr>
-<tr><td><strong>HOLDOUT-DTI (historical; private evaluator; not comparable)</strong><br><code>gems.metric v1</code></td><td>60,594</td><td>E1 ridge 0.0578 [0.0499, 0.0652]; E2 dimensionality 0.0463 [0.0398, 0.0523]; E3 tensor/strike 0.0444 [0.0383, 0.0502]</td><td>Different private implementation, folds, and positive count; do not compare with the canonical-local record.</td></tr>
-<tr><td><strong>HOLDOUT-DTI (historical H56; not promotion-grade)</strong><br><code>src/gems55/dti55.py</code>; explicit version absent, local/unreconciled</td><td>60,988</td><td>H56 multiscale full tensor 0.0172779 [0.0161283, 0.0184686]; matched random 0.0144049 [0.0137330, 0.0153747]; one-scale comparator 0.0185193 [0.0178235, 0.0194024]</td><td>Stored intervals resample five fold DTI values, not pooled-score contributions. Candidate did not beat the stored comparator; evaluator is not authorized/shared.</td></tr>
-<tr><td><strong>HOLDOUT-DTI (historical H55 exp10 Q4; not promotion-grade)</strong><br><code>src/gems55/dti55.py</code>; explicit version absent, local/unreconciled</td><td>60,988</td><td>160,000-dot tensor_full 0.1019 [0.0877, 0.1185]</td><td>Four-quadrant fold-level t interval (df=3), not pooled-score contribution uncertainty; quadrant folds can split connected faults. The control CI is absent from the final card and is not reproduced.</td></tr></table>
-<p>Each numerical metric entry above is a historical <strong>HOLDOUT-DTI</strong> value with its evaluator, withheld-positive count, and stored interval. None is a valid promotion result. No valid HOLDOUT-DTI/95% CI was computed in this review. Repository-local synthetic-test utilities cover whole-component assignment, Euclidean buffering, and score-independent sampling, but they are not the authorized shared evaluator. The data-dependent local runner is retired; reconciliation with the shared template and an explicitly reopened budget are required before any future run.</p>
-<h2>0.2778 and leaderboard attribution</h2>
-<p>A saved <strong>PUBLIC-LEADERBOARD snapshot (not a submission-page receipt and not ORGANIZER-CONFIRMED)</strong> lists <strong>0.2778</strong> at rank 17 under <code>extradr19</code>, <strong>0.3195</strong> at rank 7, and <strong>0.3774</strong> at rank 1. No row identifies a raster/hash, and the mapping from <code>extradr19</code> to H33 is unverified. The owner-maintained GEMSDOE32 manifest lists <code>receipt: null</code> for H33, marks it <code>UNSCORED</code>, and calls <code>0.2747</code> projected. This is secondary evidence, not an organizer receipt. No explanation of why an identified submission received the public value or claim of beating it is established. See <a href="anchor-0.2778.html">the attribution audit</a> and <a href="leaderboard-review-20261009.md">the dated review</a>.</p>
-<h2>Submission disposition</h2>
-<p>Separate historical final-dot reports exceed the literal 70% stop rule: H55 40,000-dot raw overlap 84.13%; H55 160,000-dot raw overlap 84.01%; H56 40,000-dot maximum overlap 100% (with another row at 73.6%). These are candidate-specific historical reports, not a fresh current scan. The prior chance-adjusted exception is not allowed. Older E1/E3 files report 632 rasters for different candidates and legacy snapshots; they are superseded and cannot be combined with the 56-raster reports. The authentic template and full local registry are absent; no raster is organizer-validated. <strong>Do not download or submit any of them.</strong></p>
-<p>Full machine-readable details: <a href="run-card.json">current run card</a> · <a href="status.json">current status</a> · <a href="h55-160k-audit.html">historical H55 160k audit (no download link)</a> · <a href="irregularities.html">irregularities</a>.</p>
-</main></body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Results · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head><body><div class="topbar"><div class="wrap topbar-inner"><a class="brand" href="index.html"><span class="brand-mark">55</span>55GEMSDOE</a><nav class="nav"><a href="index.html">Summary</a><a href="executive-summary.html">How to submit</a><a href="download.html">Download</a><a href="method.html">Method</a><a href="calibration.html">Budget calibration</a><a href="results.html" class=active>Results</a><a href="hypotheses.html">Hypotheses</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a></nav></div></div><main class="wrap">
+<h1>Results</h1>
+<p class="lead">The one number that matters, the control it is measured against, and the test that
+failed.</p>
+<h2>Preregistered final run</h2>
+<div class="callout good"><h2>HOLDOUT-DTI 0.038091 &nbsp;·&nbsp; 95% CI [0.035574, 0.040581]</h2>
+<p>Evidence class HOLDOUT-DTI, evaluator <code>gems55.dti55/2.0-local</code>.
+60,988 withheld positive pixels in 4
+disjoint fault-segment folds with a 3 px (300 m) buffer; each fold's features
+and emissions are masked pixel-exactly and differenced against the all-visible-faults baseline.
+Interval from 3,182 spatial blocks of 40 × 40 px, 1,000 bootstrap
+draws — the block is larger than the 300 m smoothing kernel so the resample respects spatial
+dependence. Not an organiser receipt.</p></div>
+<div class="grid">
+<div class="card"><p class="metric-label">Random control</p>
+<p class="metric-value">0.034064</p>
+<p class="small">± 0.000581 over 3 replicates, uniform random dots,
+identical count and identical mask</p></div>
+<div class="card"><p class="metric-label">Lift</p>
+<p class="metric-value">1.12×</p>
+<p class="small">the candidate's CI lower bound sits above the control's replicate range</p></div>
+<div class="card"><p class="metric-label">Positive budget</p>
+<p class="metric-value">16,000</p>
+<p class="small">0.31% of the
+5,167,373-pixel footprint, separation 3 px</p></div>
+</div>
+<h3>Weighted counts behind the number</h3>
+<div class="table-wrap"><table class="table"><tr><th>poorly-predicted true positive</th>
+<th>false positive</th><th>false negative</th></tr>
+<tr><td>1989.52</td><td>15214.57</td><td>58998.48</td></tr></table></div>
+<pre>DT = TP / (α·TP + β·FP + (1−α−β)·FN)      α = 0.2,  β = 0.8
+   = 1989.52 / (0.2·1989.52 + 0.8·15214.57 + 0.2·58998.48)
+   = 0.038091</pre>
+<p class="small">The unweighted single-pixel equivalent is <code>TP / (TP + FP + FN)</code>, which
+is what the organiser's documentation uses for its worked examples. At these counts it gives
+<code>1990 / (1990 + 15215 + 58998) =
+0.026108</code> — one order of magnitude smaller. The α/β weighting matters, so every number on
+this site names the evaluator that produced it. The sweep and the final run use the same
+evaluator, the same α and the same β.</p>
+<h2>Ablation at the identical budget — what actually carries the signal</h2>
+<div class="table-wrap"><table class="table"><tr><th>Surface</th><th>holdout DTI</th></tr>
+<tr><td>ridge_only</td><td>0.023264</td></tr>
+<tr><td>ridge_x_dim</td><td>0.039231</td></tr></table></div>
+<p>Ranking by gradient ridges alone is the weakest configuration, but it is also the only one
+whose emission is limited by its own geometry: non-maximum suppression finds only 9,628 eligible
+peaks at a 3 px separation, so it never reaches the 16,000-cell budget and its lower DTI is
+partly a budget artefact rather than a pure quality judgement. Adding the near-2-D gate is the
+single largest measured gain. The dimensionality indicator is what this lane contributes; the
+strike-agreement gate is not, and the next section says so.</p>
+<h2>The confirmatory test, preregistered and then run — it failed</h2>
+<div class="callout bad"><h2>NOT_SUPPORTED</h2>
+<p>The lane predicted that withheld faults' strikes should agree with the tensor strike more often
+than randomly chosen detected ridges do. The measurement goes the other way.</p>
+<ul class="list">
+<li><strong>Group A — withheld catalogue fault segments</strong> (n = 1,661, ≥ 12 px):
+median angular difference 43.4°, 25.3% within
+20°.</li>
+<li><strong>Group B — random detected ridges</strong> (n = 262, ≥ 600 m from any mapped
+fault): median 19.4°, 50.4% within 20°.</li>
+<li>Two-proportion z = -8.35.</li>
+</ul>
+<p>Group A's median of 43.4° is statistically indistinguishable from the
+45° median of a uniform distribution on [0°, 90°]: at catalogue fault segments the tensor strike
+carries no information about the fault's own strike. Group B's low median is at least partly
+circular — the ridge azimuth and the tensor eigenvector come from the same field, so a strong
+ridge is self-consistent whether or not it is a fault. A negative result is a deliverable, so it
+is reported here and in <a href="run-card.json">run-card.json</a> rather than dropped.</p></div>
+<h2>Why the holdout is not a score</h2>
+<div class="callout warn"><h2>HOLDOUT-DTI is measured against the public catalogue</h2>
+<p>The competition scores against <em>new</em> faults that are not in that catalogue. Every number
+above is a rank-ordering signal on a proxy task, not a prediction of the leaderboard value, and
+taking the holdout argmax as the budget would be over-fitting the proxy. The public-catalogue
+truth is 60,988 pixels against a private test set that the
+<a href="calibration.html">registry calibration</a> puts at roughly 15,000–25,000 pixels, which is
+why the budget comes from the calibration and not from the sweep. The only organiser-confirmed
+number this project can hold is a submission receipt, and it has none.</p></div>
+</main><footer class="footer"><div class="wrap"><p>55GEMSDOE — tensor-dimensionality lane, <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge</a> (Drivendata 306).</p></div></footer></body></html>

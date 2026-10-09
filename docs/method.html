@@ -1,25 +1,90 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Method and implementation limits · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
-<body><main><p><a href="index.html">← Executive summary</a></p><h1>Method and implementation limits</h1>
-<p>The repository contains a tensor-dimensionality prototype in <code>src/gems55/</code>. It is not a validated submission pipeline. The competition feature rasters, organizer template, cache, and registry rasters are absent in this checkout, and this review did not rebuild or run the lane.</p>
-<h2>Prototype method</h2><ol>
-<li>Read RTP-magnetic band 2 and isostatic-gravity band 13 from the competition feature stack.</li>
-<li>Fill invalid cells and apply a band-pass. The current code uses an along-axis profile-removal operation over the full raster; it has not been shown to operate independently inside verified acquisition polygons.</li>
-<li>Compute each field's FFT gradient tensor, eigenvalues/eigenvectors, a dimensionality statistic, horizontal-gradient ridges, and local strike information.</li>
-<li>Combine normalized ridge strength with near-2-D, strike-agreement, plunge, and striping factors to form a continuous score surface.</li>
-<li>Emitters produce point predictions from the score; they do not provide evidence of holdout improvement by themselves.</li>
-</ol>
-<h2>Known implementation limits</h2>
-<ul>
-<li><code>LaneConfig.block_px=64</code> controls robust normalization in regular pixel tiles. It is <strong>not</strong> an official GeoDAWN acquisition-block mask. The existing run-card statement that each acquisition block was processed independently was unsupported.</li>
-<li>The field-preparation profile is global along the selected raster axis, not separately estimated in the official acquisition polygons. Authorized block/flight-line layers are not staged.</li>
-<li>Repository-local utilities specify whole-component hide-and-recover, per-fold visible masks, and score-independent random controls. They are not certified as the authorized shared evaluator; historical results used different logic and remain invalid for promotion.</li>
-<li>The greedy cover function optimizes a monotone submodular coverage surrogate. It does not account for the exact DTI false-positive term and is not a DTI optimizer.</li>
-<li>Passing synthetic unit tests verifies code properties only; it is not geological validation, an official evaluator match, or a submission clearance.</li>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Method · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head><body><div class="topbar"><div class="wrap topbar-inner"><a class="brand" href="index.html"><span class="brand-mark">55</span>55GEMSDOE</a><nav class="nav"><a href="index.html">Summary</a><a href="executive-summary.html">How to submit</a><a href="download.html">Download</a><a href="method.html" class=active>Method</a><a href="calibration.html">Budget calibration</a><a href="results.html">Results</a><a href="hypotheses.html">Hypotheses</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a></nav></div></div><main class="wrap">
+<h1>Method</h1>
+<p class="lead">Everything below is computed from the official GeoDAWN grids only. No catalogue,
+no label and no previously submitted raster enters the score.</p>
+<h2>1 · Inputs</h2>
+<ul class="list">
+<li><strong>Competition band 2</strong>, reduced-to-pole magnetic anomaly (nT) — 
+<a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">official feature list</a>.</li>
+<li><strong>Competition band 13</strong>, isostatic gravity anomaly (mGal).</li>
+<li>Both are read at their native 100 m grid, EPSG:32611, 3730 × 3292, with the sentinel
+<code>-1e38</code> mapped to NaN as the organiser reference solution does.</li>
 </ul>
-<h2>Scientific interpretation</h2>
-<p>A two-dimensional tensor signature is not specific to a fault. Lithologic contacts, dikes, intrusive sheets, altered corridors, flight-line artifacts, block seams, and FFT edge effects can mimic or distort it. Geophysical signals are candidate structure indicators, not geological labels.</p>
-<p>Required next steps after the experiment budget is explicitly reopened: obtain authorized data, validate acquisition masks and grid alignment, freeze the processing configuration, run one-feature-at-a-time leakage canaries, evaluate whole connected fault segments with buffer and exact visible-fault masking, calculate pooled HOLDOUT-DTI with the shared evaluator and a spatial 95% CI, then check surface and final-dot uniqueness. A same-evaluator holdout win is required before submission-slot promotion.</p>
-<p><strong>Current decision:</strong> no new experiment, no valid holdout win, no download CTA, and no submission.</p>
-</main></body></html>
+<h2>2 · Preparation</h2>
+<p>Nearest-neighbour gap fill inside the footprint, then a Gaussian band-pass
+(low-pass σ = 300 m, high-pass λ = 8 km) applied <em>before</em> differentiation, because the
+derivative operators amplify short-wavelength noise by |k| and |k|². Along-track median levelling
+was measured and <strong>switched off</strong>: the delivered grids show no flight-line striping
+(the standard deviation of the east–west mean profile is 24.10 against 24.70 for the north–south
+profile, ratio 0.976, and lag-1 autocorrelation is 0.992 along x against 0.995 along y). There is
+nothing to level, so levelling would only remove real signal.</p>
+<h2>3 · Pseudogravity</h2>
+<p>The magnetic anomaly is reduced to the pole, so magnetisation and inducing field are vertical
+and the anomaly is proportional to the vertical derivative of the magnetic scalar potential. The
+potential is recovered by dividing the spectrum by |k| (Baranov/Gunn pseudogravity),
+<code>V̂ = T̂ / |k|</code> with <code>V̂(0) = 0</code>. The gradient tensor is then built from V, so
+it is the Marussi tensor analysed by Pedersen &amp; Rasmussen (1990) and Beiki &amp; Pedersen
+(2010), not a third-derivative proxy. Eigenvalues and the horizontal strike azimuth are invariant
+to the sign convention chosen for the vertical operator, so the result does not depend on that
+choice.</p>
+<h2>4 · The tensor</h2>
+<pre>Txx &lt;-&gt; -kx²      Tyy &lt;-&gt; -ky²      Txy &lt;-&gt; -kx·ky
+Tzz = -(Txx+Tyy)  (Laplace: the tensor is traceless by construction)
+Txz &lt;-&gt; i·kx·|k|   Tyz &lt;-&gt; i·ky·|k|</pre>
+<p>Closed-form symmetric 3×3 eigen-decomposition (Smith 1961) over all 12.28 M cells; verified
+against <code>numpy.linalg.eigh</code> in <code>tests_numeric/test_core.py</code>.</p>
+<h2>5 · Dimensionality and strike</h2>
+<pre>e2 = λ1λ2 + λ1λ3 + λ2λ3      e3 = λ1λ2λ3
+I  = 27·e3² / (4·(−e2)³)     0 = pure 2-D (λ = a, 0, −a);  1 = equidimensional 3-D</pre>
+<p>The intermediate eigenvalue's eigenvector gives the strike; its horizontality gives a plunge
+weight. The eigenvalue-ratio variant <code>D = −λ2/λ1</code> is computed alongside and the
+holdout picks between them.</p>
+<h2>6 · Score</h2>
+<pre>score = ridge · (1 − I) · exp(−(Δθ/25°)²) · plunge
+ridge = sqrt(rank_mag · rank_grav)      (corroboration of both fields)
+Δθ    = angle between the tensor strike and the ridge tangent (ridge tangent = gradient azimuth + 90°)</pre>
+<p>Ridges are the local maxima of the corroborated horizontal-gradient magnitude, thinned by
+non-maximum suppression to a minimum separation of 3 px — two dots closer than the 300 m kernel
+cannot both add true-positive credit (the metric takes a <em>max</em>), so packing them tighter
+only buys false positives.</p>
+<h2>7 · What was deliberately not done</h2>
+<ul class="list">
+<li>No destriping (measured to be unnecessary — see §2).</li>
+<li>No acquisition-block splitting: the delivered grid is a single merged, levelled product and
+neither official block polygons nor flight-line metadata are distributed with the competition
+files, so inventing them would be fabrication. The 64-pixel tiles used for amplitude
+equalisation are normalisation windows, not acquisition blocks, and are labelled as such.</li>
+<li>No east–west mask: with no measurable striping, an E–W azimuth mask would delete real
+east-trending structures without removing an artefact. Measured, then dropped — reported rather
+than silently applied.</li>
+</ul>
+<h2>Leakage canary (each feature alone on the holdout)</h2>
+<div class="table-wrap"><table class="table"><tr><th>Feature</th><th>AUC vs withheld truth</th>
+<th>mean score lift vs far field</th><th>verdict</th></tr><tr><td>tensor_full</td><td>0.5361</td><td>1.20×</td><td>ok</td></tr>
+<tr><td>ridge_only</td><td>0.5867</td><td>1.14×</td><td>ok</td></tr>
+<tr><td>ridge_x_dim</td><td>0.5730</td><td>1.14×</td><td>ok</td></tr>
+<tr><td>ridge_x_agree</td><td>0.5391</td><td>1.21×</td><td>ok</td></tr>
+<tr><td>ridge_mag_only</td><td>0.5485</td><td>1.10×</td><td>ok</td></tr>
+<tr><td>ridge_grav_only</td><td>0.5531</td><td>1.11×</td><td>ok</td></tr>
+<tr><td>_dim</td><td>0.5103</td><td>1.02×</td><td>ok</td></tr>
+<tr><td>_dtheta</td><td>0.4828</td><td>0.97×</td><td>ok</td></tr>
+<tr><td>_agree</td><td>0.5172</td><td>1.07×</td><td>ok</td></tr></table></div>
+<p class="small">Negatives are footprint cells at least 600 m from any mapped fault. Every value
+is far below the 0.90 leakage threshold, so no feature is reading the withheld segments.</p>
+<h2>Dot-count sweep (tensor_full, separation 3 px, no dilation)</h2>
+<div class="table-wrap"><table class="table"><tr><th>dots</th><th>holdout DTI</th>
+<th>random control</th><th>lift</th><th>TP_w</th><th>FP_w</th></tr><tr><td>8,000</td><td>0.019527</td><td>0.017220</td><td>1.13×</td><td>986</td><td>7626</td></tr>
+<tr><td>12,000</td><td>0.028909</td><td>0.024089</td><td>1.20×</td><td>1485</td><td>11425</td></tr>
+<tr><td>16,000</td><td>0.038091</td><td>0.032784</td><td>1.16×</td><td>1990</td><td>15215</td></tr>
+<tr><td>20,000</td><td>0.045840</td><td>0.040867</td><td>1.12×</td><td>2433</td><td>19038</td></tr>
+<tr><td>25,000</td><td>0.055320</td><td>0.050479</td><td>1.10×</td><td>2996</td><td>23812</td></tr>
+<tr><td>30,000</td><td>0.062980</td><td>0.056636</td><td>1.11×</td><td>3476</td><td>28562</td></tr>
+<tr><td>37,654</td><td>0.073231</td><td>0.070719</td><td>1.04×</td><td>4160</td><td>35890</td></tr>
+<tr><td>50,000</td><td>0.074653</td><td>0.072955</td><td>1.02×</td><td>4258</td><td>36959</td></tr></table></div>
+<p class="small">The holdout optimum keeps rising with dot count because the holdout truth
+(60,988 catalogue pixels) is roughly three to four times the size of the private test set implied
+by the <a href="calibration.html">registry calibration</a>. The shipped budget of
+16,000 dots therefore comes from the calibration, not from the holdout argmax, and
+that is stated openly rather than hidden.</p>
+</main><footer class="footer"><div class="wrap"><p>55GEMSDOE — tensor-dimensionality lane, <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge</a> (DrivenData 306).</p></div></footer></body></html>

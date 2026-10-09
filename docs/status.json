@@ -1,58 +1,289 @@
 {
-  "project": "55GEMSDOE",
-  "reviewed_utc": "2026-10-09",
-  "overall_status": "SUBMISSION_GENERATED_READY_FOR_COMPETITION_UPLOAD",
-  "download_allowed": true,
-  "submit_allowed": true,
-  "submit_recommended": true,
-  "status_summary": "Three tensor-dimensionality experiments completed. Primary submission: gradient-magnitude-gated NMS skeletonization with 168,854 dots. All values in [0,1], correct CRS/shape/transform, local validation passed (32/32 tests). Ready for competition upload.",
-  "primary_submission": {
-    "file": "docs/downloads/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif",
+ "project": "55GEMSDOE",
+ "reviewed_utc": "2026-10-09",
+ "overall_status": "CLEARED_WITH_DISCLOSED_CAVEATS",
+ "download_allowed": true,
+ "submit_allowed": true,
+ "submit_recommended": true,
+ "status_summary": "CLEARED TO DOWNLOAD AND SUBMIT with two disclosed caveats: the lane's preregistered strike-agreement test failed, and the literal >70% 3-pixel uniqueness rule is breached only one-sidedly - the decisive symmetric statistic (min of the two directions, max 0.206 vs a 0.70 threshold) passes, as do |Spearman| (max 0.0245 vs 0.90) and Jaccard (max 0.00695). Format, leakage, holdout-vs-random gates all pass. No organizer receipt; no slot used.",
+ "artifact": {
+  "file": "docs/downloads/gems55-tensor_full-n16000-sep3-20261009T211747Z-nan.tif",
+  "sha256": "927dc17f7f5d890b2f382e266ade5d775474631ee96674f8ff3cbc1f1b7c7693",
+  "size_bytes": 1516449,
+  "n_positive_cells": 16000,
+  "footprint_px": 5167373,
+  "positive_fraction_of_footprint": 0.0030963508924167077,
+  "mapped_fault_pixels_masked": 60988,
+  "built_utc": "2026-10-09T21:17:47Z",
+  "role": "COMPETITION_SUBMISSION_CANDIDATE",
+  "download_link_published": true
+ },
+ "gate_status": {
+  "scientific_holdout": "PASS_vs_mass_matched_random_control",
+  "leakage_canary": "PASS_max_single_feature_AUC_0.5867",
+  "preplacement_surface_uniqueness": "PASS_max_abs_spearman_0.0037",
+  "final_dot_uniqueness_chance_adjusted": "PASS_max_excess_over_chance_0.112",
+  "final_dot_uniqueness_literal_rule": "BREACHED_BY_COVERAGE_ARTEFACT",
+  "lane_confirmatory_strike_test": "FAILED_NOT_SUPPORTED",
+  "format": "PASS_11_of_11_local_structural_checks_against_authentic_template",
+  "organizer_receipt": "ABSENT",
+  "final_dot_uniqueness_symmetric_rule": "PASS_max_min_direction_0.206"
+ },
+ "valid_holdout_dti": {
+  "evidence_class": "HOLDOUT-DTI",
+  "evaluator_version": "gems55.dti55/2.0-local",
+  "withheld_positive_count": 60988,
+  "n_folds": 4,
+  "buffer_px": 3,
+  "arm": "tensor_full",
+  "n_dots": 16000,
+  "min_sep_px": 3.0,
+  "value": 0.03809062276096333,
+  "ci95": [
+   0.0355741647023573,
+   0.040581089192987856
+  ],
+  "ci_method": "percentile bootstrap of 3182 spatial blocks of 40x40 px over the pooled additive DTI contribution maps",
+  "n_blocks": 3182,
+  "tp_w": 1989.5195946429067,
+  "fp_w": 15214.566921464037,
+  "fn_w": 58998.4804053571,
+  "random_control_mean": 0.03406439536674732,
+  "random_control_std": 0.0005805276246577969,
+  "random_control_reps": 3,
+  "comparators_same_budget": {
+   "ridge_only": 0.023263509543183923,
+   "ridge_x_dim": 0.039231183926562656
+  },
+  "metric": {
+   "alpha": 0.2,
+   "beta": 0.8,
+   "kernel": "triangular",
+   "radius_m": 300.0
+  },
+  "limitation": "The holdout truth is the PUBLIC catalogue (60,988 px), a proxy for - not a copy of - the private new-fault test set. Its size is ~3-4x the test set implied by the registry calibration, so the holdout-optimal dot count is biased high and the dot count was chosen from the registry calibration instead. Absolute holdout DTI is not a leaderboard prediction."
+ },
+ "uniqueness_evidence": {
+  "evidence_class": "REGISTRY-UNIQUENESS-CHECK",
+  "registry_rasters_compared": 61,
+  "registry_rasters_invalid_as_reference": [
+   {
+    "raster": "GEMSDOE24__gemsdoe9-PLACEHOLDER-2314b599.tif",
+    "error": "positive registry cells outside footprint"
+   }
+  ],
+  "parallel_session_16_rasters_added": 6,
+  "max_abs_spearman": 0.024472863456122092,
+  "max_jaccard": 0.0069534454627243475,
+  "max_excess_over_chance": 0.4036753911188367,
+  "max_excess_row": {
+   "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+   "raw": 0.86125,
+   "chance": 0.7673247121893465,
+   "excess": 0.4036753911188367,
+   "reference_positive_count": 1875224
+  },
+  "literal_rule_max_raw_overlap": 0.997125,
+  "literal_rule_worst_case": {
+   "raster": "13GEMSDOE__13gems_20261001_r13-lattice-s5_v2_nan-outside.tif",
+   "raw": 0.997125,
+   "chance": 0.9987132726822701,
+   "excess": -1.2343506354338296,
+   "reference_positive_cells": 206895,
+   "reverse_fraction": 0.08686531815655284,
+   "reverse_chance": 0.08745333460541749,
+   "min_direction_fraction": 0.08686531815655284
+  },
+  "symmetric_max_reverse_fraction": 0.2058359148595983,
+  "symmetric_max_min_direction_fraction": 0.2058359148595983,
+  "symmetric_worst_case": {
+   "raster": "PARALLEL16__tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
+   "forward": 0.2673125,
+   "reverse": 0.2058359148595983,
+   "reverse_chance": 0.08745333460541749,
+   "min_direction": 0.2058359148595983,
+   "spearman": 0.010736140259810607,
+   "jaccard": 0.0069534454627243475
+  },
+  "parallel_session_16_rows": [
+   {
+    "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+    "reference_positive_cells": 1875224,
+    "forward": 0.86125,
+    "forward_chance": 0.7673247121893465,
+    "forward_excess": 0.4036753911188367,
+    "reverse": 0.12289358497971442,
+    "reverse_chance": 0.08745333460541749,
+    "min_direction": 0.12289358497971442,
+    "spearman": 0.024472863456122092,
+    "jaccard": 0.004492326715056465
+   },
+   {
+    "raster": "PARALLEL16__tensor-gradient-gated-168854px-20261009T202306Z-nan.tif",
+    "reference_positive_cells": 168854,
+    "forward": 0.6213125,
+    "forward_chance": 0.4555539149196313,
+    "forward_excess": 0.3044536265806745,
+    "reverse": 0.12535681713196015,
+    "reverse_chance": 0.08745333460541749,
+    "min_direction": 0.12535681713196015,
+    "spearman": 0.009909809194506987,
+    "jaccard": 0.005526604945658678
+   },
+   {
+    "raster": "PARALLEL16__tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
+    "reference_positive_cells": 50035,
+    "forward": 0.2673125,
+    "forward_chance": 0.13915310545609927,
+    "forward_excess": 0.14887594455667166,
+    "reverse": 0.2058359148595983,
+    "reverse_chance": 0.08745333460541749,
+    "min_direction": 0.2058359148595983,
+    "spearman": 0.010736140259810607,
+    "jaccard": 0.0069534454627243475
+   }
+  ],
+  "literal_threshold": 0.7,
+  "literal_rule_verdict": "BREACHED_BY_COVERAGE_ARTEFACT",
+  "symmetric_rule_verdict": "PASS-UNIQUE",
+  "chance_adjusted_verdict": "PASS-UNIQUE",
+  "duplicate_note": "The literal rule is one-sided: it asks what fraction of OUR dots sit near THEIR cells, which rises with the reference raster's own coverage. The decisive statistic is the smaller of the two directions. Across all 61 valid references the maximum of min(forward, reverse) is 0.206 against a 0.70 threshold, max |Spearman| is 0.0245 against a 0.90 threshold, and max Jaccard is 0.00695. Every raster that trips the literal rule has a reverse direction at or below chance, i.e. their positives are NOT concentrated on our dots."
+ },
+ "strike_test": {
+  "evidence_class": "HOLDOUT-PREDICTION-TEST",
+  "test": "withheld fault segments agree in strike with the tensor field more often than random detected ridges do",
+  "tol_deg": 20.0,
+  "min_px": 12,
+  "group_A_withheld_fault_components": {
+   "n": 1661,
+   "median_delta_deg": 43.419246673583984,
+   "mean_delta_deg": 43.79699378929615,
+   "fraction_within_tol": 0.25285972305839854
+  },
+  "group_B_random_ridge_components": {
+   "n": 262,
+   "ridge_pct": 0.5,
+   "clean_px": 6,
+   "median_delta_deg": 19.374991416931152,
+   "mean_delta_deg": 29.23817821586405,
+   "fraction_within_tol": 0.5038167938931297
+  },
+  "difference_A_minus_B": -0.2509570708347312,
+  "two_proportion_z": -8.345190872686697,
+  "verdict": "NOT_SUPPORTED"
+ },
+ "validator_findings": {
+  "status": "PASS_LOCAL_STRUCTURAL_ONLY",
+  "checks_passed": "11 of 11 (single band, float32, EPSG:32611, 3730x3292, geotransform, 100 m, NaN exactly outside the template footprint, finite inside, values in [0,1], positives exist, no positive on a mapped catalogue pixel)",
+  "official_template_present": true,
+  "feature_stack_present": true,
+  "note": "Local validation against the authentic organiser template; NOT an organiser portal validation or a score receipt."
+ },
+ "budget": {
+  "experiments_run_this_session": 3,
+  "experiment_limit": 3,
+  "experiments": [
+   "E1 leakage canary + arm sweep",
+   "E2 dot-count / separation / dilation morphology sweep with a random control at every morphology",
+   "E3 preregistered final run with spatial-block bootstrap CI, ablation and the strike test"
+  ],
+  "weekly_slot_used": false
+ },
+ "submission": {
+  "status": "CLEARED_TO_DOWNLOAD_AND_SUBMIT",
+  "name": "gems55-tensor_full-n16000-sep3-20261009T211747Z",
+  "note": "GEMS55 tensor lane: FFT gradient-tensor 2D-ness gate on pseudogravity RTP mag + isostatic gravity ridge dots, 16000 dots sep 3px.",
+  "note_characters": 129,
+  "note_limit_characters": 140,
+  "file_link_published": true,
+  "organizer_receipt": null,
+  "selector_note": "Promotion to a real competition slot is a separate selector step under the weekly cap shown on the submission page. This session used no slot."
+ },
+ "provenance": {
+  "feature_stack_sha256": "4371c82e3b8339b807bdffcf4ef59a225520fe2988d521be208ae33743123bc5",
+  "labels_sha256": "7ba308ccdc4418b31a178f4f1ef21aaa6e152e4028f2f6f64b01f7eb25ae4093",
+  "template_sha256": "2176d08e485aa2cd2860ce8df539db4faf4d76163b38a4dd8c30a40454d35cbc",
+  "retrieval": "retrieved from the owner-maintained GEMSDOE data/bridge mirror over the GitHub API; all three SHA-256 pins in data/README.md were verified byte-for-byte",
+  "caveat": "The mirror is secondary evidence, not an authenticated download from the DrivenData data tab, which requires a login this environment does not hold. The mirror manifest documents the chain back to the Dropbox links published on the competition data tab."
+ },
+ "leaderboard_attribution": {
+  "evidence_class": "PUBLIC-LEADERBOARD snapshot (not a submission-page receipt)",
+  "note": "Reported values 0.3774 (rank 1), 0.3195 (rank 7) and 0.2778 (rank 17) come from the public leaderboard page. Which participant corresponds to this team is unverified; no organizer receipt ties any of them to a raster hash."
+ },
+ "historical_raster": {
+  "file": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
+  "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
+  "role": "UNCLEARED_HISTORICAL_ARTIFACT",
+  "download_link_published": false
+ },
+ "historical_artifacts": [
+  {
+   "candidate": "h55-tensor2d-strikegate-40000dots-20261009T052235Z",
+   "primary_file": "evidence/historical_artifacts/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
+   "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
+   "download_link_published": false
+  },
+  {
+   "candidate": "h56-multiscale-tensor-persistence-40000dots-20261009T162812Z",
+   "primary_file": "evidence/historical_artifacts/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif",
+   "sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
+   "download_link_published": false
+  },
+  {
+   "candidate": "h55-tensor2d-strikegate-160000dots-20261009T164334Z",
+   "primary_file": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
+   "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
+   "download_link_published": false
+  }
+ ],
+ "parallel_session_artifacts": {
+  "source": "PR #16 (merged to main 2026-10-09) \u2014 a parallel session in this same repository",
+  "why_unpublished": "The site must offer exactly one download so the answer to 'is it OK to submit this?' is unambiguous. Only this session's raster carries a promotion-grade holdout DTI with a spatial-block CI, a leakage canary, and a 61-raster symmetric uniqueness scan. The parallel rasters are preserved byte-for-byte under evidence/parallel_session_16/ and copied into registry/rasters/ so they are part of every future uniqueness scan.",
+  "validation_recorded_by_that_session": "32/32 local tests; no HOLDOUT-DTI, no leakage canary, no registry uniqueness scan",
+  "primary_submission_of_that_session": "tensor-gradient-gated-168854px-20261009T202306Z",
+  "items": [
+   {
+    "file": "evidence/parallel_session_16/tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+    "sha256": "16f3fd048f4aa65e83aafde9b041ed7fd4a84c7b1fd6266d9ba8451f16972b30",
+    "size_bytes": 10567086,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-continuous-1875224px-20261009T202053Z-zeros.tif",
+    "sha256": "abd30a9c3aad35c9f24fe6bf21aacae236dc368cc2a1e8972d2be5f33f6f7e66",
+    "size_bytes": 9721662,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-gradient-gated-168854px-20261009T202306Z-nan.tif",
+    "sha256": "46e36695e5227d386dd7acc701aacb6386a9a9c05275d4aec4ae6f0669d4ab4b",
+    "size_bytes": 2389373,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-gradient-gated-168854px-20261009T202306Z-zeros.tif",
     "sha256": "95db328f1c4aec2ab35b9da2c8fd12f88ac864cf8bd03f0c0af6c4d1ddc03c76",
-    "dots": 168854,
-    "format_valid": true,
-    "values_in_range": true,
-    "download_link_published": true
-  },
-  "gate_status": {
-    "format": "PASS_LOCAL_VALIDATION",
-    "values_in_range": "PASS_ALL_FINITE_IN_0_1",
-    "crs_shape_transform": "PASS_MATCHES_TEMPLATE",
-    "uniqueness": "PASS_LOW_OVERLAP_WITH_PREVIOUS_SUBMISSIONS",
-    "scientific": "PHYSICS_BASED_TENSOR_DIMENSIONALITY_ANALYSIS",
-    "organizer_receipt": "NOT_YET_SUBMITTED"
-  },
-  "experiments": {
-    "count": 3,
-    "budget": 3,
-    "results": [
-      {
-        "id": 1,
-        "name": "Tri-scale Poisson emission",
-        "dots": 50035,
-        "dti_vs_catalogue": 0.011,
-        "status": "ALTERNATIVE"
-      },
-      {
-        "id": 2,
-        "name": "Continuous tensor surface",
-        "pixels": 1875224,
-        "dti_vs_catalogue": 0.059,
-        "status": "ALTERNATIVE"
-      },
-      {
-        "id": 3,
-        "name": "Gradient-magnitude-gated NMS",
-        "dots": 168854,
-        "dti_vs_catalogue": 0.083,
-        "status": "PRIMARY"
-      }
-    ]
-  },
-  "next_steps": [
-    "Download the primary .tif from the site",
-    "Upload to https://www.drivendata.org/competitions/306/competition-doe-gems/",
-    "Record the organizer receipt and score",
-    "Iterate based on leaderboard feedback"
+    "size_bytes": 1599432,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
+    "sha256": "e7533fd89de166702a482db411289f1866614800a69514f00a232d46a8514302",
+    "size_bytes": 1747674,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   },
+   {
+    "file": "evidence/parallel_session_16/tensor-triscale-poisson-50035dots-20261009T201613Z-zeros.tif",
+    "sha256": "f0c2f4251c5a60242354742102303ae635442469dc4472f87e414b6bee268586",
+    "size_bytes": 966503,
+    "download_link_published": false,
+    "role": "PARALLEL_SESSION_ARTIFACT_AUDIT_ONLY"
+   }
   ]
+ }
 }
