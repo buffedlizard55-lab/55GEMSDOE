@@ -134,5 +134,9 @@
       "all_passed": true,
       "sha256": "038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424"
     }
-  }
+  },
+  "review_status": "SUPERSEDED_HISTORICAL_NOT_PROMOTION_EVIDENCE",
+  "promotion_use": "PROHIBITED",
+  "review_note": "Historical holdout evidence from a private local gems.metric v1 evaluator and quadrant/segment logic; the results were not reproduced with the authorized shared evaluator and are invalid for promotion.",
+  "evaluator_provenance": "gems.metric v1 was a private local re-implementation, not the organizer or authorized shared evaluator."
 }

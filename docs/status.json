@@ -1,34 +1,73 @@
 {
   "project": "55GEMSDOE",
   "reviewed_utc": "2026-10-09",
-  "overall_status": "format_cleared_science_negative",
-  "submission_tif": "docs/downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
-  "download_allowed": true,
-  "submit_allowed": true,
+  "overall_status": "NOT_CLEARED_DUPLICATE_STOP_AND_HOLDOUT_UNVALIDATED",
+  "download_allowed": false,
+  "submit_allowed": false,
   "submit_recommended": false,
-  "why_download_is_allowed": "The file passes 12/12 independent format checks re-read from the written bytes (single-band float32, EPSG:32611, 3292x3730, template transform, every value in [0,1], zero NaN, no dot on a mapped catalogue pixel) and is unique against 56 prior scored rasters.",
-  "why_submission_is_not_recommended": "On the leakage-free spatial holdout the lane scores 0.0667 pooled DTI versus 0.0757 for a uniform-random control at matched mass, and is below it in 4 of 4 folds. It has not beaten the control, so it must not be promoted into a weekly slot on this evidence.",
-  "holdout_dti": {
-    "evidence_class": "HOLDOUT-DTI",
-    "evaluator": "src/gems55/dti55.py (exact official DTI; verified vs brute force and the official worked example)",
-    "tensor_lane": 0.06670118698244415,
-    "uniform_random_control": 0.07572925371015232,
-    "fold_mean": 0.07418604544828375,
-    "ci95_folds": [
-      0.05600790445991459,
-      0.08934589204746593
-    ],
-    "withheld_positive_count": 60988,
-    "concurrent_session_replication": {
-      "ridge_baseline": 0.0578,
-      "full_tensor_lane": 0.0444,
-      "ci95": [
-        0.0383,
-        0.0502
-      ]
-    }
+  "status_summary": "Do not download or submit a raster from this project. Historical raster variants are archived under evidence/historical_artifacts/ outside the published site; none is a cleared deliverable.",
+  "historical_raster": {
+    "file": "evidence/historical_artifacts/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
+    "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
+    "role": "UNCLEARED_HISTORICAL_ARTIFACT",
+    "download_link_published": false
   },
-  "organizer_confirmed_score": null,
-  "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
-  "reason": "A validated, unique raster is published because the owner's standing requirement is an obvious downloadable submission. Its scientific verdict is negative and the site says so next to the download button."
+  "gate_status": {
+    "scientific_holdout": "BLOCKED_NO_VALID_PROMOTION_HOLDOUT",
+    "leakage_canary": "HISTORICAL_RESULT_NOT_SUFFICIENT_FOR_CLEARANCE",
+    "preplacement_surface_uniqueness": "NOT_RECHECKABLE_SURFACE_CACHE_ABSENT",
+    "final_dot_uniqueness": "DUPLICATE_STOP_LITERAL_THRESHOLD",
+    "format": "PARTIALLY_INSPECTED_NOT_ORGANIZER_VALIDATED",
+    "organizer_receipt": "ABSENT"
+  },
+  "uniqueness_evidence": {
+    "evidence_class": "HISTORICAL_REGISTRY_COMPARISON_NOT_RECHECKED_IN_THIS_REVIEW",
+    "registry_rasters_reported_scanned": 56,
+    "max_abs_spearman": 0.0043,
+    "max_jaccard": 0.007993,
+    "max_fraction_candidate_dots_within_3px_raw": 0.8413,
+    "literal_threshold": 0.70,
+    "verdict": "DUPLICATE_STOP",
+    "why": "The prior control-adjusted exception is not authorized by the standing rule. The reported raw overlap already exceeds the literal threshold; no uniqueness pass is issued. The local registry raster corpus is absent, so the comparison was not repeated."
+  },
+  "valid_holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "status": "NOT_AVAILABLE",
+    "evaluator_version": null,
+    "withheld_positive_count": null,
+    "value": null,
+    "ci95": null,
+    "reason": "The existing holdout used quadrant withholding, could split a connected mapped fault, used a score-conditioned random arm, and reported fold-bootstrap intervals as if they were pooled-score uncertainty. No experiment was rerun because the recorded budget is exhausted."
+  },
+  "historical_holdout_dti": [
+    {
+      "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+      "evaluator_version": "unversioned local src/gems55/dti55.py transcription, pre-audit",
+      "withheld_positive_count": 60988,
+      "tensor_full_value": 0.06670118698244415,
+      "tensor_full_ci95": [0.05600790445991459, 0.08934589204746593],
+      "control_name": "score-conditioned random; not a uniform random control",
+      "control_value": 0.07572925371015232,
+      "control_ci95": [0.05711247628318898, 0.12139421481046019],
+      "ci_note": "Historical four-fold bootstrap over quadrant-fold DTI values; not a valid pooled-score 95% CI.",
+      "invalid_reasons": ["not whole-component holdout", "random arm filtered by score > 0", "fold interval is not pooled-DTI uncertainty"]
+    },
+    {
+      "evidence_class": "HOLDOUT-DTI (historical; separate private evaluator; not comparable)",
+      "evaluator_version": "gems.metric v1 private re-implementation",
+      "withheld_positive_count": 60594,
+      "tensor_full_value": 0.0444,
+      "tensor_full_ci95": [0.0383, 0.0502],
+      "ridge_baseline_value": 0.0578,
+      "ridge_baseline_ci95": [0.0499, 0.0652],
+      "invalid_reasons": ["quadrant/segment split", "private evaluator fork", "different withheld-positive count", "not comparable to canonical local record"]
+    }
+  ],
+  "leaderboard_attribution": {
+    "evidence_class": "USER-REPORTED / NOT ORGANIZER-CONFIRMED",
+    "reported_values": [0.2778, 0.3195, 0.3774],
+    "h33_0_2778_attribution": "UNSUPPORTED",
+    "reason": "No organizer submission receipt tying the score to the H33 raster/hash is present. The owner-maintained GEMSDOE32 manifest records receipt=null and labels the H33 file UNSCORED with projected 0.2747."
+  },
+  "next_gate": "Acquire organizer-authorized data and exact receipt evidence; replace invalid holdout design before any new experiment. No experiment or submission promotion is authorized in this review."
 }

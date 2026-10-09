@@ -60,7 +60,9 @@
     "fold_ci95": [
       0.05711247628318898,
       0.12139421481046019
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "fold_ci95_status": "historical bootstrap over fold DTI values, not pooled-DTI 95% CI"
   },
   "ridge_only": {
     "pooled": {
@@ -114,7 +116,9 @@
     "fold_ci95": [
       0.04585876598667871,
       0.058480005403439644
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "fold_ci95_status": "historical bootstrap over fold DTI values, not pooled-DTI 95% CI"
   },
   "ridge_x_dim": {
     "pooled": {
@@ -168,7 +172,9 @@
     "fold_ci95": [
       0.057688550633991,
       0.09599377068941528
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "fold_ci95_status": "historical bootstrap over fold DTI values, not pooled-DTI 95% CI"
   },
   "ridge_x_agree": {
     "pooled": {
@@ -222,7 +228,9 @@
     "fold_ci95": [
       0.059983497516462356,
       0.10040553338926057
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "fold_ci95_status": "historical bootstrap over fold DTI values, not pooled-DTI 95% CI"
   },
   "tensor_full": {
     "pooled": {
@@ -276,7 +284,9 @@
     "fold_ci95": [
       0.05600790445991459,
       0.08934589204746593
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "fold_ci95_status": "historical bootstrap over fold DTI values, not pooled-DTI 95% CI"
   },
   "leakage_canary": {
     "tensor_full_score": {
@@ -356,5 +366,17 @@
       -4.683395349864613
     ],
     "lift_fraction_points": 0.0797204245572152
-  }
+  },
+  "evidence_class": "HOLDOUT-DTI (HISTORICAL; INVALID FOR PROMOTION)",
+  "evaluator_version": "unversioned local src/gems55/dti55.py transcription, pre-audit",
+  "withheld_positive_count": 60988,
+  "review_status": "INVALID_FOR_PROMOTION_NOT_RERUN",
+  "invalid_reasons": [
+    "folds were contiguous quadrants; connected mapped faults crossing a boundary were split",
+    "emit_dots applied score > 0 before its random branch, so the random control was not uniform over all eligible pixels",
+    "reported fold-bootstrap interval is not a pooled-DTI confidence interval",
+    "no official organizer evaluator receipt is present"
+  ],
+  "correct_metric_algebra": "DTI = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps); at alpha=.2,beta=.8 denominator=.2*TP_w + .2*FP_w + .8*|G| + eps",
+  "promotion_use": "PROHIBITED"
 }

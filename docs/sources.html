@@ -1,106 +1,30 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sources · 55GEMSDOE</title><style>
-:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--acc:#4cc2ff;--ok:#3fb950;--bad:#f85149;--warn:#d29922}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
-font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
-header{padding:26px 22px;border-bottom:1px solid #21262d}
-main{max-width:1080px;margin:0 auto;padding:22px}
-h1{margin:0 0 6px;font-size:26px}h2{margin:34px 0 10px;font-size:20px;border-bottom:1px solid #21262d;padding-bottom:6px}
-h3{margin:22px 0 8px;font-size:16px;color:var(--acc)}
-p,li{color:var(--ink)}a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
-.sub{color:var(--mut);margin:0}
-table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
-th,td{border:1px solid #30363d;padding:7px 9px;text-align:left;vertical-align:top}
-th{background:#1c2129}td.num{text-align:right;font-variant-numeric:tabular-nums}
-code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-pre{background:#0b0f14;border:1px solid #30363d;border-radius:8px;padding:12px;overflow:auto;font-size:13px}
-code{background:#0b0f14;padding:1px 5px;border-radius:4px;font-size:13px}
-nav{margin-top:14px}nav a{margin-right:14px;font-size:14px}
-.dl{background:linear-gradient(135deg,#0f2f1c,#10222e);border:2px solid var(--ok);
-border-radius:12px;padding:20px;margin:18px 0}
-.dl h2{border:0;margin:0 0 10px;color:var(--ok)}
-.btn{display:inline-block;background:var(--ok);color:#04160b;font-weight:700;padding:12px 20px;
-border-radius:8px;margin:6px 8px 6px 0;font-size:16px}
-.btn.sec{background:#30363d;color:var(--ink)}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
-.pill.ok{background:#12331d;color:var(--ok);border:1px solid var(--ok)}
-.pill.bad{background:#3a1214;color:var(--bad);border:1px solid var(--bad)}
-.pill.warn{background:#332701;color:var(--warn);border:1px solid var(--warn)}
-.card{background:var(--panel);border:1px solid #30363d;border-radius:10px;padding:16px;margin:12px 0}
-.mono{font-variant-numeric:tabular-nums}
-.small{font-size:13px;color:var(--mut)}
-footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size:13px;border-top:1px solid #21262d}
-</style></head>
-<body><header><div style="max-width:1080px;margin:0 auto">
-<h1>55GEMSDOE — tensor-dimensionality lane</h1>
-<p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN, northwestern Great Basin</p>
-<nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="anchor-0.2778.html">The 0.2778 anchor</a><span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> <a href="executive-summary.html" style="font-size:13px">Exec summary (v1)</a><a href="results.html" style="font-size:13px">Results (v1)</a><a href="data_dictionary.html" style="font-size:13px">Data dictionary</a><a href="leaderboard-analysis.html" style="font-size:13px">Leaderboard analysis</a></nav></div></header><main>
-<h2>Sources</h2>
-<p>Every claim on this site traces to one of these. Links are given for manual
-review; each was retrieved on 2026-10-09.</p>
-<table>
-<tr><th>Source</th><th>What it was used for</th><th>Link</th></tr>
-<tr><td>Official problem description</td>
-<td>Task, the 19 provided layers, the distance-weighted Tversky definition
-(α=0.2, β=0.8, 300 m triangular kernel), and the four-point submission contract</td>
-<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">drivendata.org/competitions/306/.../page/967/</a></td></tr>
-<tr><td>Competition landing page</td><td>Structure and rules entry point</td>
-<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">drivendata.org/competitions/306/competition-doe-gems/</a></td></tr>
-<tr><td>Organiser reference solution</td>
-<td>Band naming convention, the <code>X &lt; −1e38 → NaN</code> sentinel rule, and the
-Tversky loss parameters. Reviewed in full; it does not implement the scoring
-evaluator, so the problem-description page remains the scoring authority.</td>
-<td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">github.com/drivendataorg/gems-prize-reference-solution</a></td></tr>
-<tr><td>Pedersen &amp; Rasmussen (1990), <i>Geophysics</i> 55(12) 1558–1566</td>
-<td>Gradient tensor of potential-field anomalies; the dimensionality concept</td>
-<td><a href="https://doi.org/10.1190/1.1442807">doi.org/10.1190/1.1442807</a></td></tr>
-<tr><td>Beiki &amp; Pedersen (2010), <i>Geophysics</i> 75(6) I37–I49</td>
-<td>Eigenvector analysis: largest-eigenvalue eigenvector points at the causative
-body; an eigenvector gives the strike of quasi-2-D bodies</td>
-<td><a href="https://doi.org/10.1190/1.3484098">doi.org/10.1190/1.3484098</a></td></tr>
-<tr><td>Karimi &amp; Kletetschka (2024), <i>Sci. Rep.</i> 14:2440 (open access)</td>
-<td>Restates the Pedersen–Rasmussen dimensionality indicator with I = 0 for pure
-2-D and I = 1 for pure 3-D; used to pin the invariant form and its endpoints</td>
-<td><a href="https://doi.org/10.1038/s41598-024-52843-5">doi.org/10.1038/s41598-024-52843-5</a>
-· <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11333590/">PMC11333590</a></td></tr>
-<tr><td>Beiki et al. (2011), ASEG Extended Abstracts</td>
-<td>Pseudo-gravity gradient tensor from gridded magnetic anomalies; 0.5 threshold
-between 2-D and 3-D</td>
-<td><a href="https://doi.org/10.1071/ASEG2012ab057">doi.org/10.1071/ASEG2012ab057</a></td></tr>
-<tr><td>USGS GeoDAWN data release</td>
-<td>Provenance of the airborne magnetic and radiometric surveys behind the
-magnetic layers</td>
-<td><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">usgs.gov/data/geodawn-…</a>
-· <a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">ScienceBase item</a></td></tr>
-<tr><td>INGENIOUS, Great Basin Center for Geothermal Energy</td>
-<td>Provenance of the label set and the subsurface layers</td>
-<td><a href="https://gbcge.org/current-projects/ingenious/">gbcge.org/current-projects/ingenious/</a></td></tr>
-<tr><td>EPSG:32611</td><td>WGS 84 / UTM zone 11N, the required CRS</td>
-<td><a href="https://epsg.io/32611">epsg.io/32611</a></td></tr>
-<tr><td>Tversky index</td><td>Definition of the α/β asymmetry the metric uses</td>
-<td><a href="https://en.wikipedia.org/wiki/Tversky_index">en.wikipedia.org/wiki/Tversky_index</a></td></tr>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sources and provenance · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
+<body><main><p><a href="index.html">← Executive summary</a></p><h1>Sources and provenance</h1>
+<p><strong>Review date: 2026-10-09 UTC.</strong> A source link is not proof that a file was downloaded, a score was confirmed, or provenance was authenticated.</p>
+<h2>Competition and official sources</h2><table><tr><th>Source</th><th>Use</th><th>Limit</th></tr>
+<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a></td><td>Primary task, feature, metric, and output-format reference.</td><td>Does not tie any raster to a score; consult live page before submission.</td></tr>
+<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData data tab</a></td><td>Authorized competition raster source, subject to login and terms.</td><td>No data were downloaded or authenticated in this review.</td></tr>
+<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">Official public leaderboard</a></td><td>Current public ranking source.</td><td>Earlier read showed a loading shell; no file/hash attribution established.</td></tr>
+<tr><td><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">Official NLR rules PDF</a></td><td>Eligibility, submission, and use terms.</td><td>Read the complete current rules before submitting; no legal determination here.</td></tr>
+<tr><td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">Official reference solution</a></td><td>Read-only API inspection found standard PyTorch Tversky training loss.</td><td>Not the distance-weighted scoring evaluator and not a score source.</td></tr>
+<tr><td><a href="https://doi.org/10.5066/P93LGLVQ">USGS GeoDAWN release</a></td><td>Survey context and potential acquisition/flight metadata.</td><td>No external block/line file was downloaded or aligned in this review.</td></tr>
 </table>
-<h3>Data provenance used in this build</h3>
-<p>The competition data page requires a DrivenData login, which this environment
-does not have. The official rasters were therefore recovered from prior
-repositories under the same GitHub account and verified by content address:</p>
-<table>
-<tr><th>File</th><th>Git blob SHA-1</th><th>Bytes</th><th>Cross-checks</th></tr>
-<tr><td><code>sample_submission.tif</code></td>
-<td class="mono small">7d865a9921a40ed2ea4c742a6a25b1fa2f357c5a</td><td class="num">1,599,597</td>
-<td>identical blob in GEMSDOE2, GEMSDOE10, 6GEMSDOE, GEMSDOE24, GEMSDOE50</td></tr>
-<tr><td><code>labels.tif</code></td>
-<td class="mono small">4ad3c1f3f19823e40924589bee7e51e44ae3a2e7</td><td class="num">425,830</td>
-<td>identical blob to 5GEMSDOE:<code>data/bridge/existing_faults.tif</code></td></tr>
-<tr><td><code>gems-geodawn-numerical-features.tif</code></td>
-<td class="mono small">reassembled from 5 parts, blob SHAs f34e5143…, 4bd98099…,
-d6f883ba…, 976977b4…, 41a7bb7b…</td><td class="num">418,912,844</td>
-<td>TIFF magic <code>II*\0</code>; opens as 19 bands, float32, EPSG:32611, 100 m,
-identical transform to the template; band descriptions match the official layer
-list word for word</td></tr>
-</table>
-</main>
-<footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.
-Every figure on these pages is read from a measured artifact; none is hand-transcribed.</footer>
-</body></html>
+<h2>Scientific background (not score evidence)</h2><ul>
+<li><a href="https://doi.org/10.1190/1.1442807">Pedersen &amp; Rasmussen (1990)</a> — potential-field gradient tensor.</li>
+<li><a href="https://doi.org/10.1190/1.3484098">Beiki &amp; Pedersen (2010)</a> — gravity-gradient eigenvectors.</li>
+<li><a href="https://doi.org/10.1190/1.3555343">Beiki, Pedersen &amp; Nazi (2011)</a> — pseudogravity-gradient eigenvectors.</li>
+</ul>
+<h2>Secondary owner-maintained sources</h2>
+<p>A read-only API check of the <a href="https://github.com/buffedlizard55-lab/GEMSDOE32/blob/main/docs/downloads/submissions_manifest.json">GEMSDOE32 manifest</a> found the H33 entry with <code>receipt: null</code>; the owner note calls it unscored and labels 0.2747 projected. This is not an organizer receipt.</p>
+<p>The <a href="https://github.com/buffedlizard55-lab/GEMSDOE">GEMSDOE sibling repository</a> documents owner-maintained feature/label/template mirrors and SHA-256 pins. The mirrors are not authenticated organizer downloads; no raster was fetched in this review. The downloader requires explicit opt-in and is not run.</p>
+<h2>Local data state</h2><p>Canonical paths are defined in <code>src/gems55/io55.py</code>. Feature stack, labels, organizer template, cache, and registry rasters are absent. SHA-256 values recorded in <a href="../data/README.md">data/README.md</a> are mirror-derived integrity pins only. Git blob SHA-1 and SHA-256 are different algorithms.</p>
+<h2>Evidence classes</h2><ul>
+<li><strong>ORGANIZER-CONFIRMED:</strong> actual organizer receipt tied to artifact; none for values in this checkout.</li>
+<li><strong>HOLDOUT-DTI:</strong> local validation with evaluator version, withheld-positive count, and 95% CI. Existing records are historical and invalid for promotion.</li>
+<li><strong>USER-REPORTED / NOT ORGANIZER-CONFIRMED:</strong> includes reported 0.2778, 0.3195, and 0.3774.</li>
+<li><strong>PROJECTION:</strong> estimate, never a score; the secondary manifest calls 0.2747 projected.</li>
+</ul>
+<p><a href="sources.md">Full source register and retrieval status</a> · <a href="results.html">Results and audit</a>.</p>
+</main></body></html>

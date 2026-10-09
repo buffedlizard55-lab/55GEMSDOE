@@ -1,110 +1,96 @@
 {
-  "schema": "55gemsdoe.run-card.v1",
-  "run_id": "55GEMSDOE-TENSOR-LANE-REVIEW-2026-10-09",
-  "status": "format_cleared_science_negative",
-  "hypothesis": "Low-pass RTP-magnetic and isostatic-gravity gradient tensors will distinguish strike-extended near-2-D structures from compact 3-D bodies; retaining only ridges whose tensor eigenvector strike agrees with the ridge axis may recover whole withheld fault segments better than random ridges.",
-  "mechanism": "Band-limit each scalar potential-field grid and compute its gradient tensor independently within the four official GeoDAWN acquisition blocks; derive a dimensionality index from tensor eigenvalues and strike from the quasi-2-D eigenvector; suppress compact signatures and east-west flight-line stripes; evaluate strike concordance on held-out whole fault segments.",
-  "named_non_fault_mimic": "Long lithologic contacts, dikes, intrusive bodies, volcanic/vent sources, acquisition-block seams, east-west flight-line striping, tie-line/leveling residuals, and FFT edge artifacts can mimic or distort the target signature.",
+  "schema": "55gemsdoe.run-card.v2",
+  "run_id": "55GEMSDOE-REVIEW-2026-10-09",
+  "review_status": "METRIC_CORRECTION_AND_FAIL_CLOSED_TOOLING_REVIEW",
+  "hypothesis": {
+    "rank": 1,
+    "name": "Tensor dimensionality and strike coherence",
+    "statement": "On potential-field gradient ridges, the tensor eigenstructure should distinguish elongated strike-extended sources from compact sources; a dimensionality and strike-coherence gate may enrich candidate fault traces among unlabelled terrain.",
+    "required_layers": [
+      {"band": 2, "name": "reduced-to-pole magnetic anomaly"},
+      {"band": 13, "name": "isostatic gravity anomaly"}
+    ],
+    "status": "EXISTING_IMPLEMENTATION_NOT_VALIDATED_FOR_PROMOTION"
+  },
+  "mechanism": "For each required potential-field layer, compute a band-limited FFT gradient tensor, derive eigenvalues/eigenvectors and a scale-free dimensionality statistic, then evaluate whether the intermediate-eigenvector strike agrees with the local ridge axis. Use whole-component buffered hide-and-recover and exact pixel masking of visible mapped faults. Score pooled candidate maps with alpha=0.2, beta=0.8, and the 300 m triangular kernel. Do not interpret a coverage-greedy surrogate as exact DTI optimization.",
+  "non_fault_mimic": [
+    "lithologic contacts and dike swarms can be elongated and genuinely strike-coherent",
+    "compact intrusions, volcanic centers, and hydrothermal systems can create strong geophysical ridges",
+    "survey-line striping and tie-line or leveling residuals can mimic two-dimensional structure",
+    "acquisition seams, edge effects, and FFT padding artifacts can create linear responses"
+  ],
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
-    "status": "RUN",
-    "evaluator_version": "gems.metric v1 (private re-implementation; see irregularity IR-55-012)",
-    "withheld_positive_count": 60594,
-    "value": 0.0444,
-    "ci95": [
-      0.0383,
-      0.0502
-    ],
-    "comparators": {
-      "E1_ridge_baseline": {
-        "value": 0.0578,
-        "ci95": [
-          0.0499,
-          0.0652
-        ]
+    "status": "NO_VALID_PROMOTION_RESULT",
+    "evaluator_version": null,
+    "withheld_positive_count": null,
+    "value": null,
+    "ci95": null,
+    "metric": {"alpha": 0.2, "beta": 0.8, "triangular_kernel_radius_m": 300},
+    "reason": "Stored results used quadrant folds that may split a connected fault; the nominal random arm was conditioned on score > 0; the reported interval bootstrapped fold scores rather than pooled-score contributions. No experiment was rerun because the recorded three-experiment budget is exhausted.",
+    "historical_records_not_for_promotion": [
+      {
+        "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+        "evaluator_version": "unversioned local src/gems55/dti55.py transcription, pre-audit",
+        "withheld_positive_count": 60988,
+        "tensor_full_value": 0.06670118698244415,
+        "tensor_full_ci95": [0.05600790445991459, 0.08934589204746593],
+        "control_value": 0.07572925371015232,
+        "control_ci95": [0.05711247628318898, 0.12139421481046019],
+        "control_limitation": "score-conditioned by score > 0; not uniform over eligible pixels",
+        "ci_limitation": "four-fold bootstrap interval, not a pooled-DTI confidence interval"
       },
-      "E2_plus_dimensionality": {
-        "value": 0.0463,
-        "ci95": [
-          0.0398,
-          0.0523
-        ]
+      {
+        "evidence_class": "HOLDOUT-DTI (historical; separate private evaluator; not comparable)",
+        "evaluator_version": "gems.metric v1 private re-implementation",
+        "withheld_positive_count": 60594,
+        "tensor_full_value": 0.0444,
+        "tensor_full_ci95": [0.0383, 0.0502],
+        "ridge_baseline_value": 0.0578,
+        "ridge_baseline_ci95": [0.0499, 0.0652],
+        "limitation": "different evaluator and fold implementation; do not compare to the canonical local record"
       }
-    },
-    "reason": "Quadrant-fold hide-and-recover over catalogue segments; visible faults masked pixel-exactly; 1000-rep block bootstrap (10 km)."
+    ]
   },
-  "leakage_canary": {
-    "status": "RUN",
-    "features_tested_alone": [
-      "gradient_magnitude",
-      "neg_dimensionality_mag",
-      "neg_dimensionality_grav",
-      "strike_agreement",
-      "E1_score",
-      "E3_score"
-    ],
-    "auc": {
-      "gradient_magnitude": 0.5179,
-      "neg_dimensionality_mag": 0.5183,
-      "neg_dimensionality_grav": 0.4803,
-      "strike_agreement": 0.5066,
-      "E1_score": 0.5182,
-      "E3_score": 0.5184
-    },
-    "auc_above_0_90_is_leakage_until_proven": true,
-    "leak_flag_any": false
-  },
-  "strike_prediction_test": {
-    "status": "RUN_FAILED",
-    "comparison": "Held-out fault strikes versus random ridges (design caveat IR-55-017)",
-    "withheld_match_rate": 0.4319,
-    "random_ridge_match_rate": 0.8764,
-    "fisher_one_sided_p": 1.0
-  },
-  "correlation_overlap_vs_registry": {
-    "registry_rasters_scanned": 56,
-    "max_abs_spearman_dense": 0.0043,
-    "threshold_spearman": 0.9,
+  "registry_comparisons": {
+    "evidence_class": "HISTORICAL_REGISTRY-CHECK; NOT RE-RUN",
+    "reported_rasters_scanned": 56,
+    "max_abs_dense_spearman": 0.0043,
     "max_jaccard": 0.007993,
-    "max_frac_within_3px_raw": 0.8413,
-    "max_frac_3px_excess_over_random_control": 0.0399,
-    "max_frac_within_3px_density_matched": 0.6694,
-    "threshold_frac_3px": 0.7,
-    "verdict": "PASS-UNIQUE-CONTROL-ADJUSTED"
+    "max_fraction_dots_within_3px_raw": 0.8413,
+    "literal_overlap_limit": 0.70,
+    "verdict": "DUPLICATE_STOP",
+    "explanation": "The old PASS used a chance-adjusted/density-matched exception not allowed by the standing literal rule. The raw reported overlap exceeds the limit. The local registry raster files and score surface are absent, so this was not independently recomputed; no uniqueness pass is claimed."
   },
-  "raster_sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
-  "validator_output": {
-    "status": "PASS",
-    "tool": "scripts/validate_submission.py",
-    "checks_passed": 12,
-    "checks_failed": 0,
-    "no_nan_inside_footprint": true,
-    "values_in_0_1_inside_footprint": true,
-    "single_band_float32": true,
-    "crs_matches": true,
-    "shape_matches": true,
-    "transform_matches": true,
-    "outside_footprint_null_or_nan": "zeros (all-finite encoding)"
+  "raster_sha256": {
+    "value": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
+    "file": "evidence/historical_artifacts/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
+    "artifact_status": "UNCLEARED_HISTORICAL_ARTIFACT; NOT A DOWNLOAD OR SUBMISSION RECOMMENDATION"
+  },
+  "validator_findings": {
+    "status": "PARTIALLY_INSPECTED; NOT ORGANIZER-VALIDATED",
+    "observed_locally_in_prior_audit": "one-band float32, EPSG:32611, 3730x3292, expected affine transform, [0,1] finite values, 40000 unit dots; the zeros-outside encoding was not checked against the authentic organizer footprint/template in this review",
+    "official_template_present": false,
+    "feature_stack_present": false,
+    "validate_submission_rerun": false,
+    "uniqueness_gate": "FAIL_CLOSED_DUPLICATE_STOP",
+    "format_gate": "NOT_CLEARED"
   },
   "submission": {
+    "status": "DO_NOT_DOWNLOAD_OR_SUBMIT",
     "name": "h55-tensor2d-strikegate-40000dots-20261009T052235Z",
     "note": "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots",
     "note_characters": 86,
-    "download_allowed": true,
-    "weekly_slot_used": false,
-    "file": "docs/downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif"
+    "note_limit_characters": 140,
+    "file_link_published": false,
+    "organizer_receipt": null
   },
-  "verdict": "negative",
-  "projection_written_as_score": false,
-  "budget": {
-    "experiments_used": 3,
-    "limit": 3,
-    "hours_limit": 2,
-    "weekly_slot_used": false
+  "score_attribution": {
+    "evidence_class": "USER-REPORTED / NOT ORGANIZER-CONFIRMED",
+    "reported_0_2778": "No receipt or artifact hash ties this value to the H33 raster. Public owner-maintained manifest reports receipt=null and UNSCORED, with projected 0.2747.",
+    "reported_leaderboard_values": [0.2778, 0.3195, 0.3774],
+    "conclusion": "No organizer-confirmed score was found; neither a causal explanation for 0.2778 nor a claim of beating reported leaderboard values is established."
   },
-  "review_passes": [
-    "implementation",
-    "bug/assumption audit (sign bug, nodata gaps, footprint outside data, saturated overlap)",
-    "requirement and source audit (main AGENTS.md gates)"
-  ]
+  "budget": {"experiments_used_recorded": 3, "experiment_limit": 3, "new_experiments_run_in_review": 0, "weekly_slot_used": false},
+  "verdict": "NOT_CLEARED_DUPLICATE_STOP_NO_VALID_HOLDOUT_NO_ORGANIZER_RECEIPT"
 }

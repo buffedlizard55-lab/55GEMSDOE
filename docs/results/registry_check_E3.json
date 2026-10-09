@@ -234,5 +234,9 @@
       "duplicate_flag": true,
       "identical_bytes": false
     }
-  ]
+  ],
+  "review_status": "SUPERSEDED_HISTORICAL_NOT_PROMOTION_EVIDENCE",
+  "promotion_use": "PROHIBITED",
+  "review_note": "Historical registry comparison for a different E3 raster using a 632-entry legacy registry view; not a fresh scan and not comparable to the current 56-entry artifact report.",
+  "evidence_class": "HISTORICAL_REGISTRY_CHECK_NOT_REPRODUCED"
 }

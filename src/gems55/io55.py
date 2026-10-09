@@ -1,22 +1,20 @@
-"""Grid constants and I/O for the DOE GEMS Prize (DrivenData competition 306).
+"""Canonical grid paths, documented geometry, and raster I/O for DOE GEMS.
 
-Every constant in this module is measured from the organiser-supplied rasters by
-``scripts/prepare_data.py`` and re-asserted by ``tests/test_io.py``.  Nothing is
-hard-coded from memory.
+``prepare_data.py`` checks local files against this module's canonical names and
+geometry plus recorded SHA-256 pins. The pins came from an owner-maintained
+sibling mirror, not organizer authentication. The grid constants and content
+must be rechecked against authorized organizer files before a candidate can be
+called organizer-validated.
 
-Verified provenance (2026-10-09, git blob SHA over the GitHub API, which is
-content-addressed so an identical SHA means identical bytes):
+Historical Git blob SHA-1 values found in sibling repositories:
+  sample_submission.tif  7d865a9921a40ed2ea4c742a6a25b1fa2f357c5a
+  labels.tif             4ad3c1f3f19823e40924589bee7e51e44ae3a2e7
+These hashes establish byte identity only within those Git objects, not organizer
+provenance or permission to redistribute the files.
 
-  sample_submission.tif  sha 7d865a9921a40ed2ea4c742a6a25b1fa2f357c5a  1,599,597 B
-  labels.tif             sha 4ad3c1f3f19823e40924589bee7e51e44ae3a2e7    425,830 B
-      (identical blob to 5GEMSDOE:data/bridge/existing_faults.tif)
-
-Submission contract, transcribed from the official problem description
-https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/ :
-  * same projected CRS as the training data -> EPSG:32611 (UTM zone 11N)
-  * same resolution as the training data   -> 100 m
-  * same bounds as the training data, null/NaN outside
-  * single layer, float32, values in [0, 1]
+The public problem description gives the format contract: same projected CRS,
+resolution, and bounds; one float32 layer; [0, 1] predictions; and null/NaN
+outside the bounds. This module writes rasters; it does not certify a submission.
 """
 
 from __future__ import annotations
@@ -35,7 +33,7 @@ FEATURES_TIF = DATA / "gems-geodawn-numerical-features.tif"
 LABELS_TIF = DATA / "labels.tif"
 TEMPLATE_TIF = DATA / "sample_submission.tif"
 
-# --- grid contract (asserted against the template in tests/test_io.py) -------
+# --- expected grid contract (synthetic or data-dependent checks in tests_numeric/test_core.py) ---
 CRS_EPSG = 32611
 RES_M = 100.0
 WIDTH = 3292          # columns  (rasterio `width`)
@@ -70,7 +68,7 @@ class Grid:
 
     height: int
     width: int
-    crs: str
+    crs: int | str | None
     transform: Affine
     footprint: np.ndarray  # bool, True where a prediction is scored/expected
 
@@ -118,16 +116,16 @@ def write_submission(
     out_path: Path,
     grid: Grid,
     *,
-    outside: str = "zeros",
+    outside: str = "nan",
     compress: str = "lzw",
 ) -> Path:
-    """Write a contract-compliant single-band float32 GeoTIFF.
+    """Write a structurally formatted single-band float32 GeoTIFF.
 
-    ``outside='zeros'`` writes 0.0 outside the footprint (all-finite file);
-    ``outside='nan'`` writes NaN there.  Both encodings are permitted by the
-    official rules ("data outside the bounds is null or nan"), but the portal's
-    range check ``[0, 1]`` is only guaranteed to pass for the all-finite
-    encoding, so ``zeros`` is the default for anything meant for upload.
+    ``outside='nan'`` matches the documented null/NaN treatment outside the
+    footprint and is the conservative default. ``outside='zeros'`` is available
+    for local diagnostics only; this writer does not establish that zero-filled
+    inactive cells satisfy the organizer's exact template interpretation, nor
+    does it clear scientific, leakage, uniqueness, or portal-validation gates.
     """
     a = np.asarray(arr, dtype=np.float32).copy()
     if a.shape != grid.shape:
@@ -138,6 +136,8 @@ def write_submission(
             raise ValueError("non-finite values inside the all-finite encoding")
     elif outside == "nan":
         a[~grid.footprint] = np.nan
+        if not np.isfinite(a[grid.footprint]).all():
+            raise ValueError("non-finite values inside the footprint")
     else:
         raise ValueError("outside must be 'zeros' or 'nan'")
     finite = a[np.isfinite(a)]

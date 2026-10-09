@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""Lane-drift / uniqueness check against every retrievable prior scored raster.
+"""Fail-closed uniqueness check against the complete manifest-listed registry.
 
-Brief thresholds: rank correlation with any registry raster > 0.90, or more than
-70% of our dots within 3 px of one registry raster's dots  =>  duplicate, stop.
-Also reports Jaccard and containment for completeness.
+Rules: absolute dense Spearman rank correlation > 0.90 with any registry raster,
+or (final-dot stage only) > 70% of candidate dots within a Euclidean 3-pixel disk
+of one prior raster's dots, is DUPLICATE-STOP. Control-adjusted overlap never
+clears a raw threshold. A PASS requires the authentic footprint and every
+manifest raster to be present and successfully compared.
 """
 from __future__ import annotations
-import argparse, json, sys
+
+import argparse
+import json
+import sys
 from pathlib import Path
+
 import numpy as np
 import rasterio
 from scipy import ndimage, stats
@@ -17,93 +23,189 @@ sys.path.insert(0, str(ROOT / "src"))
 from gems55 import io55  # noqa: E402
 
 REG = ROOT / "registry" / "rasters"
+MANIFEST = ROOT / "registry" / "registry.json"
 EVID = ROOT / "evidence"
+RHO_LIMIT = 0.90
+OVERLAP_LIMIT = 0.70
+RADIUS_PX = 3.0
 
-ap = argparse.ArgumentParser(); ap.add_argument("tif"); ap.add_argument("--out", default=None)
-args = ap.parse_args()
 
-grid, _ = io55.read_template()
-with rasterio.open(args.tif) as s:
-    ours = s.read(1)
-odots = np.nan_to_num(ours, nan=0.0) > 0
-n_ours = int(odots.sum())
-oy, ox = np.nonzero(odots)
-print(f"ours: {Path(args.tif).name}  n_dots={n_ours}")
+def read_candidate(path: Path, array_key: str) -> np.ndarray:
+    if path.suffix.lower() == ".npz":
+        with np.load(path) as z:
+            if array_key not in z.files:
+                raise KeyError(f"array key {array_key!r} absent from {path}; keys={z.files}")
+            return np.asarray(z[array_key])
+    if path.suffix.lower() == ".npy":
+        return np.asarray(np.load(path, mmap_mode="r"))
+    with rasterio.open(path) as src:
+        if src.count != 1:
+            raise ValueError(f"candidate must have one band, got {src.count}")
+        return src.read(1)
 
-rows = []
-for p in sorted(REG.glob("*.tif")):
-    with rasterio.open(p) as s:
-        if (s.width, s.height) != (grid.width, grid.height):
+
+def disk(radius_px: float) -> np.ndarray:
+    r = int(np.ceil(radius_px))
+    yy, xx = np.ogrid[-r : r + 1, -r : r + 1]
+    return (yy * yy + xx * xx) <= radius_px * radius_px + 1e-9
+
+
+def compare(candidate_path: Path, *, stage: str, array_key: str) -> dict:
+    result = {
+        "evidence_class": "REGISTRY-UNIQUENESS-CHECK",
+        "candidate": str(candidate_path),
+        "stage": stage,
+        "thresholds": {"abs_spearman": RHO_LIMIT, "final_dot_fraction_within_3px": OVERLAP_LIMIT},
+        "verdict": "BLOCKED_INCOMPLETE",
+        "comparisons": [],
+        "missing_registry_rasters": [],
+        "invalid_registry_rasters": [],
+    }
+
+    if not MANIFEST.is_file():
+        result["block_reason"] = f"registry manifest missing: {MANIFEST}"
+        return result
+    try:
+        manifest = json.loads(MANIFEST.read_text())
+    except Exception as exc:
+        result["block_reason"] = f"registry manifest unreadable: {exc}"
+        return result
+    if not isinstance(manifest, dict) or not manifest:
+        result["block_reason"] = "registry manifest is empty or not a mapping"
+        return result
+    result["manifest_raster_count"] = len(manifest)
+
+    if not io55.TEMPLATE_TIF.is_file():
+        result["block_reason"] = "authentic sample template/footprint is missing"
+        return result
+    try:
+        grid, _template = io55.read_template()
+        footprint = np.asarray(grid.footprint, dtype=bool)
+    except Exception as exc:
+        result["block_reason"] = f"could not read authoritative template footprint: {exc}"
+        return result
+
+    try:
+        ours = read_candidate(candidate_path, array_key)
+    except Exception as exc:
+        result["block_reason"] = f"could not read candidate: {type(exc).__name__}: {exc}"
+        return result
+    if ours.shape != grid.shape:
+        result["block_reason"] = f"candidate shape {ours.shape} != template shape {grid.shape}"
+        return result
+    if not np.isfinite(np.asarray(ours[footprint], dtype=np.float64)).all():
+        result["block_reason"] = "candidate contains non-finite values inside the authoritative footprint"
+        return result
+
+    candidate_dots = np.isfinite(ours) & (ours > 0.0)
+    if np.any(candidate_dots & ~footprint):
+        result["block_reason"] = "candidate has positive predictions outside the authoritative footprint"
+        return result
+    n_candidate_dots = int(candidate_dots.sum())
+    result["candidate_positive_count"] = n_candidate_dots
+    if stage == "final" and n_candidate_dots == 0:
+        result["block_reason"] = "final-dot candidate has no positive cells"
+        return result
+
+    expected = set(manifest.keys())
+    available = {p.name: p for p in REG.glob("*.tif")} if REG.is_dir() else {}
+    missing = sorted(name for name in expected if name not in available)
+    result["missing_registry_rasters"] = missing
+    if not REG.is_dir():
+        result["block_reason"] = f"registry raster directory missing: {REG}"
+        return result
+
+    footprint_idx = footprint.ravel()
+    structure = disk(RADIUS_PX)
+    for name in sorted(expected & set(available)):
+        path = available[name]
+        try:
+            with rasterio.open(path) as src:
+                if src.count != 1:
+                    raise ValueError(f"band count is {src.count}, expected one")
+                ref = src.read(1)
+        except Exception as exc:
+            result["invalid_registry_rasters"].append({"raster": name, "error": str(exc)})
             continue
-        a = np.nan_to_num(s.read(1), nan=0.0)
-    rd = a > 0
-    n = int(rd.sum())
-    if n == 0:
-        continue
-    inter = int((odots & rd).sum())
-    jac = inter / max(int((odots | rd).sum()), 1)
-    # fraction of our dots within 3 px of one of their dots
-    dil = ndimage.binary_dilation(rd, iterations=3)
-    frac3 = float(dil[oy, ox].mean())
-    # rank correlation on the positive-pixel values + a jitter-free rank tie-break
-    ry, rx = np.nonzero(rd)
-    sub_o = ours[ry, rx]; sub_r = a[ry, rx]
-    if np.ptp(sub_o) > 0 and np.ptp(sub_r) > 0:
-        rho = float(stats.spearmanr(sub_o, sub_r).statistic)
+        if ref.shape != grid.shape:
+            result["invalid_registry_rasters"].append(
+                {"raster": name, "error": f"shape {ref.shape} != {grid.shape}"}
+            )
+            continue
+        ref_in = np.asarray(ref[footprint], dtype=np.float64)
+        ours_in = np.asarray(ours[footprint], dtype=np.float64)
+        if not np.isfinite(ref_in).all():
+            result["invalid_registry_rasters"].append(
+                {"raster": name, "error": "non-finite values inside footprint"}
+            )
+            continue
+        rho = float(stats.spearmanr(ours_in, ref_in).statistic)
+        if not np.isfinite(rho):
+            result["invalid_registry_rasters"].append(
+                {"raster": name, "error": "Spearman correlation undefined"}
+            )
+            continue
+
+        rec = {"raster": name, "spearman": rho, "abs_spearman": abs(rho)}
+        if stage == "final":
+            ref_dots = ref > 0.0
+            if np.any(ref_dots & ~footprint):
+                result["invalid_registry_rasters"].append(
+                    {"raster": name, "error": "positive registry cells outside footprint"}
+                )
+                continue
+            near = ndimage.binary_dilation(ref_dots, structure=structure)
+            frac = float(near[candidate_dots].mean())
+            rec["fraction_candidate_dots_within_euclidean_3px"] = frac
+            rec["jaccard"] = float(np.count_nonzero(candidate_dots & ref_dots) /
+                                   max(np.count_nonzero(candidate_dots | ref_dots), 1))
+        result["comparisons"].append(rec)
+
+    result["scanned_registry_raster_count"] = len(result["comparisons"])
+    all_scanned = (
+        not result["missing_registry_rasters"]
+        and not result["invalid_registry_rasters"]
+        and len(result["comparisons"]) == len(manifest)
+    )
+    result["complete_registry_scan"] = bool(all_scanned)
+    max_rho = max((r["abs_spearman"] for r in result["comparisons"]), default=None)
+    result["max_abs_spearman"] = max_rho
+    max_overlap = None
+    if stage == "final":
+        max_overlap = max((r["fraction_candidate_dots_within_euclidean_3px"]
+                           for r in result["comparisons"]
+                           if "fraction_candidate_dots_within_euclidean_3px" in r), default=None)
+    result["max_fraction_candidate_dots_within_euclidean_3px"] = max_overlap
+
+    duplicate = (max_rho is not None and max_rho > RHO_LIMIT) or (
+        stage == "final" and max_overlap is not None and max_overlap > OVERLAP_LIMIT
+    )
+    if duplicate:
+        result["verdict"] = "DUPLICATE-STOP"
+    elif all_scanned and max_rho is not None and (stage != "final" or max_overlap is not None):
+        result["verdict"] = "PASS-UNIQUE"
     else:
-        rho = float("nan")
-    # dense Spearman over the footprint (both are binary -> ties dominate)
-    fp = grid.footprint
-    rho_dense = float(stats.spearmanr(ours[fp], a[fp]).statistic)
-    rows.append({"raster": p.name, "n_pos": n, "intersect": inter, "jaccard": round(jac, 6),
-                 "frac_our_dots_within_3px": round(frac3, 4),
-                 "spearman_on_their_positives": None if np.isnan(rho) else round(rho, 4),
-                 "spearman_dense_footprint": round(rho_dense, 4)})
+        result["verdict"] = "BLOCKED_INCOMPLETE"
+        result["block_reason"] = "not every registry raster was validly compared; fail closed"
+    return result
 
-# ---- control: the SAME statistic for a uniform-random dot set of equal size ----
-# A dense reference raster (e.g. a spacing-5 lattice with 206,895 positives) puts
-# almost every pixel within 3 px of one of its dots, so the 70% rule is vacuous
-# against it.  The control measures that inflation so the criterion can be read.
-rng = np.random.default_rng(0)
-pool = np.nonzero(grid.footprint.ravel() & ~odots.ravel())[0]
-ctrl = np.zeros(odots.shape, dtype=bool)
-ctrl.ravel()[rng.choice(pool, size=n_ours, replace=False)] = True
-cy, cx = np.nonzero(ctrl)
-for r in rows:
-    p2 = REG / r["raster"]
-    with rasterio.open(p2) as s:
-        a2 = np.nan_to_num(s.read(1), nan=0.0) > 0
-    r["frac3px_random_control"] = round(float(ndimage.binary_dilation(a2, iterations=3)[cy, cx].mean()), 4)
-    r["frac3px_excess_over_control"] = round(r["frac_our_dots_within_3px"] - r["frac3px_random_control"], 4)
-    r["density_ratio_vs_ours"] = round(r["n_pos"] / n_ours, 3)
 
-rows.sort(key=lambda r: -r["frac3px_excess_over_control"])
-maxfrac = max(r["frac_our_dots_within_3px"] for r in rows)
-maxexcess = max(r["frac3px_excess_over_control"] for r in rows)
-matched = [r for r in rows if 0.25 <= r["density_ratio_vs_ours"] <= 4.0]
-maxfrac_matched = max((r["frac_our_dots_within_3px"] for r in matched), default=float("nan"))
-maxrho = max(r["spearman_dense_footprint"] for r in rows)
-maxjac = max(r["jaccard"] for r in rows)
-verdict = "PASS-UNIQUE" if (maxrho <= 0.90 and maxfrac <= 0.70) else "REVIEW"
-if verdict == "REVIEW" and maxexcess <= 0.05:
-    verdict = "PASS-UNIQUE-CONTROL-ADJUSTED"
-out = {"ours": Path(args.tif).name, "n_dots": n_ours, "n_registry": len(rows),
-       "max_spearman_dense": round(maxrho, 4), "max_frac_within_3px": round(maxfrac, 4),
-       "max_jaccard": round(maxjac, 6), "thresholds": {"spearman": 0.90, "frac_3px": 0.70},
-       "max_frac3px_excess_over_random_control": round(maxexcess, 4),
-       "max_frac_within_3px_density_matched": round(maxfrac_matched, 4),
-       "n_density_matched": len(matched),
-       "verdict": verdict, "top10": rows[:10], "all": rows}
-EVID.mkdir(exist_ok=True)
-dst = Path(args.out) if args.out else EVID / "uniqueness.json"
-dst.write_text(json.dumps(out, indent=2))
-for r in rows[:8]:
-    print(f"  {r['raster'][:58]:58s} n={r['n_pos']:7d} jac={r['jaccard']:.4f} "
-          f"frac3px={r['frac_our_dots_within_3px']:.3f} ctrl={r['frac3px_random_control']:.3f} "
-          f"excess={r['frac3px_excess_over_control']:+.3f} rho={r['spearman_dense_footprint']:+.4f}")
-print(f"\nmax |Spearman| dense = {maxrho:.4f}   max frac within 3px = {maxfrac:.4f}   "
-      f"max Jaccard = {maxjac:.4f}")
-print(f"max frac3px EXCESS over the random control = {maxexcess:+.4f}   "
-      f"density-matched max frac3px = {maxfrac_matched:.4f} (n={len(matched)} refs)")
-print(f"VERDICT: {verdict}")
-print("wrote", dst)
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("candidate", type=Path)
+    ap.add_argument("--stage", choices=("surface", "final"), default="final")
+    ap.add_argument("--array-key", default="score", help="key for .npz candidate surfaces")
+    ap.add_argument("--out", type=Path, default=None)
+    args = ap.parse_args()
+
+    result = compare(args.candidate, stage=args.stage, array_key=args.array_key)
+    EVID.mkdir(exist_ok=True)
+    out_path = args.out or EVID / f"uniqueness_{args.stage}.json"
+    out_path.write_text(json.dumps(result, indent=2) + "\n")
+    print(json.dumps(result, indent=2))
+    print(f"wrote {out_path}")
+    sys.exit(0 if result["verdict"] == "PASS-UNIQUE" else (2 if result["verdict"] == "DUPLICATE-STOP" else 1))
+
+
+if __name__ == "__main__":
+    main()

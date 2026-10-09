@@ -1,62 +1,45 @@
-# Results — tensor-dimensionality lane (2026-10-09)
+# Results and evidence status
 
-**Every number on this page is HOLDOUT-DTI.** None is an organiser-confirmed score. No candidate TIFF is published, and no download is allowed (see [status](status.json) and [run card](run-card.json)).
+**Current disposition: no valid promotion result; no download or submission is cleared.** This review corrected code/documentation and ran regression tests only. It did not rerun a geological experiment, download competition data, or submit anything. The experiment log records the three-experiment budget as already used.
 
-## Holdout (evaluator `gems.metric v1`)
+## Metric algebra correction
 
-- DTI with α = 0.2, β = 0.8, triangular kernel R = 300 m (3 px). The formula was checked against the worked example on the [problem description page](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/).
-- Holdout: four quadrant folds (NW, NE, SW, SE) of catalogue fault segments (3,199 segments). Each fold's segments are withheld. Visible faults are masked pixel-exactly.
-- Withheld positives: **60,594 px**.
-- 95% CI: block bootstrap, 1,000 reps, 10 km blocks.
+The official definitions give `TP_w + FN_w = |G|`, because for each truth pixel the matched-credit maximum and its complement sum to one. Substituting this identity into the distance-weighted Tversky denominator gives
 
-| Experiment | What it is | HOLDOUT-DTI | 95% CI | TP_w | FP_w | FN_w |
-|---|---|---|---|---|---|---|
-| E1 | Ridge baseline (RTP gradient ridges, flight-line rows masked) | **0.0578** | 0.0499 – 0.0652 | 3,794.0 | 82,001.6 | 56,800.0 |
-| E2 | E1 × (1 − magnetic dimensionality index) | 0.0463 | 0.0398 – 0.0523 | 2,816.3 | 59,038.8 | 57,777.7 |
-| E3 | E2 × (1 − mean of magnetic and gravity indices) × strike-agreement gate (lane method) | 0.0444 | 0.0383 – 0.0502 | 2,662.9 | 54,759.9 | 57,931.1 |
-
-Experiment budget: 3 of 3 used.
-
-## Leakage canary (each feature alone, AUC on ridge pixels)
-
-Ridge pixels: n_pos = 23,530, n_neg = 161,645 (from `docs/results/tensor_lane_results.json`). Threshold for leakage: AUC > 0.90.
-
-| Feature | AUC | Flag |
-|---|---|---|
-| Gradient magnitude | 0.5179 | no |
-| − dimensionality (magnetic) | 0.5183 | no |
-| − dimensionality (gravity) | 0.4803 | no |
-| Strike agreement | 0.5066 | no |
-| E1 score | 0.5182 | no |
-| E3 score | 0.5184 | no |
-
-No leakage is detected. The features also carry little signal (AUC ≈ 0.5).
-
-## Strike prediction test
-
-- Withheld fault strike matches the field's tensor strike: **43.2%** (N = 910 segments).
-- Random ridge orientation matches the field's tensor strike: **87.6%** (N = 133,448 px).
-- One-sided Fisher p = 1.0. The test **failed**. Its design is not a fair comparison (irregularity IR-55-017).
-
-## Uniqueness (registry scan)
-
-- Same-grid GEMSDOE rasters compared: 630 of 632 (63 repos).
-- Max Spearman (E1, footprint): 0.165, below the 0.90 threshold.
-- Overlap rule (≥70% of dots within 3 px of one registry raster): flagged 70 of 630 for E1 and for E3. The rule is saturated by dense registry rasters and is not chance-corrected (IR-55-020).
-- Result files: [E1](results/registry_check_tensor_lane_E1.json), [E3](results/registry_check_E3.json).
-
-## Local candidate files (not published)
-
-Both files were checked for format with rasterio against `data/sample_submission.tif`. Each is one float32 band in EPSG:32611, with the template's shape, transform and 100 m resolution. The finite pixels number 5,167,373 (the footprint), values lie in [0, 1], and no infinities are present. These are format checks only; they are not organiser validation. The files are held locally only (gitignored `outputs/`), because the gates did not pass.
-
-- E1 `outputs/tensor-lane-candidate_E1_ridge_baseline.tif`, sha256 `038bfdcd081e3054fd4650a51ee5d37df83d8f3ec003dfc151ad55ae118bf424`
-- E3 `outputs/tensor-lane-candidate_E3_full_tensor_lane.tif`, sha256 `25f2ccf40c096efe9b25bed9ab8c28151d48123a7ba4527c85ac490c3dc18d80`
-
-## Reproduce
-
-```bash
-python scripts/prepare_data.py                 # checks the sha256 pins in data/
-python scripts/run_tensor_lane.py --out outputs/tensor-lane-candidate.tif --tag tensor-lane-v1 --results docs/results/tensor_lane_results.json
-python scripts/registry_check.py outputs/tensor-lane-candidate_E1_ridge_baseline.tif <registry_dir> docs/results/registry_check_tensor_lane_E1.json
-python scripts/make_run_card.py
+```text
+DTI = TP_w / (TP_w + alpha*FP_w + beta*FN_w + eps)
+    = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps)
 ```
+
+For `alpha=0.2`, `beta=0.8`, the denominator is
+
+```text
+0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps
+```
+
+It is **not** generally `0.2*N + 0.8*|G|`: `TP_w + FP_w = N` is not an identity. A synthetic regression case in `tests_numeric/test_core.py` has one truth pixel, a unit prediction on it, and a second unit prediction one pixel away. Then `TP_w=1`, `FP_w=1/3`, `FN_w=0`, and the exact DTI is `0.9375`; the invalid count-only formula gives `5/6`. Claims, tables, target-size calculations, and “coverage plateau” conclusions based on the count-only formula are withdrawn.
+
+The old `breakeven_credit` helper also used an incorrect marginal threshold. Its corrected `alpha*DTI` expression is explicitly limited to isolated single-match assumptions; it is not a generic per-dot rule. The greedy coverage routine maximizes a submodular **surrogate** and does not optimize the full DTI ratio because it omits the separate FP term.
+
+## Historical canonical-local HOLDOUT-DTI record — not valid for promotion
+
+- **HOLDOUT-DTI (historical; invalid for promotion)** — evaluator version: unversioned pre-audit `src/gems55/dti55.py` local transcription; withheld-positive count: **60,988**. Tensor-lane pooled value: **0.06670118698244415**; stored fold-bootstrap interval: **[0.05600790445991459, 0.08934589204746593]**.
+- **HOLDOUT-DTI random-control record (historical; invalid control)** — same evaluator version, withheld-positive count, and stored interval method. Value: **0.07572925371015232**; stored interval: **[0.05711247628318898, 0.12139421481046019]**. The random branch was filtered by `score > 0` before sampling, so it was not uniform over the eligible domain.
+- Both used quadrant folds; a connected mapped fault crossing a quadrant boundary could be split between visible and withheld labels. The stored interval bootstraps four fold DTI values and is not a pooled-DTI confidence interval. These are retained as historical records, not as scientific clearance or an established negative result.
+
+## Separate legacy HOLDOUT-DTI record — not comparable
+
+- **HOLDOUT-DTI (historical; separate private evaluator; not comparable)** — evaluator version `gems.metric v1` (private re-implementation), withheld-positive count **60,594**. E1 ridge baseline **0.0578** (95% CI **[0.0499, 0.0652]**); E2 dimensionality-weighted ridge **0.0463** (95% CI **[0.0398, 0.0523]**); E3 tensor/strike-gated lane **0.0444** (95% CI **[0.0383, 0.0502]**).
+- These values came from a different evaluator and fold implementation; they cannot be pooled with or used to “replicate” the canonical-local record. They also do not clear the user-required protocol.
+
+No new **HOLDOUT-DTI** value or confidence interval is reported in this review. Repository-local utility code has synthetic coverage for whole-component assignment, Euclidean buffering, score-independent random placement, and additive metric terms. It is not certified as the authorized shared evaluator; the data-dependent local holdout runner is retired, and there is no budget or authorized feature cache available for another run. Reconcile with the authorized template and explicitly reopen the budget before any future experiment.
+
+## Score attribution and leaderboard
+
+The values **0.2778**, **0.3195**, and **0.3774** are **USER-REPORTED / NOT ORGANIZER-CONFIRMED** in this checkout. No organizer submission-page receipt or official artifact/hash link ties any of them to a TIFF. A read-only check of the owner-maintained GEMSDOE32 artifact manifest reports `receipt: null` for the H33 file and describes that file as `UNSCORED`, with **projected 0.2747**. That secondary manifest does not establish an official score. Accordingly, this repository cannot explain why H33 “scored 0.2778,” nor claim that any current candidate beats a reported leaderboard value.
+
+## Geological and submission conclusions
+
+The tensor-dimensionality lane remains a geologically plausible source-geometry hypothesis, not a validated locator. Existing evidence is insufficient to assert a valid holdout win, an experiment failure under the required protocol, or a submission-slot promotion. The historical raster fails the literal uniqueness rule (see [`docs/status.json`](status.json)); format metadata inspection is partial and not organizer validation. Older E1/E3 registry JSON files report 632 rasters for different candidate files and legacy snapshots, so those counts are not a current scan or a substitute for the 56-raster report. Do not download or submit it.
+
+See the machine-readable [run card](run-card.json), [source register](sources.md), [hypothesis shortlist](hypotheses.md), and [irregularity log](irregularities.md).

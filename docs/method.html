@@ -1,96 +1,25 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Method · 55GEMSDOE</title><style>
-:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--acc:#4cc2ff;--ok:#3fb950;--bad:#f85149;--warn:#d29922}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
-font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
-header{padding:26px 22px;border-bottom:1px solid #21262d}
-main{max-width:1080px;margin:0 auto;padding:22px}
-h1{margin:0 0 6px;font-size:26px}h2{margin:34px 0 10px;font-size:20px;border-bottom:1px solid #21262d;padding-bottom:6px}
-h3{margin:22px 0 8px;font-size:16px;color:var(--acc)}
-p,li{color:var(--ink)}a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
-.sub{color:var(--mut);margin:0}
-table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
-th,td{border:1px solid #30363d;padding:7px 9px;text-align:left;vertical-align:top}
-th{background:#1c2129}td.num{text-align:right;font-variant-numeric:tabular-nums}
-code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-pre{background:#0b0f14;border:1px solid #30363d;border-radius:8px;padding:12px;overflow:auto;font-size:13px}
-code{background:#0b0f14;padding:1px 5px;border-radius:4px;font-size:13px}
-nav{margin-top:14px}nav a{margin-right:14px;font-size:14px}
-.dl{background:linear-gradient(135deg,#0f2f1c,#10222e);border:2px solid var(--ok);
-border-radius:12px;padding:20px;margin:18px 0}
-.dl h2{border:0;margin:0 0 10px;color:var(--ok)}
-.btn{display:inline-block;background:var(--ok);color:#04160b;font-weight:700;padding:12px 20px;
-border-radius:8px;margin:6px 8px 6px 0;font-size:16px}
-.btn.sec{background:#30363d;color:var(--ink)}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
-.pill.ok{background:#12331d;color:var(--ok);border:1px solid var(--ok)}
-.pill.bad{background:#3a1214;color:var(--bad);border:1px solid var(--bad)}
-.pill.warn{background:#332701;color:var(--warn);border:1px solid var(--warn)}
-.card{background:var(--panel);border:1px solid #30363d;border-radius:10px;padding:16px;margin:12px 0}
-.mono{font-variant-numeric:tabular-nums}
-.small{font-size:13px;color:var(--mut)}
-footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size:13px;border-top:1px solid #21262d}
-</style></head>
-<body><header><div style="max-width:1080px;margin:0 auto">
-<h1>55GEMSDOE — tensor-dimensionality lane</h1>
-<p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN, northwestern Great Basin</p>
-<nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><a href="anchor-0.2778.html">The 0.2778 anchor</a><span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> <a href="executive-summary.html" style="font-size:13px">Exec summary (v1)</a><a href="results.html" style="font-size:13px">Results (v1)</a><a href="data_dictionary.html" style="font-size:13px">Data dictionary</a><a href="leaderboard-analysis.html" style="font-size:13px">Leaderboard analysis</a></nav></div></header><main>
-<h2>Method</h2>
-<h3>1. Inputs</h3>
-<p>The official 19-layer GeoTIFF (<code>gems-geodawn-numerical-features.tif</code>,
-418,912,844 bytes, 19 bands, float32, EPSG:32611, 100 m). Band 2 is the
-reduced-to-pole magnetic anomaly; band 13 is the isostatic gravity anomaly. Both
-carry 5,165,852 valid cells (sentinel −3.4e38 elsewhere).</p>
-<h3>2. Levelling and filtering</h3>
-<p>NaN cells are filled by exact nearest-neighbour. Each grid is then levelled
-inside its acquisition blocks by subtracting the robust along-track profile
-(the standard micro-levelling step) and band-passed to the 400 m – 6 km
-structural band. Derivative operators amplify noise by |k| and |k|², so the
-low-pass precedes differentiation.</p>
-<h3>3. FFT gradient tensor</h3>
-<p>With angular wavenumbers (kx, ky), |k| = hypot(kx, ky), z positive downward
-and sources beneath the observation plane:</p>
-<pre>Txx ↔ −kx²·F      Tyy ↔ −ky²·F      Txy ↔ −kx·ky·F
-Tzz ↔ +|k|²·F  = −(Txx+Tyy)         (trace T = 0, Laplace, by construction)
-Txz ↔ +i·kx·|k|·F                   Tyz ↔ +i·ky·|k|·F</pre>
-<p>For the magnetic grid this is the pseudo-gravity gradient tensor: the field is
-already reduced to pole and the vertical derivative is the |k| operator. The
-sign convention was checked against an analytic harmonic solution
-(V = e^{+kz} sin(kx·x)) in <code>tests/test_core.py</code> — that test caught a
-unit error (radians per pixel versus per metre) during development.</p>
-<h3>4. Dimensionality and strike</h3>
-<p>Eigenvalues come from the closed-form trigonometric solution for a symmetric
-3×3 matrix (checked against <code>numpy.linalg.eigh</code>). The dimensionality
-indicator is the scale-free invariant form</p>
-<pre>I = 27·(λ1λ2λ3)² / (4·(−(λ1λ2+λ1λ3+λ2λ3))³)</pre>
-<p>with the two documented endpoints exact and unit-tested: I = 0 for a
-strike-extended 2-D source (λ = a, 0, −a) and I = 1 for an equidimensional 3-D
-source (λ = 2a, −a, −a). The eigenvalue ratio D = −λ2/λ1 (0 for 2-D, ½ for a
-point mass) is computed alongside it. Strike is the geographic azimuth of the
-intermediate eigenvector, weighted by how horizontal that eigenvector is.</p>
-<h3>5. Gating</h3>
-<pre>score = ridge × (1 − I) × exp(−(Δθ/25°)²) × plunge-weight × 0.25·[not survey line]</pre>
-<p>where <code>ridge</code> is the corroborated horizontal-gradient rank of the two
-fields (geometric mean, so a ridge must appear in both magnetics and gravity),
-and Δθ is the angle between the eigenvector strike and the ridge's own tangent
-(gradient azimuth + 90°).</p>
-<h3>6. Survey-line masking</h3>
-<p>The lane brief asserts east–west flight-line striping. Three independent
-measurements on these two grids contradict that: the 1–20 km spectral annulus
-carries more power with its wavevector along east–west (0.104 and 0.222) than
-along north–south (0.089 and 0.166), and the 6 km-lag coherence is higher along
-north–south for both fields. The azimuth convention was itself verified on a
-synthetic field before the decision. The <b>measured</b> direction (north–south)
-is masked, not the assumed one. A test documents why the mask cannot come from
-the tensor: a field varying only across the flight lines has eigenvalues
-(|f″|, 0, −|f″|) — indistinguishable from a 2-D source with strike along the
-lines.</p>
-<h3>7. Emission</h3>
-<p>40,000 unit dots at non-maximum-suppressed peaks of the score with 3 px
-separation, never on a mapped catalogue pixel (expected credit 0, guaranteed
-false-positive cost) and never outside the footprint.</p>
-</main>
-<footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.
-Every figure on these pages is read from a measured artifact; none is hand-transcribed.</footer>
-</body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Method and implementation limits · 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
+<body><main><p><a href="index.html">← Executive summary</a></p><h1>Method and implementation limits</h1>
+<p>The repository contains a tensor-dimensionality prototype in <code>src/gems55/</code>. It is not a validated submission pipeline. The competition feature rasters, organizer template, cache, and registry rasters are absent in this checkout, and this review did not rebuild or run the lane.</p>
+<h2>Prototype method</h2><ol>
+<li>Read RTP-magnetic band 2 and isostatic-gravity band 13 from the competition feature stack.</li>
+<li>Fill invalid cells and apply a band-pass. The current code uses an along-axis profile-removal operation over the full raster; it has not been shown to operate independently inside verified acquisition polygons.</li>
+<li>Compute each field's FFT gradient tensor, eigenvalues/eigenvectors, a dimensionality statistic, horizontal-gradient ridges, and local strike information.</li>
+<li>Combine normalized ridge strength with near-2-D, strike-agreement, plunge, and striping factors to form a continuous score surface.</li>
+<li>Emitters produce point predictions from the score; they do not provide evidence of holdout improvement by themselves.</li>
+</ol>
+<h2>Known implementation limits</h2>
+<ul>
+<li><code>LaneConfig.block_px=64</code> controls robust normalization in regular pixel tiles. It is <strong>not</strong> an official GeoDAWN acquisition-block mask. The existing run-card statement that each acquisition block was processed independently was unsupported.</li>
+<li>The field-preparation profile is global along the selected raster axis, not separately estimated in the official acquisition polygons. Authorized block/flight-line layers are not staged.</li>
+<li>Repository-local utilities specify whole-component hide-and-recover, per-fold visible masks, and score-independent random controls. They are not certified as the authorized shared evaluator; historical results used different logic and remain invalid for promotion.</li>
+<li>The greedy cover function optimizes a monotone submodular coverage surrogate. It does not account for the exact DTI false-positive term and is not a DTI optimizer.</li>
+<li>Passing synthetic unit tests verifies code properties only; it is not geological validation, an official evaluator match, or a submission clearance.</li>
+</ul>
+<h2>Scientific interpretation</h2>
+<p>A two-dimensional tensor signature is not specific to a fault. Lithologic contacts, dikes, intrusive sheets, altered corridors, flight-line artifacts, block seams, and FFT edge effects can mimic or distort it. Geophysical signals are candidate structure indicators, not geological labels.</p>
+<p>Required next steps after the experiment budget is explicitly reopened: obtain authorized data, validate acquisition masks and grid alignment, freeze the processing configuration, run one-feature-at-a-time leakage canaries, evaluate whole connected fault segments with buffer and exact visible-fault masking, calculate pooled HOLDOUT-DTI with the shared evaluator and a spatial 95% CI, then check surface and final-dot uniqueness. A same-evaluator holdout win is required before submission-slot promotion.</p>
+<p><strong>Current decision:</strong> no new experiment, no valid holdout win, no download CTA, and no submission.</p>
+</main></body></html>
