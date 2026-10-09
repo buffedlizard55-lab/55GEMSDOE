@@ -58,7 +58,8 @@ class SiteStatusTests(unittest.TestCase):
         self.assertIn("no tiff available", index)
 
     def test_every_local_html_link_resolves(self) -> None:
-        for page in DOCS.glob("*.html"):
+        pages = list(DOCS.glob("*.html")) + [ROOT / "index.html"]
+        for page in pages:
             parser = LinkCollector()
             parser.feed(page.read_text())
             for href in parser.hrefs:
