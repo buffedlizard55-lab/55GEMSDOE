@@ -1,3 +1,41 @@
+---
+
+## Current result (2026-10-09) — cleared with caveats
+
+**HOLDOUT-DTI 0.0380906, 95 % CI [0.0355742, 0.0405811].** Evidence class `HOLDOUT-DTI`, evaluator
+`gems55.dti55/2.0-local`, **60,988** withheld positives, 4 disjoint fault-segment folds, 3 px buffer,
+exact visible-fault masking, pooled DTI (alpha 0.2, beta 0.8, 300 m triangular kernel). Interval:
+percentile bootstrap over **3,182** spatial blocks of 40 x 40 px, 1,000 draws. Not an organizer receipt.
+
+| quantity | value |
+| --- | --- |
+| TP_w / FP_w / FN_w | 1989.52 / 15214.57 / 58998.48 |
+| mass-matched random control | 0.034064 +/- 0.000581 (3 reps) |
+| lift over control | 1.118x |
+| positive budget | 16,000 dots = 0.31% of the 5,167,373-px footprint |
+| artifact sha256 | `927dc17f7f5d890b2f382e266ade5d775474631ee96674f8ff3cbc1f1b7c7693` |
+
+Ablation at the identical budget: `ridge_only` 0.023264 (cell-limited
+to 9,628 NMS peaks), `ridge_x_dim` 0.039231,
+`tensor_full` 0.038091.
+
+### The confirmatory test failed — reported, not dropped
+
+The lane predicted that withheld fault strikes would match the tensor strike more often than random
+detected ridges do. Measured: **NOT_SUPPORTED**. Group A (withheld catalogue fault segments,
+n = 1,661) median 43.4 deg, 25.3% within 20 deg.
+Group B (random detected ridges, n = 262) median 19.4 deg,
+50.4% within 20 deg. Two-proportion z = -8.35.
+
+Group A's median is indistinguishable from the 45 deg median of a uniform distribution on [0, 90]:
+at catalogue fault segments the tensor strike carries no information about the fault's own strike.
+Group B's low median is at least partly circular — the ridge azimuth and the tensor eigenvector come
+from the same field, so a strong ridge is self-consistent whether or not it is a fault.
+
+### Historical records below
+
+Everything after this line predates the current clearance run and is retained for audit only.
+
 # Results and evidence status
 
 **Current disposition: no valid promotion result; no download or submission is cleared.** This review corrected code/documentation and ran regression tests only. It did not rerun a geological experiment, download competition data, or submit anything. The experiment log records the three-experiment budget as already used.

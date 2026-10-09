@@ -157,6 +157,21 @@ def compare(candidate_path: Path, *, stage: str, array_key: str) -> dict:
             near = ndimage.binary_dilation(ref_dots, structure=structure)
             frac = float(near[candidate_dots].mean())
             rec["fraction_candidate_dots_within_euclidean_3px"] = frac
+            # Density-matched chance baseline.  A reference raster that already
+            # covers a large part of the footprint makes the *raw* 3-pixel
+            # overlap high for ANY candidate, so the raw number alone cannot
+            # distinguish "the same prediction" from "both methods target the
+            # same ridge network".  The chance baseline is the fraction of the
+            # footprint covered by the dilated reference, i.e. the expected
+            # overlap of a uniformly placed dot; the excess over chance is the
+            # informative statistic.  Both are reported; the literal rule is
+            # still applied to the raw value.
+            chance = float(near[footprint].mean())
+            rec["chance_fraction_within_3px"] = chance
+            rec["excess_over_chance"] = (
+                float((frac - chance) / (1.0 - chance)) if chance < 1.0 else float("nan")
+            )
+            rec["reference_positive_count"] = int(ref_dots.sum())
             rec["jaccard"] = float(np.count_nonzero(candidate_dots & ref_dots) /
                                    max(np.count_nonzero(candidate_dots | ref_dots), 1))
         result["comparisons"].append(rec)
@@ -177,11 +192,39 @@ def compare(candidate_path: Path, *, stage: str, array_key: str) -> dict:
                            if "fraction_candidate_dots_within_euclidean_3px" in r), default=None)
     result["max_fraction_candidate_dots_within_euclidean_3px"] = max_overlap
 
+    # Chance-adjusted overlap: the informative uniqueness statistic.  Reported
+    # alongside the literal rule because the literal 3-pixel overlap rises with
+    # the reference raster's coverage regardless of whether two predictions are
+    # actually the same.
+    max_excess = None
+    if stage == "final":
+        ex = [r["excess_over_chance"] for r in result["comparisons"]
+              if "excess_over_chance" in r and np.isfinite(r["excess_over_chance"])]
+        max_excess = max(ex) if ex else None
+        result["max_excess_over_chance"] = max_excess
+        top = max((r for r in result["comparisons"] if "excess_over_chance" in r),
+                  key=lambda r: r["excess_over_chance"], default=None)
+        if top is not None:
+            result["max_excess_row"] = {
+                "raster": top["raster"],
+                "raw": top["fraction_candidate_dots_within_euclidean_3px"],
+                "chance": top["chance_fraction_within_3px"],
+                "excess": top["excess_over_chance"],
+                "reference_positive_count": top["reference_positive_count"],
+            }
+
     duplicate = (max_rho is not None and max_rho > RHO_LIMIT) or (
         stage == "final" and max_overlap is not None and max_overlap > OVERLAP_LIMIT
     )
+    result["literal_rule_verdict"] = "DUPLICATE-STOP" if duplicate else "WITHIN-LITERAL-LIMIT"
     if duplicate:
         result["verdict"] = "DUPLICATE-STOP"
+        result["duplicate_note"] = (
+            "The literal >70% raw 3-pixel-overlap rule is breached. The "
+            "chance-adjusted excess is reported separately; where the reference "
+            "raster is much denser than the candidate, the raw value is largely a "
+            "coverage artefact rather than evidence of a copied prediction."
+        )
     elif all_scanned and max_rho is not None and (stage != "final" or max_overlap is not None):
         result["verdict"] = "PASS-UNIQUE"
     else:

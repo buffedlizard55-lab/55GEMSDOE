@@ -194,19 +194,22 @@ def auc(scores: np.ndarray, labels: np.ndarray) -> float:
     npos, nneg = int(y.sum()), int((~y).sum())
     if npos == 0 or nneg == 0:
         return float("nan")
+    n = s.size
     order = np.argsort(s, kind="mergesort")
-    ranks = np.empty(s.size, dtype=np.float64)
-    ranks[order] = np.arange(1, s.size + 1, dtype=np.float64)
-    # average ties
+    sorted_ranks = np.arange(1, n + 1, dtype=np.float64)
     ss = s[order]
-    i = 0
-    while i < ss.size:
-        j = i
-        while j + 1 < ss.size and ss[j + 1] == ss[i]:
-            j += 1
-        if j > i:
-            ranks[order[i : j + 1]] = ranks[order[i : j + 1]].mean()
-        i = j + 1
+    # Average the ranks inside each run of equal scores.  Vectorised: the
+    # previous per-element Python loop over ~4.5e6 cells dominated every
+    # experiment that called this helper (shared-tool fix, 2026-10-09).
+    new_run = np.empty(n, dtype=bool)
+    new_run[0] = True
+    np.not_equal(ss[1:], ss[:-1], out=new_run[1:])
+    grp = np.cumsum(new_run) - 1
+    counts = np.bincount(grp)
+    sums = np.bincount(grp, weights=sorted_ranks)
+    avg_sorted = (sums / counts)[grp]
+    ranks = np.empty(n, dtype=np.float64)
+    ranks[order] = avg_sorted
     return float((ranks[y].sum() - npos * (npos + 1) / 2.0) / (npos * nneg))
 
 

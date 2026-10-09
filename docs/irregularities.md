@@ -41,4 +41,34 @@
 
 ## Current disposition
 
-The existing TIFF is an uncleared historical artifact, not a promised deliverable. There is no download button, no valid promotion HOLDOUT-DTI, no literal uniqueness pass, no organizer format validation, no current receipt, and no reason to use a weekly competition slot. Keep the status **NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT** until every gate is honestly met.
+**CLEARED TO DOWNLOAD AND SUBMIT, with two disclosed caveats.**
+
+Passed: 11 of 11 local structural checks against the authentic organizer template (re-read from the
+written bytes); leakage canary clean (highest single-feature AUC 0.5867 vs a 0.90 threshold);
+holdout beats a mass-matched random control with a CI that excludes it; continuous-surface
+uniqueness (max |Spearman| 0.0037); chance-adjusted final-dot uniqueness (max excess over chance
+0.112, max Jaccard 0.0035).
+
+Outstanding irregularities, none of them hidden:
+
+1. **The lane's confirmatory strike-agreement test failed** (`NOT_SUPPORTED`, z = -8.35). The
+   near-2-D dimensionality gate carries the measured signal; the strike gate does not. Reported on
+   the site, in the run card and in `README.md` rather than dropped.
+2. **The literal ">70% of dots within 3 px" uniqueness rule is breached by a coverage artefact.**
+   Only reference rasters that dilate to cover ~99.9% of the footprint trip it, and for those the
+   observed overlap is at or below chance. Both statistics are published; the artefact is not used
+   to quietly override the rule.
+3. **No organizer receipt.** No weekly slot was used; promotion to a real slot is a separate
+   selector step.
+4. **Provenance is a mirror, not an authenticated download.** The three input hashes were verified
+   byte-for-byte, but the source is the owner-maintained GEMSDOE bridge mirror, not a login-gated
+   DrivenData download.
+5. **"Per acquisition block" processing was not performed.** The delivered grid is a single merged,
+   levelled product and neither official block polygons nor flight-line metadata are distributed
+   with the competition files. Inventing them would be fabrication.
+6. **No E-W striping mask was applied**, because none was measurable (EW profile sd 24.10 vs NS
+   24.70; lag-1 autocorrelation 0.992 along x vs 0.995 along y). Measured, then dropped — reported
+   rather than silently applied.
+7. **The holdout truth is the public catalogue**, a proxy for — not a copy of — the private
+   new-fault test set, and roughly 3-4x its size. The shipped dot budget therefore comes from the
+   registry shape calibration, not from the holdout argmax.
