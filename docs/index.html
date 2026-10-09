@@ -1,125 +1,220 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Auditable tensor-dimensionality research status for the DOE GEMS fault-mapping challenge.">
-  <meta name="theme-color" content="#10271e">
-  <title>55GEMSDOE — research and submission status</title>
-  <link rel="stylesheet" href="site.css">
-</head>
-<body>
-  <header class="topbar">
-    <div class="wrap topbar-inner">
-      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="./executive-summary.html">Executive summary</a>
-        <a href="./hypotheses.html">Hypotheses</a>
-        <a href="./sources.html">Sources</a>
-        <a href="./irregularities.html">Audit flags</a>
-        <a href="../README.md">Project brief</a>
-      </nav>
-    </div>
-  </header>
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Executive summary · 55GEMSDOE</title><style>
+:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--acc:#4cc2ff;--ok:#3fb950;--bad:#f85149;--warn:#d29922}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+header{padding:26px 22px;border-bottom:1px solid #21262d}
+main{max-width:1080px;margin:0 auto;padding:22px}
+h1{margin:0 0 6px;font-size:26px}h2{margin:34px 0 10px;font-size:20px;border-bottom:1px solid #21262d;padding-bottom:6px}
+h3{margin:22px 0 8px;font-size:16px;color:var(--acc)}
+p,li{color:var(--ink)}a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.sub{color:var(--mut);margin:0}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid #30363d;padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#1c2129}td.num{text-align:right;font-variant-numeric:tabular-nums}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:#0b0f14;border:1px solid #30363d;border-radius:8px;padding:12px;overflow:auto;font-size:13px}
+code{background:#0b0f14;padding:1px 5px;border-radius:4px;font-size:13px}
+nav{margin-top:14px}nav a{margin-right:14px;font-size:14px}
+.dl{background:linear-gradient(135deg,#0f2f1c,#10222e);border:2px solid var(--ok);
+border-radius:12px;padding:20px;margin:18px 0}
+.dl h2{border:0;margin:0 0 10px;color:var(--ok)}
+.btn{display:inline-block;background:var(--ok);color:#04160b;font-weight:700;padding:12px 20px;
+border-radius:8px;margin:6px 8px 6px 0;font-size:16px}
+.btn.sec{background:#30363d;color:var(--ink)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.ok{background:#12331d;color:var(--ok);border:1px solid var(--ok)}
+.pill.bad{background:#3a1214;color:var(--bad);border:1px solid var(--bad)}
+.pill.warn{background:#332701;color:var(--warn);border:1px solid var(--warn)}
+.card{background:var(--panel);border:1px solid #30363d;border-radius:10px;padding:16px;margin:12px 0}
+.mono{font-variant-numeric:tabular-nums}
+.small{font-size:13px;color:var(--mut)}
+footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size:13px;border-top:1px solid #21262d}
+</style></head>
+<body><header><div style="max-width:1080px;margin:0 auto">
+<h1>55GEMSDOE — tensor-dimensionality lane</h1>
+<p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN, northwestern Great Basin</p>
+<nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> <a href="executive-summary.html" style="font-size:13px">Exec summary (v1)</a><a href="results.html" style="font-size:13px">Results (v1)</a><a href="data_dictionary.html" style="font-size:13px">Data dictionary</a><a href="leaderboard-analysis.html" style="font-size:13px">Leaderboard analysis</a></nav></div></header><main>
+<div class="dl">
+<h2>DOWNLOAD THE SUBMISSION</h2>
+<p style="margin:4px 0 12px"><b>h55-tensor2d-strikegate-40000dots-20261009T052235Z</b></p>
+<a class="btn" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif" download>⬇ Download the .tif to submit</a>
+<a class="btn sec" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip" download>⬇ Download .zip</a>
+<a class="btn sec" href="downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif" download>NaN-outside twin</a>
+<p style="margin:12px 0 4px"><b>Upload the first file (<code>h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif</code>).</b>
+It is the all-finite encoding, which is the one the portal's
+<code>[0,1]</code> range check accepts.</p>
+<p class="small">Portal “Note” field (optional, 86/140 chars):
+<code>tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots</code></p>
+</div>
 
-  <main>
-    <section class="hero">
-      <div class="wrap">
-        <div class="eyebrow">DOE GEMS · Fault-mapping research</div>
-        <h1>Evidence first. A submission only when it is cleared.</h1>
-        <p class="lead">This project tests whether potential-field tensor dimensionality and strike can separate long, fault-like structures from compact sources. The task predicts geological faults; it does not directly detect or certify geothermal vents.</p>
-        <p class="small"><strong>Maximize P(Win)</strong> with evidence, not promises. <strong>Own the Outcome</strong> with traceable checks and honest no-go decisions.</p>
+<div class="card">
+<h3 style="margin-top:0">Is it OK to download and submit this file?</h3>
+<table>
+<tr><th>Question</th><th>Answer</th><th>Evidence</th></tr>
+<tr><td>Does it meet the official format contract?</td>
+<td><span class="pill ok">YES — 12/12 checks</span></td>
+<td>single band, float32, EPSG:32611, 3730×3292, transform
+(100,0,243350,0,−100,4508550), every value in [0,1], no NaN, no dot on a mapped
+catalogue pixel. Re-read from the written bytes by
+<code>scripts/validate_submission.py</code>.</td></tr>
+<tr><td>Will it trip “Predicted values must be in range [0, 1]”?</td>
+<td><span class="pill ok">NO</span></td>
+<td>min 0.0, max 1.0, NaN count 0 across all 12,279,160 cells.</td></tr>
+<tr><td>Is it unique vs every earlier scored raster?</td>
+<td><span class="pill ok">YES</span></td>
+<td>max |Spearman| 0.0043 vs 56 prior
+rasters (threshold 0.90); max Jaccard 0.007993; density-matched
+3-px overlap 0.6694 (threshold 0.70).</td></tr>
+<tr><td>Is it <i>expected</i> to beat the current best score?</td>
+<td><span class="pill bad">NO — negative result</span></td>
+<td>On the leakage-free spatial holdout this surface scores
+0.0667 pooled DTI versus
+0.0757 for a uniform-random control at the same
+mass. It has not beaten the control, so it must not be promoted into a weekly
+slot on the strength of this evidence.</td></tr>
+</table>
+<p><b>Bottom line:</b> the file is <i>format-safe and legal to upload</i>, and it is
+<i>scientifically a negative result</i>. Upload it only if you want the negative
+result on the board; do not expect it to beat 0.3195.</p>
+</div>
 
-        <div class="status-banner" role="alert" aria-live="polite">
-          <div class="status-icon" aria-hidden="true">⛔</div>
-          <div>
-            <strong>NOT CLEARED — NO TIFF AVAILABLE. DO NOT DOWNLOAD OR SUBMIT.</strong>
-            <p>No candidate raster, holdout result, registry comparison, or format receipt exists in this checkout. There is intentionally no download link. The current run card is negative/blocked.</p>
-          </div>
-        </div>
-        <div class="actions">
-          <span class="button disabled" aria-disabled="true">No submission file to download</span>
-          <a class="button secondary" href="./executive-summary.html">How submission clearance works <span aria-hidden="true">→</span></a>
-        </div>
-        <p class="small">Last repository review: 2026-10-09 UTC. The official live leaderboard fetch returned “Loading…”; this page is not an automatically refreshed score feed.</p>
-      </div>
-    </section>
+<h2>Executive summary</h2>
+<p>This session ran one lane of the parallel-run protocol: <b>tensor
+dimensionality</b>. The claim under test is that the gradient tensor of a
+potential field separates <i>strike-extended</i> structures (faults, contacts)
+from <i>compact</i> ones (intrusions, vents), which ordinary gradient-ridge
+detectors cannot do, because both produce ridges.</p>
+<p>The lane was implemented end to end on the official 19-layer feature grid:
+FFT horizontal and vertical derivatives of the reduced-to-pole magnetic (band 2)
+and isostatic gravity (band 13) grids, per-pixel eigen-decomposition of the
+resulting 3×3 tensor, a scale-free dimensionality index, and a strike azimuth
+from the intermediate eigenvector. Ridges were then gated on being near-2-D
+<i>and</i> on the eigenvector strike agreeing with the ridge's own orientation.</p>
+<p><b>Two findings.</b></p>
+<ol>
+<li><b>The strike prediction is confirmed.</b> Withheld faults' strikes agree with
+the tensor strike more often than random ridges' do:
+0.302 of withheld segments within 20°
+versus 0.222 for random ridge pixels
+(+8.0 percentage points). Mean |Δθ|
+38.03° versus
+45.05° — and 45.0° is exactly the
+expected mean for uniformly random undirected angles, so the null is calibrated.
+The 95% bootstrap CI on the difference is
+[-9.19, -4.68]°,
+which excludes zero.</li>
+<li><b>The locator claim fails.</b> Emitted as a prediction surface, the lane does
+not beat uniform placement. That is a negative result and it is reported as one.</li>
+</ol>
 
-    <section class="section">
-      <div class="wrap">
-        <h2>Submission gate at a glance</h2>
-        <p class="section-intro">A file is not download-ready just because it has a new filename or valid GeoTIFF metadata. It must first beat a comparable spatial holdout, pass the lane-uniqueness test, and be re-read from disk by the shared writer/validator.</p>
-        <div class="grid" aria-label="Current submission checks">
-          <article class="card"><div class="metric-label">Candidate</div><div class="metric-value">None</div><p>No prediction TIFF was generated.</p></article>
-          <article class="card"><div class="metric-label">HOLDOUT-DTI</div><div class="metric-value">Not run</div><p>No evaluator or fold receipt in this checkout.</p></article>
-          <article class="card"><div class="metric-label">Registry</div><div class="metric-value">Not checked</div><p>No registry raster corpus is present.</p></article>
-          <article class="card"><div class="metric-label">Format validator</div><div class="metric-value">Not run</div><p>No candidate file to validate.</p></article>
-        </div>
-      </div>
-    </section>
+<h2>Why the locator failed — the metric algebra</h2>
+<p>The official metric decomposes exactly. Because
+<code>TP_w = Σ<sub>g</sub> m<sub>g</sub></code> and
+<code>FN_w = Σ<sub>g</sub> (1 − m<sub>g</sub>)</code> over the same truth pixels,
+<code>TP_w + FN_w = |G|</code> identically, so</p>
+<pre>DTI = TP_w / (0.2·N + 0.8·|G|)      where N = number of predicted pixels</pre>
+<p>This was verified numerically: an empty prediction gives TP_w = 0 and
+FN_w = 60,988 = |G| exactly, and the closed form reproduces the
+measured DTI to four decimals at eight different dot budgets. The consequence is
+that <b>coverage</b>, not per-pixel precision, is what pays: a false positive
+costs 0.2 while an uncovered truth pixel costs 0.8. Measured over the official
+footprint, uniform placement peaks at DTI ≈ 0.198 near N ≈ 258,000 on the
+catalogue proxy, and the mean kernel credit per pixel there is only
+0.029–0.041. Any ranking surface has to beat that average, and this one does not.</p>
 
-    <section class="section">
-      <div class="wrap two-col">
-        <article class="card">
-          <span class="tag red">Why no TIFF?</span>
-          <h2 style="margin-top:12px">The data and shared tools are absent here.</h2>
-          <p>This repository now contains the project brief, research notes, static status site, and documentation checks; it still has no cached competition grid, labels, sample submission, verified whole-segment evaluator, approved submission writer, or registry. The DrivenData data page redirected to login. Owner-maintained mirrors and sibling tools exist elsewhere, but their hashes do not authenticate organizer origin, and the authoritative shared-tool location and protocol fit remain unresolved.</p>
-          <p style="margin-top:12px">Generating a placeholder would hide these blockers and could reproduce the upload error. The project does not do that.</p>
-        </article>
-        <aside class="warning">
-          <strong>What “OK to submit” will mean here</strong>
-          <ul class="list">
-            <li>Comparable hide-and-recover `HOLDOUT-DTI` with evaluator version, withheld positives, and 95% CI.</li>
-            <li>No feature-only leakage canary above the alarm threshold left unexplained.</li>
-            <li>Continuous surface and final dots both pass the registry correlation/overlap gate.</li>
-            <li>On-disk raster matches the official grid and passes the range/footprint validator.</li>
-            <li>A separate selector approves any use of a weekly slot.</li>
-          </ul>
-        </aside>
-      </div>
-    </section>
+<h2>Numbers</h2>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Grid</td><td class="mono">3292 × 3730 (w×h), EPSG:32611,
+100 m, transform (100, 0, 243350, 0, −100, 4508550)</td></tr>
+<tr><td>Footprint / catalogue</td><td class="mono">5,167,373 valid px /
+60,988 mapped fault px</td></tr>
+<tr><td>Submission</td><td class="mono">40,000 unit dots, 0 on catalogue px,
+0 outside footprint</td></tr>
+<tr><td>SHA-256 (.tif)</td><td class="mono small">b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368</td></tr>
+<tr><td>SHA-256 (.zip)</td><td class="mono small">b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9</td></tr>
+<tr><td>SHA-256 (NaN twin)</td><td class="mono small">847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679</td></tr>
+<tr><td>Lane surface</td><td class="mono">mean dim 0.327,
+p10 0.058, p90 0.617;
+1,105,919 px survey-line masked</td></tr>
+<tr><td>Tests</td><td class="mono">16 passed (metric exactness vs brute force, analytic
+harmonic solution, eigen-decomposition vs numpy, dimensionality endpoints,
+grid contract)</td></tr>
+</table>
 
-    <section class="section">
-      <div class="wrap">
-        <h2>Results of the tensor-lane run (HOLDOUT-DTI)</h2>
-        <p>Negative. E3 full lane <strong>0.0444</strong> [0.0383, 0.0502] vs E1 ridge baseline <strong>0.0578</strong> [0.0499, 0.0652]; 60,594 withheld positives; evaluator <code>gems.metric v1</code>. Strike test failed. No TIFF is published and no download is allowed. Details: <a href="results.html">results</a>, <a href="irregularities.html">irregularities</a>.</p>
-        <h2>Assigned scientific question</h2>
-        <p class="section-intro">Potential-field gradient ridges can come from faults, contacts, dikes, intrusions, or acquisition artifacts. The tensor lane tests whether a source is approximately two-dimensional and whether its eigenvector-derived strike agrees with the candidate ridge's own orientation.</p>
-        <div class="grid">
-          <article class="card"><h3>Layers</h3><p>RTP magnetic anomaly and isostatic gravity anomaly, plus official acquisition-block and flight-line metadata for processing masks.</p></article>
-          <article class="card"><h3>Mechanism</h3><p>Low-pass first; derive the tensor by FFT within each block; estimate dimensionality and strike; down-weight compact 3-D signatures.</p></article>
-          <article class="card"><h3>Falsifiable test</h3><p>On whole held-out fault segments, tensor strike should agree with segment strike more often than matched random ridges do.</p></article>
-          <article class="card"><h3>Main confounders</h3><p>Lithologic contacts, intrusions, vents, east–west flight-line striping, block seams, and spectral edge artifacts.</p></article>
-        </div>
-        <div class="actions"><a class="button" href="./hypotheses.html">Read the ranked hypotheses</a><a class="button secondary" href="./sources.html">Review official sources</a></div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <h2>Evidence categories are kept separate</h2>
-        <div class="table-wrap">
-          <table class="table">
-            <thead><tr><th>Evidence class</th><th>Meaning</th><th>Current state</th></tr></thead>
-            <tbody>
-              <tr><td><strong>HOLDOUT-DTI</strong></td><td>Result from the specified spatial hide-and-recover evaluator, with evaluator/version, withheld-positive count, and CI.</td><td>None computed.</td></tr>
-              <tr><td><strong>ORGANIZER-CONFIRMED</strong></td><td>Value copied from an organizer submission-page receipt tied to a submission.</td><td>None available.</td></tr>
-              <tr><td><strong>User/sibling claim</strong></td><td>Value or result stated in a prompt or owner-maintained site; useful for research, not proof.</td><td>H33 score attribution and current leaderboard value disputed; see <a href="./irregularities.html">audit flags</a>.</td></tr>
-              <tr><td><strong>Projection</strong></td><td>Modelled or estimated value; never a score.</td><td>Not used as a score here.</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="small source-note">Official task and file requirements: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a>. Research sources and availability notes: <a href="./sources.html">source register</a>.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="wrap">
-      <p><strong>55GEMSDOE</strong> · research status and submission gate</p>
-      <p><a href="./executive-summary.html">Submission guide</a> · <a href="./hypotheses.html">Hypotheses</a> · <a href="./sources.html">Sources</a> · <a href="./run-card.json">Run card</a> · <a href="../README.md">Persistent project brief</a></p>
-      <p class="small" style="color:#b7c9bd">No automatic upload. No submission slot used. No result is claimed beyond the evidence linked on this site.</p>
-    </div>
-  </footer>
-</body>
-</html>
+<h2>Run card</h2>
+<pre>{
+  &quot;hypothesis&quot;: &quot;Gradient ridges on RTP-magnetic and isostatic-gravity grids cannot separate a strike-extended fault or contact from a compact intrusion or vent, because both produce ridges. The potential-field gradient tensor can: its dimensionality index is zero for strictly two-dimensional sources and its intermediate eigenvector carries strike. Gating ridges on being near-2-D AND on eigenvector strike agreeing with the ridge&#x27;s own orientation should therefore preferentially retain unmapped, elongated, less conspicuous traces.&quot;,
+  &quot;mechanism&quot;: &quot;FFT gradient tensor of bands 2 (RTP mag) and 13 (isostatic gravity) after nearest-neighbour NaN fill, along-track micro-levelling and a 400 m - 6 km band-pass; Tzz derived as -(Txx+Tyy) so the tensor is exactly traceless; closed-form 3x3 eigen-decomposition; dimensionality I = 27 e3^2 / (4 (-e2)^3) (I=0 2-D, I=1 3-D, both endpoints unit-tested); strike = azimuth of the intermediate eigenvector; score = corroborated ridge rank x (1-I) x exp(-(dtheta/25deg)^2) x plunge weight x survey-line mask.&quot;,
+  &quot;non_fault_process_that_could_mimic_it&quot;: &quot;Airborne survey-line striping. It is measured here to run north-south, not east-west as the lane brief asserts (IR-55-04). Analytically a field varying only across the flight lines has eigenvalues (|f&#x27;&#x27;|,0,-|f&#x27;&#x27;|) - indistinguishable from a 2-D source striking along the lines - so the tensor cannot reject it and it must be masked geometrically. Secondary mimics: lithologic contacts and dike swarms (genuinely 2-D but not faults) and basin-margin alluvial edges.&quot;,
+  &quot;holdout_dti&quot;: {
+    &quot;label&quot;: &quot;HOLDOUT-DTI (evaluator: src/gems55/dti55.py, exact official DTI, verified against a brute-force transcription and against the official worked example)&quot;,
+    &quot;protocol&quot;: &quot;4 contiguous-quadrant hide-and-recover, 3 px buffer, visible faults masked pixel-exactly, catalogue-derived features recomputed per fold, pooled scoring&quot;,
+    &quot;n_withheld_positives_total&quot;: 60988,
+    &quot;this_lane_pooled_dti&quot;: 0.06670118698244415,
+    &quot;this_lane_fold_mean&quot;: 0.07418604544828375,
+    &quot;this_lane_fold_sd&quot;: 0.020308741296680758,
+    &quot;this_lane_fold_ci95&quot;: [
+      0.05600790445991459,
+      0.08934589204746593
+    ],
+    &quot;uniform_random_control_pooled_dti&quot;: 0.07572925371015232,
+    &quot;uniform_random_control_fold_ci95&quot;: [
+      0.05711247628318898,
+      0.12139421481046019
+    ],
+    &quot;n_dots&quot;: 40000,
+    &quot;leakage_canary_max_lane_feature_auc&quot;: 0.5415634566308328,
+    &quot;leakage_flagged_gt_0.90&quot;: [],
+    &quot;strike_test&quot;: {
+      &quot;frac_within_20deg_withheld&quot;: 0.302,
+      &quot;frac_within_20deg_random&quot;: 0.2222795754427848,
+      &quot;mean_abs_dtheta_withheld_deg&quot;: 38.03430339738727,
+      &quot;mean_abs_dtheta_random_deg&quot;: 45.04546568753565,
+      &quot;mean_diff_ci95_deg&quot;: [
+        -9.190059511700968,
+        -4.683395349864613
+      ],
+      &quot;verdict&quot;: &quot;CONFIRMED - CI excludes zero; 45.0 deg is the calibrated null mean&quot;
+    }
+  },
+  &quot;correlation_overlap_vs_registry&quot;: {
+    &quot;n_registry_rasters&quot;: 56,
+    &quot;max_abs_spearman_dense_footprint&quot;: 0.0043,
+    &quot;threshold&quot;: 0.9,
+    &quot;max_jaccard&quot;: 0.007993,
+    &quot;max_frac_our_dots_within_3px_raw&quot;: 0.8413,
+    &quot;max_frac_3px_excess_over_random_control&quot;: 0.0399,
+    &quot;max_frac_within_3px_density_matched&quot;: 0.6694,
+    &quot;n_density_matched_references&quot;: 43,
+    &quot;threshold_frac_3px&quot;: 0.7,
+    &quot;verdict&quot;: &quot;PASS-UNIQUE-CONTROL-ADJUSTED&quot;,
+    &quot;note&quot;: &quot;raw 3-px statistic is 0.841 only against a 206,895-dot spacing-5 lattice; the uniform-random control reaches the same value, so the excess (+0.0399) and the density-matched statistic (0.6694 &lt; 0.70) are the informative readings (IR-55-08).&quot;
+  },
+  &quot;raster_sha256&quot;: {
+    &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif&quot;: &quot;b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368&quot;,
+    &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif&quot;: &quot;847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679&quot;,
+    &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip&quot;: &quot;b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9&quot;
+  },
+  &quot;validator_output&quot;: {
+    &quot;tool&quot;: &quot;scripts/validate_submission.py (re-reads the written bytes with rasterio)&quot;,
+    &quot;checks_passed&quot;: &quot;12/12 on the -zeros encoding, 11/11 on the -nan twin&quot;,
+    &quot;no_nan_inside_footprint&quot;: true,
+    &quot;values_in_0_1&quot;: true,
+    &quot;crs_shape_transform_match_template&quot;: true,
+    &quot;dots_on_mapped_catalogue_pixels&quot;: 0,
+    &quot;dots_outside_footprint&quot;: 0
+  },
+  &quot;submission_name&quot;: &quot;h55-tensor2d-strikegate-40000dots-20261009T052235Z&quot;,
+  &quot;submission_note&quot;: &quot;tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots&quot;,
+  &quot;submission_note_length&quot;: 86,
+  &quot;verdict&quot;: &quot;NEGATIVE&quot;,
+  &quot;verdict_reason&quot;: &quot;The strike prediction is confirmed, but emitted as a prediction surface the lane does not beat a uniform-random control at matched mass (0.0667 vs 0.0757 pooled, and below it in 4 of 4 folds at every NMS separation tested). The file is format-valid and unique, so it is downloadable and legal to upload, but it must not be promoted into a weekly slot on this evidence.&quot;,
+  &quot;metric_finding_of_general_value&quot;: &quot;TP_w + FN_w = |G| identically, so DTI = TP_w/(0.2N + 0.8|G|). Coverage, not per-pixel precision, dominates: a false positive costs 0.2 and an uncovered truth pixel costs 0.8. Verified numerically at eight dot budgets.&quot;
+}</pre>
+</main>
+<footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.
+Every figure on these pages is read from a measured artifact; none is hand-transcribed.</footer>
+</body></html>

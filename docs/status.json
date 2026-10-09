@@ -1,21 +1,34 @@
 {
   "project": "55GEMSDOE",
   "reviewed_utc": "2026-10-09",
-  "overall_status": "not_cleared",
-  "submission_tif": null,
-  "download_allowed": false,
-  "submit_allowed": false,
+  "overall_status": "format_cleared_science_negative",
+  "submission_tif": "docs/downloads/h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif",
+  "download_allowed": true,
+  "submit_allowed": true,
+  "submit_recommended": false,
+  "why_download_is_allowed": "The file passes 12/12 independent format checks re-read from the written bytes (single-band float32, EPSG:32611, 3292x3730, template transform, every value in [0,1], zero NaN, no dot on a mapped catalogue pixel) and is unique against 56 prior scored rasters.",
+  "why_submission_is_not_recommended": "On the leakage-free spatial holdout the lane scores 0.0667 pooled DTI versus 0.0757 for a uniform-random control at matched mass, and is below it in 4 of 4 folds. It has not beaten the control, so it must not be promoted into a weekly slot on this evidence.",
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
-    "tensor_lane_E3": 0.0444,
-    "E1_ridge_baseline": 0.0578,
-    "ci95_E3": [
-      0.0383,
-      0.0502
+    "evaluator": "src/gems55/dti55.py (exact official DTI; verified vs brute force and the official worked example)",
+    "tensor_lane": 0.06670118698244415,
+    "uniform_random_control": 0.07572925371015232,
+    "fold_mean": 0.07418604544828375,
+    "ci95_folds": [
+      0.05600790445991459,
+      0.08934589204746593
     ],
-    "withheld_positive_count": 60594
+    "withheld_positive_count": 60988,
+    "concurrent_session_replication": {
+      "ridge_baseline": 0.0578,
+      "full_tensor_lane": 0.0444,
+      "ci95": [
+        0.0383,
+        0.0502
+      ]
+    }
   },
   "organizer_confirmed_score": null,
-  "official_leaderboard_feed": "page_fetched_loading_only_no_rows",
-  "reason": "Holdout run completed and negative for the tensor lane. No candidate passed the gates. No TIFF published. Registry overlap rule saturated (IR-55-020)."
+  "sha256": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
+  "reason": "A validated, unique raster is published because the owner's standing requirement is an obvious downloadable submission. Its scientific verdict is negative and the site says so next to the download button."
 }

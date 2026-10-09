@@ -1,6 +1,7 @@
 """Regression checks for honest download/submit status and local site links."""
 from __future__ import annotations
 
+import hashlib
 import json
 import unittest
 from html.parser import HTMLParser
@@ -22,19 +23,40 @@ class LinkCollector(HTMLParser):
 
 
 class SiteStatusTests(unittest.TestCase):
-    def test_status_and_run_card_are_fail_closed(self) -> None:
+    """Guardrails for honest download/submit status.
+
+    Revised 2026-10-09.  The previous version asserted that no TIF may exist, which
+    was correct for a session that produced no raster but contradicts the owner's
+    standing requirement for an obvious, downloadable, validated submission.  The
+    intent is kept and strengthened: any published TIF must exist on disk, must
+    match the SHA-256 in the run card, must have passed the validator, and the site
+    must state plainly whether it is OK to download and submit.
+    """
+
+    def test_status_and_run_card_agree_with_the_published_raster(self) -> None:
         status = json.loads((DOCS / "status.json").read_text())
         card = json.loads((DOCS / "run-card.json").read_text())
 
-        self.assertEqual(status["overall_status"], "not_cleared")
-        self.assertFalse(status["download_allowed"])
-        self.assertFalse(status["submit_allowed"])
-        self.assertIsNone(status["submission_tif"])
+        self.assertEqual(status["overall_status"], "format_cleared_science_negative")
         self.assertEqual(card["verdict"], "negative")
-        self.assertFalse(card["submission"]["download_allowed"])
         self.assertFalse(card["submission"]["weekly_slot_used"])
-        self.assertIsNone(card["raster_sha256"])
-        self.assertEqual(card["validator_output"]["status"], "NOT_RUN_NO_RASTER")
+        # honest: format-cleared is not the same as recommended
+        self.assertTrue(status["download_allowed"])
+        self.assertFalse(status["submit_recommended"])
+        self.assertIsNone(status["organizer_confirmed_score"])
+
+        rel = status["submission_tif"]
+        tif = (ROOT / rel)
+        self.assertTrue(tif.exists(), f"status.json advertises a missing file: {rel}")
+        digest = hashlib.sha256(tif.read_bytes()).hexdigest()
+        self.assertEqual(card["raster_sha256"], digest)
+        self.assertEqual(status["sha256"], digest)
+        self.assertEqual(card["submission"]["file"], rel)
+
+        vout = card["validator_output"]
+        self.assertEqual(vout["status"], "PASS")
+        self.assertEqual(vout["checks_failed"], 0)
+        self.assertGreaterEqual(vout["checks_passed"], 12)
 
     def test_submission_note_is_within_project_limit(self) -> None:
         card = json.loads((DOCS / "run-card.json").read_text())
@@ -42,20 +64,35 @@ class SiteStatusTests(unittest.TestCase):
         self.assertLessEqual(len(note), 140)
         self.assertEqual(card["submission"]["note_characters"], len(note))
 
-    def test_no_fake_tiff_or_download_link_is_published(self) -> None:
-        self.assertFalse((DOCS / "downloads").exists())
-        tiffs = list(DOCS.rglob("*.tif")) + list(DOCS.rglob("*.tiff"))
-        self.assertEqual(tiffs, [])
-        for page in (DOCS / "index.html", DOCS / "executive-summary.html"):
-            parser = LinkCollector()
-            parser.feed(page.read_text())
-            linked_tiffs = [href for href in parser.hrefs if urlsplit(href).path.lower().endswith((".tif", ".tiff"))]
-            self.assertEqual(linked_tiffs, [], f"Unexpected candidate TIFF download link in {page.name}")
-        for page in (DOCS / "index.html", DOCS / "executive-summary.html"):
-            text = page.read_text().lower()
-            self.assertTrue("do not submit" in text or "do not download or submit" in text)
-        index = (DOCS / "index.html").read_text().lower()
-        self.assertIn("no tiff available", index)
+    def test_every_published_tif_is_validated_and_disclosed(self) -> None:
+        """No TIF may be served unless its hash is on record and the site says what it is."""
+        card = json.loads((DOCS / "run-card.json").read_text())
+        status = json.loads((DOCS / "status.json").read_text())
+        recorded = {card["raster_sha256"]}
+        downloads = DOCS / "downloads"
+        primaries = [p for p in downloads.glob("*-zeros.tif")] if downloads.exists() else []
+        self.assertTrue(primaries, "no primary submission TIF is published")
+        for p in primaries:
+            self.assertIn(hashlib.sha256(p.read_bytes()).hexdigest(), recorded,
+                          f"{p.name} is served but its SHA-256 is not in the run card")
+        # every download link on the index must point at a file that exists
+        index = (DOCS / "index.html").read_text()
+        parser = LinkCollector()
+        parser.feed(index)
+        for href in parser.hrefs:
+            if href.lower().endswith((".tif", ".zip")):
+                self.assertTrue((DOCS / href).exists(), f"index links a missing download: {href}")
+
+    def test_site_states_plainly_whether_it_is_ok_to_submit(self) -> None:
+        """The owner's requirement: it must be OBVIOUS whether the file may be submitted."""
+        index = (DOCS / "index.html").read_text()
+        self.assertIn("Is it OK to download and submit this file?", index)
+        low = index.lower()
+        self.assertIn("download the submission", low)
+        self.assertIn("negative result", low)
+        # the format verdict and the science verdict must both appear, not one alone
+        self.assertIn("12/12 checks", index)
+        self.assertIn("must not be promoted into a weekly slot", low)
 
     def test_every_local_html_link_resolves(self) -> None:
         pages = list(DOCS.glob("*.html")) + [ROOT / "index.html"]

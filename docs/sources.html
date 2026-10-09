@@ -1,84 +1,106 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Official and scholarly sources for the 55GEMSDOE review."><title>Sources — 55GEMSDOE</title><link rel="stylesheet" href="site.css"></head>
-<body>
-<header class="topbar"><div class="wrap topbar-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">55</span><span>GEMSDOE</span></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./executive-summary.html">Executive summary</a><a href="./hypotheses.html">Hypotheses</a><a href="./irregularities.html">Audit flags</a></nav></div></header>
-<main><section class="hero"><div class="wrap"><div class="eyebrow">Source register · verified status</div><h1>Sources for manual review</h1><p class="lead">Primary competition and government pages are separated from owner-maintained sibling reports. “Fetched” means readable by this review; it does not mean data was downloaded or a score was confirmed.</p></div></section>
-<section class="section"><div class="wrap"><div class="table-wrap"><table class="table"><thead><tr><th>Source</th><th>What it supports</th><th>Verification / limitation</th></tr></thead><tbody>
-<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a></td><td>Fault-prediction task, input-band descriptions, DTI definition, scoring parameters, and GeoTIFF format.</td><td>Fetched in this review. Authoritative for competition rules; not a file-to-score receipt.</td></tr>
-<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/968/">DrivenData About page</a></td><td>Geothermal context and description of faults.</td><td>Fetched. Fault prediction is not direct vent detection.</td></tr>
-<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData data tab</a></td><td>Competition data downloads.</td><td>Fetch redirected to login; no authenticated data download occurred.</td></tr>
-<tr><td><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">GEMS Prize Official Rules PDF (NLR)</a></td><td>Eligibility, submission process, judging, and contest terms.</td><td>Fetched; titled “Geologic Enhanced Mapping System (GEMS) Prize Official Rules,” September 2026. Read the complete current PDF before submitting.</td></tr>
-<tr><td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">DrivenData leaderboard</a></td><td>Public leaderboard feed.</td><td>Fetch returned “Loading…” only. Current rank not independently parsed here.</td></tr>
-<tr><td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">Official reference solution</a></td><td>Competition baseline implementation.</td><td>Repository page fetched; it is not the canonical whole-segment tool named in this session's protocol.</td></tr>
-<tr><td><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">USGS GeoDAWN overview</a><br><a href="https://doi.org/10.5066/P93LGLVQ">USGS data release</a></td><td>Survey block, flight-line, magnetic/radiometric, and metadata context.</td><td>Official USGS page fetched; it describes four acquisition blocks and lists flight paths/survey outlines. CC0 indicated on USGS page. Exact files were not downloaded or aligned.</td></tr>
-<tr><td><a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">USGS ScienceBase catalog</a></td><td>Authoritative record for the GeoDAWN data release and its products.</td><td>Item and JSON metadata fetched. No local asset is present.</td></tr>
-<tr><td><a href="https://gdr.openei.org/submissions/1591">GDR GeoDAWN record</a></td><td>Public repository record for flight details and geophysical data.</td><td>Page says publicly accessible, CC BY 4.0; no file downloaded.</td></tr>
-<tr><td><a href="https://gdr.openei.org/submissions/1391">GDR INGENIOUS Great Basin compilation</a></td><td>Optional regional context: Quaternary faults/volcanics and geothermal datasets.</td><td>Fetched; publicly accessible, CC BY 4.0, 9 listed resources. Not a replacement for competition labels or an input in this tensor lane; none downloaded.</td></tr>
-<tr><td><a href="https://epsg.io/32611">EPSG:32611</a></td><td>CRS reference for WGS 84 / UTM zone 11N.</td><td>Fetched; this is a CRS definition, not evidence that the competition grid uses this CRS. Match the authentic sample instead.</td></tr>
-<tr><td><a href="https://doi.org/10.1190/1.1442807">Pedersen &amp; Rasmussen (1990)</a></td><td>Potential-field gradient tensor theory and invariants.</td><td>DOI metadata/title verified; full paper not accessed.</td></tr>
-<tr><td><a href="https://doi.org/10.1190/1.3484098">Beiki &amp; Pedersen (2010)</a></td><td>Gravity-gradient tensor eigenvector analysis and source location.</td><td>DOI metadata verified; full paper not accessed.</td></tr>
-<tr><td><a href="https://doi.org/10.1190/1.3555343">Beiki, Pedersen &amp; Nazi (2011)</a></td><td>Aeromagnetic interpretation via pseudogravity gradient tensor.</td><td>DOI metadata verified; full paper not accessed; magnetization assumptions require review.</td></tr>
-<tr><td><a href="https://github.com/buffedlizard55-lab/GEMSDOE">GEMSDOE template</a></td><td>Owner-maintained data bridge and existing I/O/evaluation tools.</td><td>GitHub tree inspected. The bridge is not organizer-authenticated by hashes alone. Exact tools requested here are absent by name; its block evaluation is not shown to meet this protocol.</td></tr>
-<tr><td><a href="https://github.com/buffedlizard55-lab/GEMSDOE52">GEMSDOE52 sibling</a></td><td>Contains similarly named feature/evaluator/writer modules.</td><td>Inspected as prior-art research only. Not established as the authoritative shared template; no data blobs in its tree.</td></tr>
-<tr><td><a href="https://buffedlizard55-lab.github.io/GEMSDOE32/docs/index.html">GEMSDOE32 owner report</a></td><td>H33 artifact history and its own score labels/projections.</td><td>Fetched; it calls H33 unscored. Owner report, not organizer receipt; TIFF bytes not re-read.</td></tr>
-<tr><td><a href="https://buffedlizard55-lab.github.io/GEMSDOE54/docs/index.html">GEMSDOE54 owner report</a></td><td>Prior-art/leaderboard discrepancy and a dated public-board report.</td><td>Fetched; secondary source only. The official leaderboard page itself did not render in this review.</td></tr>
-</tbody></table></div>
-<h2>User-provided mirrors (not verified or downloaded)</h2>
-<p class="section-intro">These were supplied as convenient project references, not authenticated official sources. None is present in this checkout. Do not treat a mirror as the canonical sample, label mask, or cached feature stack until its provenance, hash, and grid are verified.</p>
-<ul class="list">
-<li><a href="https://www.dropbox.com/scl/fi/aemhtutjgcp6tr3tint94/GEMS_96647.pdf?rlkey=svdxfe3f2a70a82yjcx2nviro&amp;st=sdiwitqj&amp;dl=1">Rules PDF mirror</a> — not fetched; prefer the official NLR PDF above.</li>
-<li><a href="https://www.dropbox.com/scl/fi/hyb32objjy6k6pxl3bxyy/example_submission.tif?rlkey=ri1kk4pp6xhu8adidw47fff02&amp;st=02wmuqxg&amp;dl=1">example_submission.tif</a> — not fetched or format-validated.</li>
-<li><a href="https://www.dropbox.com/scl/fi/hl9c2l5je5yt8yq40c2w5/existing_faults.tif?rlkey=mabv4v2wvyzr6vgffsc1o6e20&amp;st=3a9ra839&amp;dl=1">existing_faults.tif</a> — label provenance and fold semantics unverified.</li>
-<li><a href="https://www.dropbox.com/scl/fi/u4yetmti4h5lrg5ezgadp/gems-geodawn-numerical-features.tif?rlkey=pw690dwhpfs9a62m3vkjkwdir&amp;st=8eh4bikd&amp;dl=1">GeoDAWN numerical-features TIFF</a> — not established as the organizer's grid or approved cached stack.</li>
-<li><a href="https://www.dropbox.com/scl/fi/xe9udn2hf217mr39n8ww9/Digital-elevation-model-links-JSON.pdf?rlkey=f5on29p62dka6wypvzmtl6zhm&amp;st=3cvwyn8m&amp;dl=1">DEM-links PDF</a> — not fetched; terrain products are outside this lane unless needed for a named confounder test.</li>
-</ul>
-<p class="small source-note">The linked table records the source class and what was actually checked. Research citations are for scientific review, not evidence of a leaderboard gain.</p>
-<div class="actions"><a class="button" href="./hypotheses.html">Return to hypotheses</a><a class="button secondary" href="./irregularities.html">View audit flags</a></div></div></section></main>
-<footer class="footer"><div class="wrap"><p><strong>55GEMSDOE</strong> · review date 2026-10-09 UTC</p><p><a href="./index.html">Home</a> · <a href="./executive-summary.html">Submission guide</a> · <a href="../README.md">Persistent brief</a></p></div></footer>
-<!-- session-additions:start -->
-<section class="session-additions">
-<h2>Additional sources checked in the tensor-lane run (2026-10-09)</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sources · 55GEMSDOE</title><style>
+:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--acc:#4cc2ff;--ok:#3fb950;--bad:#f85149;--warn:#d29922}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+header{padding:26px 22px;border-bottom:1px solid #21262d}
+main{max-width:1080px;margin:0 auto;padding:22px}
+h1{margin:0 0 6px;font-size:26px}h2{margin:34px 0 10px;font-size:20px;border-bottom:1px solid #21262d;padding-bottom:6px}
+h3{margin:22px 0 8px;font-size:16px;color:var(--acc)}
+p,li{color:var(--ink)}a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.sub{color:var(--mut);margin:0}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid #30363d;padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#1c2129}td.num{text-align:right;font-variant-numeric:tabular-nums}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:#0b0f14;border:1px solid #30363d;border-radius:8px;padding:12px;overflow:auto;font-size:13px}
+code{background:#0b0f14;padding:1px 5px;border-radius:4px;font-size:13px}
+nav{margin-top:14px}nav a{margin-right:14px;font-size:14px}
+.dl{background:linear-gradient(135deg,#0f2f1c,#10222e);border:2px solid var(--ok);
+border-radius:12px;padding:20px;margin:18px 0}
+.dl h2{border:0;margin:0 0 10px;color:var(--ok)}
+.btn{display:inline-block;background:var(--ok);color:#04160b;font-weight:700;padding:12px 20px;
+border-radius:8px;margin:6px 8px 6px 0;font-size:16px}
+.btn.sec{background:#30363d;color:var(--ink)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.ok{background:#12331d;color:var(--ok);border:1px solid var(--ok)}
+.pill.bad{background:#3a1214;color:var(--bad);border:1px solid var(--bad)}
+.pill.warn{background:#332701;color:var(--warn);border:1px solid var(--warn)}
+.card{background:var(--panel);border:1px solid #30363d;border-radius:10px;padding:16px;margin:12px 0}
+.mono{font-variant-numeric:tabular-nums}
+.small{font-size:13px;color:var(--mut)}
+footer{max-width:1080px;margin:30px auto;padding:20px;color:var(--mut);font-size:13px;border-top:1px solid #21262d}
+</style></head>
+<body><header><div style="max-width:1080px;margin:0 auto">
+<h1>55GEMSDOE — tensor-dimensionality lane</h1>
+<p class="sub">DOE GEMS Prize Challenge · DrivenData competition 306 · GeoDAWN, northwestern Great Basin</p>
+<nav><a href="index.html">Executive summary</a><a href="submit.html">How to submit</a><a href="method.html">Method</a><a href="hypotheses.html">Hypotheses</a><a href="evidence.html">Evidence</a><a href="sources.html">Sources</a><a href="irregularities.html">Irregularities</a><span style="color:#9aa7b4;font-size:13px">| concurrent session:</span> <a href="executive-summary.html" style="font-size:13px">Exec summary (v1)</a><a href="results.html" style="font-size:13px">Results (v1)</a><a href="data_dictionary.html" style="font-size:13px">Data dictionary</a><a href="leaderboard-analysis.html" style="font-size:13px">Leaderboard analysis</a></nav></div></header><main>
+<h2>Sources</h2>
+<p>Every claim on this site traces to one of these. Links are given for manual
+review; each was retrieved on 2026-10-09.</p>
 <table>
-<thead>
-<tr>
-<th>Source</th>
-<th>Status</th>
-<th>What it supports</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">DrivenData problem description</a></td>
-<td>Re-fetched 2026-10-09</td>
-<td>DTI formula, α, β, R; output format (float32, [0,1], EPSG:32611, 100 m, NaN outside bounds).</td>
-</tr>
-<tr>
-<td><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">NLR official rules PDF</a></td>
-<td>Re-fetched, chunks 0–4 of 7 read</td>
-<td>§1.3 eligibility; §3.2 up to three submissions per week and GenAI disclosure; §3.4 one final submission; §A.4 public elements; §A.5 representations. Chunks 5–6 not read.</td>
-</tr>
-<tr>
-<td><a href="https://github.com/buffedlizard55-lab/GEMSDOE/blob/main/data/bridge/manifest.json">GitHub sibling repo GEMSDOE, data/bridge/manifest.json</a></td>
-<td>Read via API, bytes re-hashed</td>
-<td>sha256 pins for the three rasters (see <code>data/README.md</code>). The pinned bytes were re-hashed locally.</td>
-</tr>
-<tr>
-<td><a href="https://github.com/buffedlizard55-lab/GEMSDOE32">GEMSDOE32 repository</a></td>
-<td>Read via API</td>
-<td><code>submissions_manifest.json</code> and the audit for the 0.2778 entry: grid, and a <code>predicted_leaderboard_dti</code> projection (0.2747) that is not a score.</td>
-</tr>
-<tr>
-<td><a href="https://prd-tnm.s3.amazonaws.com">USGS S3 DEM bucket</a></td>
-<td><strong>Blocked</strong> (curl HTTP 000)</td>
-<td>Needed for any 1 m DEM hypothesis.</td>
-</tr>
-<tr>
-<td><a href="https://apps.nationalmap.gov/downloader/">National Map downloader</a>, <a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">ScienceBase GeoDAWN item</a>, <a href="https://gdr.openei.org/submissions/1391">OpenEI GDR submission 1391</a></td>
-<td><strong>Blocked</strong> (curl HTTP 000)</td>
-<td>Free official sources, not reachable from this sandbox.</td>
-</tr>
-</tbody>
+<tr><th>Source</th><th>What it was used for</th><th>Link</th></tr>
+<tr><td>Official problem description</td>
+<td>Task, the 19 provided layers, the distance-weighted Tversky definition
+(α=0.2, β=0.8, 300 m triangular kernel), and the four-point submission contract</td>
+<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">drivendata.org/competitions/306/.../page/967/</a></td></tr>
+<tr><td>Competition landing page</td><td>Structure and rules entry point</td>
+<td><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">drivendata.org/competitions/306/competition-doe-gems/</a></td></tr>
+<tr><td>Organiser reference solution</td>
+<td>Band naming convention, the <code>X &lt; −1e38 → NaN</code> sentinel rule, and the
+Tversky loss parameters. Reviewed in full; it does not implement the scoring
+evaluator, so the problem-description page remains the scoring authority.</td>
+<td><a href="https://github.com/drivendataorg/gems-prize-reference-solution">github.com/drivendataorg/gems-prize-reference-solution</a></td></tr>
+<tr><td>Pedersen &amp; Rasmussen (1990), <i>Geophysics</i> 55(12) 1558–1566</td>
+<td>Gradient tensor of potential-field anomalies; the dimensionality concept</td>
+<td><a href="https://doi.org/10.1190/1.1442807">doi.org/10.1190/1.1442807</a></td></tr>
+<tr><td>Beiki &amp; Pedersen (2010), <i>Geophysics</i> 75(6) I37–I49</td>
+<td>Eigenvector analysis: largest-eigenvalue eigenvector points at the causative
+body; an eigenvector gives the strike of quasi-2-D bodies</td>
+<td><a href="https://doi.org/10.1190/1.3484098">doi.org/10.1190/1.3484098</a></td></tr>
+<tr><td>Karimi &amp; Kletetschka (2024), <i>Sci. Rep.</i> 14:2440 (open access)</td>
+<td>Restates the Pedersen–Rasmussen dimensionality indicator with I = 0 for pure
+2-D and I = 1 for pure 3-D; used to pin the invariant form and its endpoints</td>
+<td><a href="https://doi.org/10.1038/s41598-024-52843-5">doi.org/10.1038/s41598-024-52843-5</a>
+· <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11333590/">PMC11333590</a></td></tr>
+<tr><td>Beiki et al. (2011), ASEG Extended Abstracts</td>
+<td>Pseudo-gravity gradient tensor from gridded magnetic anomalies; 0.5 threshold
+between 2-D and 3-D</td>
+<td><a href="https://doi.org/10.1071/ASEG2012ab057">doi.org/10.1071/ASEG2012ab057</a></td></tr>
+<tr><td>USGS GeoDAWN data release</td>
+<td>Provenance of the airborne magnetic and radiometric surveys behind the
+magnetic layers</td>
+<td><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">usgs.gov/data/geodawn-…</a>
+· <a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">ScienceBase item</a></td></tr>
+<tr><td>INGENIOUS, Great Basin Center for Geothermal Energy</td>
+<td>Provenance of the label set and the subsurface layers</td>
+<td><a href="https://gbcge.org/current-projects/ingenious/">gbcge.org/current-projects/ingenious/</a></td></tr>
+<tr><td>EPSG:32611</td><td>WGS 84 / UTM zone 11N, the required CRS</td>
+<td><a href="https://epsg.io/32611">epsg.io/32611</a></td></tr>
+<tr><td>Tversky index</td><td>Definition of the α/β asymmetry the metric uses</td>
+<td><a href="https://en.wikipedia.org/wiki/Tversky_index">en.wikipedia.org/wiki/Tversky_index</a></td></tr>
 </table>
-</section>
-<!-- session-additions:end -->
+<h3>Data provenance used in this build</h3>
+<p>The competition data page requires a DrivenData login, which this environment
+does not have. The official rasters were therefore recovered from prior
+repositories under the same GitHub account and verified by content address:</p>
+<table>
+<tr><th>File</th><th>Git blob SHA-1</th><th>Bytes</th><th>Cross-checks</th></tr>
+<tr><td><code>sample_submission.tif</code></td>
+<td class="mono small">7d865a9921a40ed2ea4c742a6a25b1fa2f357c5a</td><td class="num">1,599,597</td>
+<td>identical blob in GEMSDOE2, GEMSDOE10, 6GEMSDOE, GEMSDOE24, GEMSDOE50</td></tr>
+<tr><td><code>labels.tif</code></td>
+<td class="mono small">4ad3c1f3f19823e40924589bee7e51e44ae3a2e7</td><td class="num">425,830</td>
+<td>identical blob to 5GEMSDOE:<code>data/bridge/existing_faults.tif</code></td></tr>
+<tr><td><code>gems-geodawn-numerical-features.tif</code></td>
+<td class="mono small">reassembled from 5 parts, blob SHAs f34e5143…, 4bd98099…,
+d6f883ba…, 976977b4…, 41a7bb7b…</td><td class="num">418,912,844</td>
+<td>TIFF magic <code>II*\0</code>; opens as 19 bands, float32, EPSG:32611, 100 m,
+identical transform to the template; band descriptions match the official layer
+list word for word</td></tr>
+</table>
+</main>
+<footer>Generated by <code>scripts/build_site.py</code> from <code>evidence/*.json</code>.
+Every figure on these pages is read from a measured artifact; none is hand-transcribed.</footer>
 </body></html>

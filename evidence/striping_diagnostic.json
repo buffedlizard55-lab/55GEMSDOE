@@ -1,0 +1,79 @@
+{
+  "grid": {
+    "width": 3292,
+    "height": 3730,
+    "res_m": 100.0
+  },
+  "synthetic_convention_check": {
+    "spectral_power_k_east_west": 0.0,
+    "spectral_power_k_north_south": 1.0,
+    "variance_of_east_west_mean_profile": 0.4992215166752,
+    "variance_of_north_south_mean_profile": 3.009265538105056e-36,
+    "profile_variance_ratio_ns_over_ew": 6.027916340919503e-36,
+    "flight_line_axis_numpy": 1,
+    "flight_line_direction": "east-west",
+    "expected_flight_line_axis_numpy": 1,
+    "convention_ok": true
+  },
+  "rtp_mag": {
+    "spectral": {
+      "spectral_power_k_east_west": 0.10373758306792706,
+      "spectral_power_k_north_south": 0.08932496165278556,
+      "variance_of_east_west_mean_profile": 2691.2096615775276,
+      "variance_of_north_south_mean_profile": 2253.2111431593107,
+      "profile_variance_ratio_ns_over_ew": 0.8372484594301464,
+      "flight_line_axis_numpy": 0,
+      "flight_line_direction": "north-south"
+    },
+    "coherence_raw": {
+      "coherence_along_x_east_west": 0.18517651705738597,
+      "n_along_x_east_west": 4929845,
+      "coherence_along_y_north_south": 0.18745595005209653,
+      "n_along_y_north_south": 4877491
+    },
+    "coherence_bandpassed": {
+      "coherence_along_x_east_west": -0.011649607394548974,
+      "n_along_x_east_west": 4929845,
+      "coherence_along_y_north_south": -0.03485246650691035,
+      "n_along_y_north_south": 4877491
+    },
+    "agreement_spectral_vs_coherence": false
+  },
+  "iso_grav": {
+    "spectral": {
+      "spectral_power_k_east_west": 0.22180659812450002,
+      "spectral_power_k_north_south": 0.16614312302878514,
+      "variance_of_east_west_mean_profile": 35.31828261321888,
+      "variance_of_north_south_mean_profile": 32.7627025243418,
+      "profile_variance_ratio_ns_over_ew": 0.9276414395098425,
+      "flight_line_axis_numpy": 0,
+      "flight_line_direction": "north-south"
+    },
+    "coherence_raw": {
+      "coherence_along_x_east_west": 0.5744969040845329,
+      "n_along_x_east_west": 4929845,
+      "coherence_along_y_north_south": 0.7248444128672791,
+      "n_along_y_north_south": 4877491
+    },
+    "coherence_bandpassed": {
+      "coherence_along_x_east_west": 0.09655553122542607,
+      "n_along_x_east_west": 4929845,
+      "coherence_along_y_north_south": 0.3445258967191026,
+      "n_along_y_north_south": 4877491
+    },
+    "agreement_spectral_vs_coherence": true
+  },
+  "decision": {
+    "flight_line_direction_long_lag_coherence": [
+      "east-west",
+      "north-south"
+    ],
+    "flight_line_direction_spectral": [
+      "north-south",
+      "north-south"
+    ],
+    "lane_brief_asserts": "east-west",
+    "measurement_used": "north-south",
+    "brief_contradicted": false
+  }
+}
