@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
-"""Lane-drift / uniqueness check against every retrievable prior scored raster.
+"""Strict lane-drift/uniqueness check against every registry raster.
 
-Brief thresholds: rank correlation with any registry raster > 0.90, or more than
-70% of our dots within 3 px of one registry raster's dots  =>  duplicate, stop.
-Also reports Jaccard and containment for completeness.
+The protocol is deliberately fail-closed:
+  * continuous candidate surface: absolute Spearman rho > 0.90 => stop;
+  * final positive dots: >70% within 3 pixels of one registry raster => stop.
+
+A chance-adjusted overlap is reported as a diagnostic because dense historical
+rasters can make the raw test saturate, but it NEVER changes the strict verdict.
+No registry pixel is copied into a candidate.
 """
 from __future__ import annotations
-import argparse, json, sys
+
+import argparse
+import hashlib
+import json
+import sys
 from pathlib import Path
+
 import numpy as np
 import rasterio
 from scipy import ndimage, stats
@@ -19,91 +28,154 @@ from gems55 import io55  # noqa: E402
 REG = ROOT / "registry" / "rasters"
 EVID = ROOT / "evidence"
 
-ap = argparse.ArgumentParser(); ap.add_argument("tif"); ap.add_argument("--out", default=None)
-args = ap.parse_args()
 
-grid, _ = io55.read_template()
-with rasterio.open(args.tif) as s:
-    ours = s.read(1)
-odots = np.nan_to_num(ours, nan=0.0) > 0
-n_ours = int(odots.sum())
-oy, ox = np.nonzero(odots)
-print(f"ours: {Path(args.tif).name}  n_dots={n_ours}")
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
 
-rows = []
-for p in sorted(REG.glob("*.tif")):
-    with rasterio.open(p) as s:
-        if (s.width, s.height) != (grid.width, grid.height):
+
+def read_surface(path: Path, key: str) -> np.ndarray:
+    if path.suffix == ".npz":
+        with np.load(path) as z:
+            if key not in z:
+                raise KeyError(f"{key!r} not found in {path}")
+            return np.asarray(z[key], dtype=np.float32)
+    with rasterio.open(path) as src:
+        return src.read(1).astype(np.float32)
+
+
+def rho_sample(a: np.ndarray, b: np.ndarray, mask: np.ndarray, rng: np.random.Generator) -> float:
+    idx = np.flatnonzero(mask.ravel())
+    if idx.size > 300_000:
+        idx = rng.choice(idx, 300_000, replace=False)
+    if idx.size < 10:
+        return float("nan")
+    r = stats.spearmanr(a.ravel()[idx], b.ravel()[idx]).statistic
+    return float(r) if np.isfinite(r) else float("nan")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("tif", type=Path)
+    ap.add_argument("--surface", type=Path, default=None,
+                    help="pre-placement continuous surface (.npz or GeoTIFF)")
+    ap.add_argument("--surface-key", default="score")
+    ap.add_argument("--out", type=Path, default=None)
+    args = ap.parse_args()
+
+    grid, _ = io55.read_template()
+    with rasterio.open(args.tif) as src:
+        ours = src.read(1).astype(np.float32)
+        if (src.height, src.width) != grid.shape:
+            raise SystemExit("candidate shape does not match the official template")
+    dots = np.nan_to_num(ours, nan=0.0) > 0
+    n_ours = int(dots.sum())
+    yy, xx = np.nonzero(dots)
+    surface = read_surface(args.surface, args.surface_key) if args.surface else ours
+    if surface.shape != grid.shape:
+        raise SystemExit("surface shape does not match the official template")
+    surface = np.nan_to_num(surface, nan=0.0, posinf=0.0, neginf=0.0)
+
+    rng = np.random.default_rng(0)
+    rows: list[dict] = []
+    registry_files = sorted(REG.glob("*.tif"))
+    for path in registry_files:
+        with rasterio.open(path) as src:
+            if (src.width, src.height) != (grid.width, grid.height):
+                continue
+            ref = src.read(1).astype(np.float32)
+        ref = np.nan_to_num(ref, nan=0.0)
+        ref_pos = ref > 0
+        if not ref_pos.any():
             continue
-        a = np.nan_to_num(s.read(1), nan=0.0)
-    rd = a > 0
-    n = int(rd.sum())
-    if n == 0:
-        continue
-    inter = int((odots & rd).sum())
-    jac = inter / max(int((odots | rd).sum()), 1)
-    # fraction of our dots within 3 px of one of their dots
-    dil = ndimage.binary_dilation(rd, iterations=3)
-    frac3 = float(dil[oy, ox].mean())
-    # rank correlation on the positive-pixel values + a jitter-free rank tie-break
-    ry, rx = np.nonzero(rd)
-    sub_o = ours[ry, rx]; sub_r = a[ry, rx]
-    if np.ptp(sub_o) > 0 and np.ptp(sub_r) > 0:
-        rho = float(stats.spearmanr(sub_o, sub_r).statistic)
+        close = ndimage.distance_transform_edt(~ref_pos)
+        overlap = float(np.mean(close[yy, xx] <= 3.0)) if n_ours else float("nan")
+        inter = int((dots & ref_pos).sum())
+        union = int((dots | ref_pos).sum())
+        srho = rho_sample(surface, ref, grid.footprint, rng)
+        crho = rho_sample(ours, ref, grid.footprint, rng)
+        rows.append({
+            "raster": path.name,
+            "sha256": sha256(path),
+            "registry_positive_px": int(ref_pos.sum()),
+            "jaccard": round(inter / max(union, 1), 6),
+            "final_dot_overlap_within_3px": round(overlap, 4),
+            "surface_spearman": None if not np.isfinite(srho) else round(srho, 4),
+            "final_binary_spearman": None if not np.isfinite(crho) else round(crho, 4),
+            "strict_duplicate_flag": bool(
+                (np.isfinite(srho) and abs(srho) > 0.90) or
+                (np.isfinite(overlap) and overlap > 0.70)
+            ),
+        })
+
+    max_overlap = max((r["final_dot_overlap_within_3px"] for r in rows), default=float("nan"))
+    max_abs_surface = max(
+        (abs(r["surface_spearman"]) for r in rows if r["surface_spearman"] is not None),
+        default=float("nan"),
+    )
+    max_binary = max(
+        (abs(r["final_binary_spearman"]) for r in rows if r["final_binary_spearman"] is not None),
+        default=float("nan"),
+    )
+    # Diagnostic only; never used to override strict_duplicate_flag.
+    ctrl = np.zeros(grid.shape, dtype=bool)
+    pool = np.flatnonzero(grid.footprint.ravel() & ~dots.ravel())
+    if n_ours and pool.size >= n_ours:
+        ctrl.ravel()[rng.choice(pool, n_ours, replace=False)] = True
+    cy, cx = np.nonzero(ctrl)
+    for row in rows:
+        with rasterio.open(REG / row["raster"]) as src:
+            ref_pos = np.nan_to_num(src.read(1), nan=0.0) > 0
+        row["random_control_overlap_within_3px"] = round(
+            float(ndimage.binary_dilation(ref_pos, iterations=3)[cy, cx].mean()), 4
+        ) if n_ours else None
+        row["overlap_excess_over_random_control"] = round(
+            row["final_dot_overlap_within_3px"] - row["random_control_overlap_within_3px"], 4
+        ) if n_ours else None
+
+    duplicate_rows = [r for r in rows if r["strict_duplicate_flag"]]
+    if not rows:
+        verdict = "NO-REGISTRY-FAIL-CLOSED"
+    elif duplicate_rows:
+        verdict = "DUPLICATE-STOP"
     else:
-        rho = float("nan")
-    # dense Spearman over the footprint (both are binary -> ties dominate)
-    fp = grid.footprint
-    rho_dense = float(stats.spearmanr(ours[fp], a[fp]).statistic)
-    rows.append({"raster": p.name, "n_pos": n, "intersect": inter, "jaccard": round(jac, 6),
-                 "frac_our_dots_within_3px": round(frac3, 4),
-                 "spearman_on_their_positives": None if np.isnan(rho) else round(rho, 4),
-                 "spearman_dense_footprint": round(rho_dense, 4)})
+        verdict = "PASS-UNIQUE"
+    out = {
+        "candidate": args.tif.name,
+        "candidate_sha256": sha256(args.tif),
+        "candidate_positive_px": n_ours,
+        "surface_source": str(args.surface) if args.surface else args.tif.name,
+        "registry_rasters_scanned": len(rows),
+        "max_abs_surface_spearman": None if not np.isfinite(max_abs_surface) else round(max_abs_surface, 4),
+        "max_abs_final_binary_spearman": None if not np.isfinite(max_binary) else round(max_binary, 4),
+        "max_final_dot_overlap_within_3px": None if not np.isfinite(max_overlap) else round(max_overlap, 4),
+        "thresholds": {"abs_surface_spearman": 0.90, "final_dot_overlap_within_3px": 0.70},
+        "strict_duplicate_rows": len(duplicate_rows),
+        "strict_verdict": verdict,
+        "verdict": verdict,
+        "control_adjusted_overlap_is_diagnostic_only": True,
+        "rows": sorted(rows, key=lambda r: -r["final_dot_overlap_within_3px"]),
+    }
+    dest = args.out or (EVID / "uniqueness.json")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(json.dumps(out, indent=2))
+    print(json.dumps({k: v for k, v in out.items() if k != "rows"}, indent=2))
+    for row in out["rows"][:8]:
+        print(
+            f"  {row['raster'][:58]:58s} n={row['registry_positive_px']:7d} "
+            f"overlap={row['final_dot_overlap_within_3px']:.3f} "
+            f"control={row['random_control_overlap_within_3px']:.3f} "
+            f"surface_rho={row['surface_spearman']} "
+            f"DUP={row['strict_duplicate_flag']}"
+        )
+    print("VERDICT:", verdict)
+    print("wrote", dest)
+    # A duplicate or unavailable registry is a deliberate non-zero stop signal.
+    raise SystemExit(0 if verdict == "PASS-UNIQUE" else 2)
 
-# ---- control: the SAME statistic for a uniform-random dot set of equal size ----
-# A dense reference raster (e.g. a spacing-5 lattice with 206,895 positives) puts
-# almost every pixel within 3 px of one of its dots, so the 70% rule is vacuous
-# against it.  The control measures that inflation so the criterion can be read.
-rng = np.random.default_rng(0)
-pool = np.nonzero(grid.footprint.ravel() & ~odots.ravel())[0]
-ctrl = np.zeros(odots.shape, dtype=bool)
-ctrl.ravel()[rng.choice(pool, size=n_ours, replace=False)] = True
-cy, cx = np.nonzero(ctrl)
-for r in rows:
-    p2 = REG / r["raster"]
-    with rasterio.open(p2) as s:
-        a2 = np.nan_to_num(s.read(1), nan=0.0) > 0
-    r["frac3px_random_control"] = round(float(ndimage.binary_dilation(a2, iterations=3)[cy, cx].mean()), 4)
-    r["frac3px_excess_over_control"] = round(r["frac_our_dots_within_3px"] - r["frac3px_random_control"], 4)
-    r["density_ratio_vs_ours"] = round(r["n_pos"] / n_ours, 3)
 
-rows.sort(key=lambda r: -r["frac3px_excess_over_control"])
-maxfrac = max(r["frac_our_dots_within_3px"] for r in rows)
-maxexcess = max(r["frac3px_excess_over_control"] for r in rows)
-matched = [r for r in rows if 0.25 <= r["density_ratio_vs_ours"] <= 4.0]
-maxfrac_matched = max((r["frac_our_dots_within_3px"] for r in matched), default=float("nan"))
-maxrho = max(r["spearman_dense_footprint"] for r in rows)
-maxjac = max(r["jaccard"] for r in rows)
-verdict = "PASS-UNIQUE" if (maxrho <= 0.90 and maxfrac <= 0.70) else "REVIEW"
-if verdict == "REVIEW" and maxexcess <= 0.05:
-    verdict = "PASS-UNIQUE-CONTROL-ADJUSTED"
-out = {"ours": Path(args.tif).name, "n_dots": n_ours, "n_registry": len(rows),
-       "max_spearman_dense": round(maxrho, 4), "max_frac_within_3px": round(maxfrac, 4),
-       "max_jaccard": round(maxjac, 6), "thresholds": {"spearman": 0.90, "frac_3px": 0.70},
-       "max_frac3px_excess_over_random_control": round(maxexcess, 4),
-       "max_frac_within_3px_density_matched": round(maxfrac_matched, 4),
-       "n_density_matched": len(matched),
-       "verdict": verdict, "top10": rows[:10], "all": rows}
-EVID.mkdir(exist_ok=True)
-dst = Path(args.out) if args.out else EVID / "uniqueness.json"
-dst.write_text(json.dumps(out, indent=2))
-for r in rows[:8]:
-    print(f"  {r['raster'][:58]:58s} n={r['n_pos']:7d} jac={r['jaccard']:.4f} "
-          f"frac3px={r['frac_our_dots_within_3px']:.3f} ctrl={r['frac3px_random_control']:.3f} "
-          f"excess={r['frac3px_excess_over_control']:+.3f} rho={r['spearman_dense_footprint']:+.4f}")
-print(f"\nmax |Spearman| dense = {maxrho:.4f}   max frac within 3px = {maxfrac:.4f}   "
-      f"max Jaccard = {maxjac:.4f}")
-print(f"max frac3px EXCESS over the random control = {maxexcess:+.4f}   "
-      f"density-matched max frac3px = {maxfrac_matched:.4f} (n={len(matched)} refs)")
-print(f"VERDICT: {verdict}")
-print("wrote", dst)
+if __name__ == "__main__":
+    main()

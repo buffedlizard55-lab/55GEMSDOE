@@ -1,69 +1,161 @@
 {
-  "hypothesis": "Gradient ridges on RTP-magnetic and isostatic-gravity grids cannot separate a strike-extended fault or contact from a compact intrusion or vent, because both produce ridges. The potential-field gradient tensor can: its dimensionality index is zero for strictly two-dimensional sources and its intermediate eigenvector carries strike. Gating ridges on being near-2-D AND on eigenvector strike agreeing with the ridge's own orientation should therefore preferentially retain unmapped, elongated, less conspicuous traces.",
-  "mechanism": "FFT gradient tensor of bands 2 (RTP mag) and 13 (isostatic gravity) after nearest-neighbour NaN fill, along-track micro-levelling and a 400 m - 6 km band-pass; Tzz derived as -(Txx+Tyy) so the tensor is exactly traceless; closed-form 3x3 eigen-decomposition; dimensionality I = 27 e3^2 / (4 (-e2)^3) (I=0 2-D, I=1 3-D, both endpoints unit-tested); strike = azimuth of the intermediate eigenvector; score = corroborated ridge rank x (1-I) x exp(-(dtheta/25deg)^2) x plunge weight x survey-line mask.",
-  "non_fault_process_that_could_mimic_it": "Airborne survey-line striping. It is measured here to run north-south, not east-west as the lane brief asserts (IR-55-04). Analytically a field varying only across the flight lines has eigenvalues (|f''|,0,-|f''|) - indistinguishable from a 2-D source striking along the lines - so the tensor cannot reject it and it must be masked geometrically. Secondary mimics: lithologic contacts and dike swarms (genuinely 2-D but not faults) and basin-margin alluvial edges.",
+  "schema": "55gemsdoe.run-card.v2",
+  "run_id": "55GEMSDOE-H56-MULTISCALE-TENSOR-2026-10-09",
+  "status": "format_valid_uniqueness_blocked_negative",
+  "hypothesis": "A fault-related RTP-magnetic/isostatic-gravity tensor response should remain near-2-D and strike-concordant at more than one structural wavelength; geometric-mean scale persistence should suppress compact bodies, derivative noise, and line artefacts better than the one-scale lane.",
+  "mechanism": "Bands 2 and 13 are NaN-filled only inside the template footprint, robustly along-track leveled, low-pass filtered at 300 m and 900 m Gaussian sigma, differentiated by FFT, decomposed as symmetric traceless 3x3 tensors, converted to dimensionality/strike/ridge products, and aggregated by geometric persistence. The existing survey-line coherence mask is unioned across scales.",
+  "named_non_fault_mimic": "Lithologic contacts, dikes, intrusive sheets, basin-margin edges, tie-line/leveling residuals, acquisition seams, east-west or north-south flight-line striping, and FFT boundary ringing can all be long or 2-D without being faults.",
   "holdout_dti": {
-    "label": "HOLDOUT-DTI (evaluator: src/gems55/dti55.py, exact official DTI, verified against a brute-force transcription and against the official worked example)",
-    "protocol": "4 contiguous-quadrant hide-and-recover, 3 px buffer, visible faults masked pixel-exactly, catalogue-derived features recomputed per fold, pooled scoring",
-    "n_withheld_positives_total": 60988,
-    "this_lane_pooled_dti": 0.06670118698244415,
-    "this_lane_fold_mean": 0.07418604544828375,
-    "this_lane_fold_sd": 0.020308741296680758,
-    "this_lane_fold_ci95": [
-      0.05600790445991459,
-      0.08934589204746593
+    "status": "RUN",
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py",
+    "parameters": {
+      "alpha": 0.2,
+      "beta": 0.8,
+      "kernel_radius_m": 300,
+      "n_dots": 40000,
+      "min_sep_px": 3.0
+    },
+    "withheld_positive_count": 60988,
+    "protocol": "5 whole-segment/lattice folds with a 3 px buffer; visible faults masked pixel-exactly per fold; pooled components; CI is 4,000 resamples of the five fold DTI values.",
+    "value": 0.01727793270506305,
+    "ci95": [
+      0.01612827573503906,
+      0.018468645641252373
     ],
-    "uniform_random_control_pooled_dti": 0.07572925371015232,
-    "uniform_random_control_fold_ci95": [
-      0.05711247628318898,
-      0.12139421481046019
-    ],
-    "n_dots": 40000,
-    "leakage_canary_max_lane_feature_auc": 0.5415634566308328,
-    "leakage_flagged_gt_0.90": [],
-    "strike_test": {
-      "frac_within_20deg_withheld": 0.302,
-      "frac_within_20deg_random": 0.2222795754427848,
-      "mean_abs_dtheta_withheld_deg": 38.03430339738727,
-      "mean_abs_dtheta_random_deg": 45.04546568753565,
-      "mean_diff_ci95_deg": [
-        -9.190059511700968,
-        -4.683395349864613
-      ],
-      "verdict": "CONFIRMED - CI excludes zero; 45.0 deg is the calibrated null mean"
+    "matched_random_control": {
+      "value": 0.014404859072739232,
+      "ci95": [
+        0.013732983126265159,
+        0.015374661727613106
+      ]
+    },
+    "current_best_comparator": {
+      "name": "one-scale ridge_x_agree ablation",
+      "value": 0.018519270698750034,
+      "ci95": [
+        0.01782350648872739,
+        0.019402442229139772
+      ]
+    },
+    "other_arms": {
+      "one_scale_ridge_only": {
+        "value": 0.017789004080108257,
+        "ci95": [
+          0.016719302180601664,
+          0.01894517919223205
+        ]
+      },
+      "one_scale_tensor_full": {
+        "value": 0.017744384543558565,
+        "ci95": [
+          0.017095580741474416,
+          0.01836769482519536
+        ]
+      },
+      "multiscale_ridge_only_ablation": {
+        "value": 0.01927199149692655,
+        "ci95": [
+          0.018290928984518638,
+          0.020261451422340312
+        ]
+      },
+      "gravity_only_tensor": {
+        "value": 0.016707865973809154,
+        "ci95": [
+          0.015809191340112487,
+          0.01762383112272163
+        ]
+      }
     }
   },
+  "leakage_canary": {
+    "evidence_class": "HOLDOUT-DTI",
+    "features_tested_alone": [
+      "tensor_full_score",
+      "ridge",
+      "one_minus_dim",
+      "strike_agree",
+      "plunge",
+      "dim_inv_raw"
+    ],
+    "max_auc": 0.5521852271834549,
+    "auc_by_feature": {
+      "tensor_full_score": 0.36017707842304414,
+      "ridge": 0.5521852271834549,
+      "one_minus_dim": 0.5056271489209598,
+      "strike_agree": 0.5299200788434344,
+      "plunge": 0.49122305761905827,
+      "dim_inv_raw": 0.4945415377263408
+    },
+    "leakage_threshold": 0.9,
+    "leakage_flag": false
+  },
+  "strike_diagnostic": {
+    "evidence_class": "HOLDOUT-DTI",
+    "withheld_segments_tested": 273,
+    "withheld_match_rate_within_20deg": 0.2600732600732601,
+    "random_ridge_match_rate_within_20deg": 0.22394571013087736,
+    "mean_abs_difference_deg": -9.945493411303604,
+    "ci95_mean_difference_deg": [
+      -12.496032447307863,
+      -7.205863991529839
+    ],
+    "note": "Auxiliary catalogue-proxy diagnostic, not an organizer score; the random-ridge comparison is not used as a promotion gate because ridge orientation and tensor strike can be geometrically coupled."
+  },
   "correlation_overlap_vs_registry": {
-    "n_registry_rasters": 56,
-    "max_abs_spearman_dense_footprint": 0.0043,
-    "threshold": 0.9,
-    "max_jaccard": 0.007993,
-    "max_frac_our_dots_within_3px_raw": 0.8413,
-    "max_frac_3px_excess_over_random_control": 0.0399,
-    "max_frac_within_3px_density_matched": 0.6694,
-    "n_density_matched_references": 43,
-    "threshold_frac_3px": 0.7,
-    "verdict": "PASS-UNIQUE-CONTROL-ADJUSTED",
-    "note": "raw 3-px statistic is 0.841 only against a 206,895-dot spacing-5 lattice; the uniform-random control reaches the same value, so the excess (+0.0399) and the density-matched statistic (0.6694 < 0.70) are the informative readings (IR-55-08)."
+    "evidence_class": "HOLDOUT-DTI",
+    "registry_rasters_scanned": 56,
+    "max_abs_surface_spearman": 0.0223,
+    "max_abs_final_binary_spearman": 0.0054,
+    "max_final_dot_overlap_within_3px": 1.0,
+    "duplicate_rows": 2,
+    "threshold_surface_spearman": 0.9,
+    "threshold_final_dot_overlap": 0.7,
+    "strict_verdict": "DUPLICATE-STOP",
+    "control_adjusted_overlap_is_diagnostic_only": true
   },
-  "raster_sha256": {
-    "h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
-    "h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif": "847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679",
-    "h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip": "b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9"
-  },
+  "raster_sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
   "validator_output": {
-    "tool": "scripts/validate_submission.py (re-reads the written bytes with rasterio)",
-    "checks_passed": "12/12 on the -zeros encoding, 11/11 on the -nan twin",
+    "status": "PASS",
+    "tool": "scripts/validate_submission.py; independent rasterio re-read",
+    "checks_passed": 12,
+    "checks_failed": 0,
     "no_nan_inside_footprint": true,
     "values_in_0_1": true,
-    "crs_shape_transform_match_template": true,
+    "single_band_float32": true,
+    "crs_matches": true,
+    "shape_matches": true,
+    "transform_matches": true,
+    "outside_footprint": "zeros in the all-finite audit encoding",
+    "positive_pixels": 40000,
     "dots_on_mapped_catalogue_pixels": 0,
     "dots_outside_footprint": 0
   },
-  "submission_name": "h55-tensor2d-strikegate-40000dots-20261009T052235Z",
-  "submission_note": "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots",
-  "submission_note_length": 86,
-  "verdict": "NEGATIVE",
-  "verdict_reason": "The strike prediction is confirmed, but emitted as a prediction surface the lane does not beat a uniform-random control at matched mass (0.0667 vs 0.0757 pooled, and below it in 4 of 4 folds at every NMS separation tested). The file is format-valid and unique, so it is downloadable and legal to upload, but it must not be promoted into a weekly slot on this evidence.",
-  "metric_finding_of_general_value": "TP_w + FN_w = |G| identically, so DTI = TP_w/(0.2N + 0.8|G|). Coverage, not per-pixel precision, dominates: a false positive costs 0.2 and an uncovered truth pixel costs 0.8. Verified numerically at eight dot budgets."
+  "submission": {
+    "name": "h56-multiscale-tensor-persistence-40000dots-20261009T162812Z",
+    "note": "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots",
+    "note_characters": 86,
+    "download_allowed_for_audit": true,
+    "submit_allowed": false,
+    "weekly_slot_used": false,
+    "file": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif",
+    "zip": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.zip",
+    "nan_twin": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-nan.tif"
+  },
+  "verdict": "negative",
+  "promotion": "do_not_promote",
+  "projection_written_as_score": false,
+  "organizer_confirmed_scores": [],
+  "budget": {
+    "experiments_used": 3,
+    "limit": 3,
+    "hours_limit": 2,
+    "weekly_slot_used": false
+  },
+  "review_passes": [
+    "implementation",
+    "bug/assumption audit",
+    "requirement/source/strict-uniqueness audit"
+  ]
 }

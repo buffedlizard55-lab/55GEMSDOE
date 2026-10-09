@@ -36,6 +36,10 @@ def main() -> None:
     ap.add_argument("--dim-power", type=float, default=1.0)
     ap.add_argument("--block-px", type=int, default=64)
     ap.add_argument("--along-axis", type=int, default=0, help="numpy axis running along the flight lines")
+    ap.add_argument(
+        "--scales-m", default=None,
+        help="comma-separated low-pass sigmas for the preregistered persistence lane; omit for one scale",
+    )
     args = ap.parse_args()
 
     t0 = time.time()
@@ -55,8 +59,19 @@ def main() -> None:
         dim_variant=args.dim_variant,
         combine=args.combine,
     )
-    print(f"[{time.time()-t0:6.1f}s] building lane (combine={cfg.combine}, dim={cfg.dim_variant})", flush=True)
-    lane = lanes55.build_lane(rtp, rv, grav, gv, footprint, cfg, along_axis=args.along_axis)
+    scales = None if args.scales_m is None else tuple(float(x) for x in args.scales_m.split(",") if x.strip())
+    if scales is not None and len(scales) < 2:
+        raise SystemExit("--scales-m needs at least two comma-separated positive values")
+    print(
+        f"[{time.time()-t0:6.1f}s] building lane (combine={cfg.combine}, dim={cfg.dim_variant}, "
+        f"scales={scales or (cfg.lowpass_m,)})", flush=True
+    )
+    if scales is None:
+        lane = lanes55.build_lane(rtp, rv, grav, gv, footprint, cfg, along_axis=args.along_axis)
+    else:
+        lane = lanes55.build_multiscale_lane(
+            rtp, rv, grav, gv, footprint, cfg, along_axis=args.along_axis, scales_m=scales
+        )
     del rtp, grav
 
     CACHE.mkdir(parents=True, exist_ok=True)
@@ -86,6 +101,8 @@ def main() -> None:
         "tag": args.tag,
         "config": cfg.__dict__,
         "along_axis": args.along_axis,
+        "scales_m": list(scales) if scales is not None else [cfg.lowpass_m],
+        "aggregation": "geometric_mean_persistence" if scales is not None else "single_scale",
         "seconds": round(time.time() - t0, 1),
         "n_footprint": int(footprint.sum()),
         "n_striping_masked": int((footprint & lane.striping_mask).sum()),

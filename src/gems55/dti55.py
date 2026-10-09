@@ -107,6 +107,19 @@ class DTIResult:
         }
 
 
+def dti_from_totals(
+    tp_w: float,
+    fp_w: float,
+    fn_w: float,
+    *,
+    alpha: float = ALPHA,
+    beta: float = BETA,
+    eps: float = EPS,
+) -> float:
+    """Return the official pooled DTI from already-pooled components."""
+    return float(tp_w / (tp_w + alpha * fp_w + beta * fn_w + eps))
+
+
 def dti(
     pred: np.ndarray,
     truth: np.ndarray,
