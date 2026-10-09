@@ -1,0 +1,12 @@
+{
+  "project": "55GEMSDOE",
+  "reviewed_utc": "2026-10-09",
+  "overall_status": "not_cleared",
+  "submission_tif": null,
+  "download_allowed": false,
+  "submit_allowed": false,
+  "holdout_dti": null,
+  "organizer_confirmed_score": null,
+  "official_leaderboard_feed": "page_fetched_loading_only_no_rows",
+  "reason": "This checkout has no data, cached feature stack, approved whole-segment evaluator, submission writer, registry corpus, or candidate raster."
+}
