@@ -3,14 +3,12 @@
 Pipeline
 --------
 1. Read the official RTP-magnetic (band 2) and isostatic-gravity (band 13) grids.
-2. NaN-fill, level each grid inside its acquisition blocks (subtract the robust
-   along-track profile -- the micro-levelling step), band-pass to the structural
-   wavelength band.
+2. NaN-fill and subtract the configured along-axis profile, then band-pass to the
+   structural wavelength band. The later robust normalization uses fixed-size
+   pixels; these are not verified acquisition-block polygons.
 3. Form the FFT gradient tensor (horizontal + vertical derivatives) of each grid.
-   For the magnetic grid this is the pseudo-gravity gradient tensor: the field is
-   already reduced to pole and the vertical derivative is the |k| operator, which
-   is exactly the construction used for aeromagnetic gradient-tensor work
-   (Beiki et al. 2011, ASEG Extended Abstracts, https://doi.org/10.1071/ASEG2012ab057).
+   For the magnetic grid this is a direct-RTP tensor proxy only. No pseudogravity
+   transform for a known magnetization direction is established by this code.
 4. Per pixel: eigenvalues -> dimensionality index; intermediate eigenvector -> strike.
 5. Gradient ridges from the horizontal-gradient magnitude; the ridge's own
    orientation comes from the gradient azimuth rotated by 90 degrees.
@@ -36,7 +34,7 @@ class LaneConfig:
     res_m: float = 100.0
     lowpass_m: float = 400.0       # Gaussian sigma, pre-differentiation
     highpass_m: float = 6000.0     # remove the regional trend
-    block_px: int = 64             # acquisition-block size for local normalisation
+    block_px: int = 64             # fixed normalization tile; not an official block polygon
     striping_lag_px: int = 60      # long-lag coherence lag (6 km)
     striping_thresh: float = 0.55  # coherence above this = survey artefact
     striping_tol_deg: float = 20.0
@@ -50,7 +48,7 @@ class LaneConfig:
 
 
 def _robust_block_norm(x: np.ndarray, valid: np.ndarray, block: int) -> np.ndarray:
-    """Per-acquisition-block robust z-score, so block-level offsets do not rank."""
+    """Per fixed-size pixel-tile robust z-score; tiles are not acquisition polygons."""
     ny, nx = x.shape
     out = np.zeros_like(x)
     for y0 in range(0, ny, block):

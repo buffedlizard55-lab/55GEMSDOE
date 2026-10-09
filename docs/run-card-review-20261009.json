@@ -1,36 +1,50 @@
 {
   "schema": "55gemsdoe.run-card.v3",
   "run_id": "55GEMSDOE-REVIEW-2026-10-09",
-  "hypothesis": "none tested this session; review of why the 0.2778 public entry scored and whether the repo can beat it",
-  "mechanism": "not tested; reasoned from the official DTI kernel: near-miss dots cost little FP and earn TP",
-  "named_non_fault_mimic": "linear artefacts (flight-line striping, levelling seams, FFT ringing) and lithologic contacts or dikes, which are also long and 2-D",
+  "hypothesis": "none tested; this is an evidence and leaderboard-attribution review",
+  "mechanism": "not tested; a distance-weighted near-miss mechanism is only a hypothesis and is not tied to an identified H33 submission",
+  "named_non_fault_mimic": "linear acquisition artifacts (flight-line striping, leveling seams, FFT ringing) and lithologic contacts or dikes can resemble strike-extended tensor ridges",
   "holdout_dti": {
     "status": "NOT RUN",
-    "evidence_class": "none"
+    "evidence_class": "none",
+    "evaluator_version": null,
+    "withheld_positive_count": null,
+    "ci95": null
   },
   "leakage_canary": {
-    "status": "NOT RUN"
+    "status": "NOT RUN",
+    "reason": "no authorized feature stack and no experiment was run"
   },
   "correlation_overlap_vs_registry": {
     "status": "NOT RUN",
-    "reason": "no feature stack or candidate surface on disk"
+    "reason": "no current candidate surface or complete registry raster corpus is available"
   },
   "raster_sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
-  "raster_sha256_note": "existing audit file, unchanged; re-read this session",
+  "raster_sha256_note": "pre-existing H56 zeros-outside historical artifact at evidence/historical_artifacts/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif; not generated or cleared by this review",
   "validator_output": {
-    "status": "NOT RE-RUN (template raster missing)",
-    "independent_reread": "PASS for format fields"
+    "status": "NOT RE-RUN; authentic organizer template is absent",
+    "independent_reread": "historical byte-level inspection only; not an organizer format pass"
   },
   "submission": {
     "name": null,
     "note": null,
+    "download_allowed": false,
     "submit_allowed": false
   },
   "public_leaderboard": {
-    "evidence_class": "PUBLIC-LEADERBOARD",
-    "rank_of_0_2778": 16,
-    "top": 0.3774,
-    "rank_of_0_3195": 7
+    "evidence_class": "PUBLIC-LEADERBOARD (not a submission-page receipt; not ORGANIZER-CONFIRMED)",
+    "snapshot_file": "evidence/leaderboard_snapshot_20261009.json",
+    "rank_16_value": 0.2778,
+    "rank_16_participant": "extradr19",
+    "rank_7_value": 0.3195,
+    "rank_1_value": 0.3774,
+    "h33_account_mapping": "unverified"
   },
-  "verdict": "negative (no new candidate); data blocker"
+  "owner_manifest": {
+    "evidence_class": "owner-maintained secondary evidence",
+    "receipt": null,
+    "artifact_status": "UNSCORED",
+    "projected_value": 0.2747
+  },
+  "verdict": "NOT CLEARED; no organizer-confirmed score attribution, no new candidate, and no download or submission"
 }

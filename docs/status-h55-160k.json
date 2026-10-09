@@ -1,30 +1,42 @@
 {
   "project": "55GEMSDOE",
   "reviewed_utc": "2026-10-09",
-  "overall_status": "format_valid_uniqueness_blocked_negative_audit_only",
-  "label": "DO NOT SUBMIT",
-  "submission_tif": "docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
+  "overall_status": "NOT_CLEARED_DUPLICATE_STOP_AND_HOLDOUT_INVALID",
+  "label": "NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT",
+  "historical_artifact": "evidence/historical_artifacts/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif",
   "sha256": "ffd2a892b750022b6fbe0bcd0759099421eab1b9e354fc5f7e2793d082859273",
-  "download_allowed": true,
-  "download_scope": "audit only (AGENTS.md: audit TIF links need a prominent DO NOT SUBMIT label)",
+  "download_allowed": false,
   "submit_allowed": false,
   "submit_recommended": false,
-  "uniqueness_status": "BLOCKED: literal 70% duplicate-stop rule tripped (raw 0.8401 vs a spacing-5 lattice; random control 0.8389; not a copy). Submit blocked until the owner decides.",
-  "why_download_is_allowed": "Audit download only. The file passes 12/12 format checks re-read from the written bytes (single-band float32, EPSG:32611, 3730x3292, template transform incl. 100 m pixel size, every value in [0,1], zero NaN, no dot on a mapped catalogue pixel). It is not a copy of any of the 56 registry rasters (max Spearman 0.014, max Jaccard 0.031). Format validity is not submit clearance.",
-  "why_submission_is_not_recommended": "On the leakage-free Q4 holdout, tensor_full at N=160000 scores 0.1019 vs 0.1627 for uniform random (HOLDOUT-DTI, 60,988 withheld positives). On Q4 it loses at N=40k, 80k and 160k and is not distinguishable at 20k. Do not spend a weekly slot on it. The uniqueness gate is also flagged (see uniqueness_status).",
+  "download_link_published": false,
+  "uniqueness_status": {
+    "evidence_class": "HISTORICAL_REGISTRY-CHECK; NOT RE-RUN",
+    "reported_rasters_scanned": 56,
+    "raw_fraction_candidate_dots_within_3px": 0.8401,
+    "literal_overlap_limit": 0.70,
+    "verdict": "DUPLICATE_STOP",
+    "reason": "Raw historical overlap exceeds the literal threshold; chance-adjusted statistics do not override the stop rule. Registry rasters and surface cache are absent, so this was not rechecked."
+  },
   "holdout_dti": {
-    "evidence_class": "HOLDOUT-DTI",
-    "evaluator": "src/gems55/dti55.py (exact official DTI; verified vs brute force and official worked example)",
-    "tensor_lane": 0.1019,
-    "uniform_random_control": 0.1627,
-    "ci95_folds": [
-      0.0877,
-      0.1185
-    ],
+    "evidence_class": "HOLDOUT-DTI (historical; invalid for promotion)",
+    "status": "INVALID_FOR_PROMOTION",
+    "evaluator_version": "src/gems55/dti55.py; explicit version identifier absent in the original run record; local implementation not reconciled with the authorized shared evaluator",
     "withheld_positive_count": 60988,
-    "n_dots": 160000
+    "candidate_value": 0.1019,
+    "ci95": [0.0877, 0.1185],
+    "ci95_method": "fold-level t interval over four quadrant-fold DTI values (df=3), not pooled-score contribution uncertainty",
+    "protocol": "Q4 quadrant primary; 3-pixel buffer; per-fold visible-only labels. B=15 px was secondary.",
+    "invalid_reasons": [
+      "quadrant folds can split connected mapped faults",
+      "local evaluator is not reconciled with the authorized shared evaluator",
+      "fold-level interval is not a pooled-score 95% CI"
+    ]
+  },
+  "format_status": {
+    "status": "NOT_ORGANIZER_VALIDATED",
+    "historically_reported_local_checks": "12/12 local structural checks in the source run card; not rerun in this review",
+    "official_template_present": false
   },
   "organizer_confirmed_score": null,
-  "organizer_score_status": "none exists for this file",
-  "reason": "A validated raster is published because the owner's standing requirement is an obvious downloadable submission. Its scientific verdict is negative and the site says so next to the button."
+  "reason": "The artifact is an uncleared historical record. No promotion-grade HOLDOUT-DTI, literal uniqueness pass, organizer format validation, or organizer receipt is available. No download, experiment, or submission is authorized. See docs/run-card-h55-160k.json and docs/run-card.json."
 }

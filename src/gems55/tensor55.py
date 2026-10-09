@@ -25,7 +25,7 @@ taking z positive *downward* and using the upward-continuation operator
     Tyz = d2V/dydz <-> +i ky |k| V^
 
 Because Tzz is *derived* from the horizontal wavenumbers, the tensor is exactly
-traceless by construction; ``tests/test_tensor.py`` asserts that.
+traceless by construction; synthetic regression tests live in ``tests_numeric/``.
 
 References
 ----------
@@ -225,7 +225,7 @@ def sym3_eigh(T: dict[str, np.ndarray], *, chunk: int = 400_000) -> tuple[np.nda
     Uses the trigonometric closed form for a symmetric 3x3 matrix (Smith 1961;
     the standard "eigenvalues of a symmetric 3x3 matrix" algorithm), which is
     orders of magnitude faster and far more memory-frugal than
-    ``numpy.linalg.eigh`` over ~5.2 M matrices.  ``tests/test_tensor.py`` checks
+    ``numpy.linalg.eigh`` over ~5.2 M matrices. ``tests_numeric/test_core.py`` checks
     it against ``numpy.linalg.eigh`` on random tensors.
 
     Returns
@@ -337,7 +337,7 @@ def dimensionality_invariant(lam: np.ndarray) -> np.ndarray:
 
         I = 27 e3^2 / (4 (-e2)^3)
 
-    Endpoints (verified analytically in ``tests/test_tensor.py``):
+    Endpoints (verified analytically in ``tests_numeric/test_tensor.py``):
 
       * strike-extended 2-D source, l = (a, 0, -a):  e3 = 0          -> I = 0
       * equidimensional 3-D source, l = (2a, -a, -a): I              -> 1

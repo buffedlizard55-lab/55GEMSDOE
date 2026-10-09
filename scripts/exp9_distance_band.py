@@ -133,40 +133,10 @@ def run_band(B, folds, arrays, n_total, min_sep, footprint, striping, cat):
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--tag", default="v1")
-    ap.add_argument("--n-dots", type=int, default=40000)
-    ap.add_argument("--min-sep", type=float, default=3.0)
-    ap.add_argument("--bands", default="3,15,30")
-    args = ap.parse_args()
-    t0 = time.time()
-    z = np.load(CACHE / f"lane_{args.tag}.npz")
-    score = z["score"].astype(np.float32)
-    arrays = (score, z["ridge"].astype(np.float32), z["dim"].astype(np.float32),
-              z["agree"].astype(np.float32), z["plunge"].astype(np.float32))
-    striping = z["striping"].astype(bool)
-    labels = z["labels"]
-    footprint = z["footprint"].astype(bool)
-    z.close()
-    grid, _ = io55.read_template()
-    assert np.array_equal(footprint, grid.footprint)
-    cat = labels == 1
-    res = {"experiment": "exp9_distance_band (E2)",
-           "label": "HOLDOUT-DTI (distance-banded whole-segment folds; dti55 exact official metric)",
-           "primary_band_px": 15, "bands": {}}
-    for B in [float(b) for b in args.bands.split(",")]:
-        folds = banded_folds(labels, footprint, B)
-        print(f"B={B:g}px folds={len(folds)} visible_px={[int(f.visible.sum()) for f in folds][:3]}...", flush=True)
-        r = run_band(B, folds, arrays, args.n_dots, args.min_sep, footprint, striping, cat)
-        res["bands"][str(int(B))] = r
-        print(f"  B={int(B)}px  " + "  ".join(f"{a}={v['fold_pooled_dti']:.4f}" for a, v in r["arms"].items())
-              + f"  | H-A-500 vs random p={r['arms']['H-A-500']['diff_vs_random_signflip_p_two_sided']:.3f}"
-              + f"  | canary max={max(r['canary_auc_max'].values()):.3f}", flush=True)
-    res["seconds"] = round(time.time() - t0, 1)
-    out = EVID / "exp9_distance_band_v1_n40000.json"
-    out.write_text(json.dumps(res, indent=2))
-    print("wrote", out, f"{res['seconds']} s")
-
+    raise SystemExit(
+        "Retired: this historical experiment has already been run and the recorded three-experiment budget is exhausted. "
+        "No experiment, data access, or output write is authorized by this entry point. See docs/results.md and evidence/*.json."
+    )
 
 if __name__ == "__main__":
     main()
