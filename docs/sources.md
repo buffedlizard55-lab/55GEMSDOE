@@ -16,7 +16,7 @@
 
 ## Scientific references (background, not performance evidence)
 
-- [Pedersen & Rasmussen (1990), “The gradient tensor of potential field anomalies”](https://doi.org/10.1190/1.1442807).
+- [Pedersen & Rasmussen (1990), “The gradient tensor of potential field anomalies: Some implications on data collection and data processing of maps”](https://doi.org/10.1190/1.1442807).
 - [Beiki & Pedersen (2010), eigenvector analysis of gravity-gradient tensors](https://doi.org/10.1190/1.3484098).
 - [Beiki, Pedersen & Nazi (2011), eigenvector analysis of pseudogravity-gradient tensors](https://doi.org/10.1190/1.3555343).
 

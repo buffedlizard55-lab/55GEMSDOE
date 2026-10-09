@@ -16,6 +16,28 @@
 <h2>What a valid organizer submission requires</h2>
 <p>When every gate has passed, a human competitor must sign in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">DOE GEMS Prize Challenge on DrivenData</a>, open the submission page, upload the exact cleared single-band GeoTIFF, enter the run-card note (at most 140 characters), submit, and preserve the organizer receipt. This repository does not hold portal credentials and has not submitted anything.</p>
 <p>Before any download link is published, the project requires: authorized input provenance; a same-evaluator whole-component holdout win with evaluator version, withheld-positive count, and 95% CI; per-feature leakage canaries; pre-placement surface uniqueness; final-dot uniqueness; and format validation against the authentic organizer template. See the <a href="run-card.json">machine-readable run card</a>.</p>
+<h2>Official format contract (verified 2026-10-09)</h2>
+<ul>
+<li><strong>Source:</strong> <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">official problem page, submission format</a>. The file must be in EPSG 32611 at 100 m, have the same bounds as the training data, and contain a single float32 layer.</li>
+<li><strong>Values:</strong> inside the footprint, each value must be between 0 and 1. Cells outside the bounds must be <code>null</code> or <code>NaN</code>. The page says so explicitly, so a zero-filled outside encoding does not meet the spec.</li>
+<li><strong>Entry form (user-reported screenshot text):</strong> a single-band GeoTIFF (.tif), or a .zip containing a single GeoTIFF; a short note field.</li>
+<li><strong>Limit:</strong> three submissions per week (<a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">official rules, section 3.2</a>).</li>
+<li><strong>Repository check:</strong> the canonical grid constants in <code>src/gems55/io55.py</code> (EPSG 32611, 100 m, 3292 by 3730) match the official text. The authoritative organizer template is absent here, so this is not an organizer validation.</li>
+</ul>
+<h2>If the portal says "Predicted values must be in range [0, 1]"</h2>
+<p>The archived rasters in this repository all lie inside [0, 1], so the error from your earlier upload is <strong>unexplained</strong> (see <code>docs/irregularities.md</code>, IR-55-049). Check these causes against the exact file that was rejected:</p>
+<ol>
+<li>Any value below 0 or above 1 anywhere in the file.</li>
+<li>NaN inside the footprint (the spec allows NaN only outside the bounds).</li>
+<li>A sentinel such as -9999, or a zero fill outside the bounds (the spec requires null or NaN there).</li>
+<li>Whether the portal reads an encoding or nodata flag differently from the file's metadata; the portal's exact rule is not published.</li>
+</ol>
+<p>To diagnose the failure, send the rejected file's name and SHA-256. Do not assume it matches an archived raster.</p>
+<h2>Naming and note convention (no name is assigned: no file exists)</h2>
+<ul>
+<li><strong>Name pattern:</strong> <code>55gemsdoe-&lt;lane&gt;-&lt;method&gt;-&lt;UTC YYYYMMDDThhmmssZ&gt;-&lt;sha256 first 8&gt;</code>, for example <code>55gemsdoe-tensor-h1n1-20261009T120000Z-1a2b3c4d</code>. It is unique to a file and is recorded in the run card.</li>
+<li><strong>Note (140 characters or fewer):</strong> lane, method, key parameters, and status, for example <code>tensor lane; pseudogravity tensor; kernel 300 m; holdout DTI pending; not cleared</code>.</li>
+</ul>
 <h2>Current artifacts</h2>
 <p>Historical TIFF variants and their checksums are preserved under <code>evidence/historical_artifacts/</code>, outside the published site. The project makes no claim that they are legal, scientifically suitable, unique, or accepted by the portal. Do not use a raw repository path as a substitute for a clearance decision.</p>
 </main></body></html>
