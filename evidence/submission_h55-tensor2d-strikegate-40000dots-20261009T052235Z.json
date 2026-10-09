@@ -1,0 +1,30 @@
+{
+  "name": "h55-tensor2d-strikegate-40000dots-20261009T052235Z",
+  "portal_note": "tensor-dim lane: FFT grad-tensor RTP-mag+iso-grav, 2-D/strike-gated ridges, 40000 dots",
+  "n_dots": 40000,
+  "n_dots_target": 40000,
+  "min_sep_px": 3.0,
+  "seed": 55,
+  "lane_tag": "v1",
+  "shape": [
+    3730,
+    3292
+  ],
+  "crs": "EPSG:32611",
+  "transform": [
+    100.0,
+    0.0,
+    243350.0,
+    0.0,
+    -100.0,
+    4508550.0
+  ],
+  "dots_on_catalogue_px": 0,
+  "dots_outside_footprint": 0,
+  "sha256": {
+    "h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.tif": "b7c7225d1b35559d27a7800e40ac75a48d9a15ef79f169de0b5b64fc1bd9d368",
+    "h55-tensor2d-strikegate-40000dots-20261009T052235Z-nan.tif": "847e7ea141766144bb28da80388e1b5f956f27b44e6eb8d32d02ae585ea8b679",
+    "h55-tensor2d-strikegate-40000dots-20261009T052235Z-zeros.zip": "b7b12e58edcb4641738b9fdfc4f9520a78774ba742c9265d8a21e5ab9a0c2cb9"
+  },
+  "created_utc": "20261009T052235Z"
+}

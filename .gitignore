@@ -1,0 +1,17 @@
+# Competition data + caches are large and licensed for local use only.
+# (Prior GEMSDOE repos follow the same convention; see docs/irregularities.md IR-55-07.)
+data/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+evidence/big/
+*.npz.tmp
+
+# Registry rasters are prior submissions from sibling repos, used ONLY as a
+# uniqueness control.  Re-downloadable with scripts/build_registry.py; the
+# derived index registry/registry.json IS committed.
+registry/rasters/
+
+# 12 MB boolean grid, reproducible from submission_writer.py with the same seed
+evidence/dots_*.npy
