@@ -4,6 +4,51 @@
 
 **Core values:** “Maximize P(Win” and “Own the Outcome.” Owning the outcome means withholding a file when evidence does not clear it, rather than manufacturing a download button or upgrading a projection into a score.
 
+## User brief (condensed; read at the start of every session)
+
+This is the owner's standing request as of 2026-10-09, condensed. The full verification record is in [`docs/session-20261009-verification.md`](docs/session-20261009-verification.md).
+
+**Goal:** place at the top of the DOE GEMS leaderboard with a unique, valid GeoTIFF that the portal accepts, and make the download obvious only when it is cleared. The leaderboard shows 0.3774 at rank 1 (captured 2026-10-09; see [`evidence/leaderboard_capture_20261009_live.json`](evidence/leaderboard_capture_20261009_live.json)).
+
+**Operating rules:**
+
+- **Core values:** Maximize P(Win), and Own the Outcome.
+- **No hallucinations:** verify each claim against an official or verified source, provide the link, flag irregularities, and record negative results.
+- **Lane and protocol:** stay in the potential-field tensor lane. Reuse the shared evaluator, cache, writer, and uniqueness checker. Label every number `HOLDOUT-DTI` (with evaluator version, withheld-positive count, and 95% CI) or `ORGANIZER-CONFIRMED`. Run a leakage canary on each feature. Stop on duplicates (rank correlation above 0.90, or over 70% of dots within 3 px of a registry raster).
+- **Budget:** three experiments or two hours. Promotion to a submission slot is a separate, later selector step.
+- **Review:** three passes (implement, bug and assumption audit, final requirement audit). End each run with a JSON run card.
+- **Submission:** a name and a note of 140 characters or fewer. Format: single-band float32 GeoTIFF, EPSG 32611, 100 m, values in [0, 1], null or NaN outside the bounds.
+
+**Requirement status (2026-10-09):**
+
+| Requirement | Status | Where |
+|---|---|---|
+| Unique GeoTIFF that the portal accepts | **BLOCKED.** No organizer inputs, no registry rasters, and no evaluator in this checkout. None was created. | [`docs/run-card-session-20261009.json`](docs/run-card-session-20261009.json), IR-55-050 |
+| Explain the 0.2778 result | **NOT ESTABLISHED.** No organizer receipt links it to H33. The metric mechanism is a derivation, not a finding. | [`docs/hypotheses.md`](docs/hypotheses.md) §A; [`docs/leaderboard-review-20261009.md`](docs/leaderboard-review-20261009.md) |
+| 3–5 new hypotheses, ranked, with validation plan | **DONE as proposals.** Two in lane (H-N1, H-N2). Two out of lane (H-N3, H-N4), pending owner decision. None validated. | [`docs/hypotheses.md`](docs/hypotheses.md) §B–D |
+| Executive summary and how to submit | **DONE.** Verified format contract, a troubleshooting checklist for the [0, 1] error, and a naming convention. Download remains withheld. | [`docs/submit.html`](docs/submit.html) |
+| Line-by-line verification with links | **DONE.** Each row is marked confirmed, not verified, or blocked. | [`docs/session-20261009-verification.md`](docs/session-20261009-verification.md) |
+| Irregularities flagged | **DONE.** Nine new items, IR-55-043 to IR-55-051. | [`docs/irregularities.md`](docs/irregularities.md) |
+| Pull request and merge to main | See the pull request record in this session. | GitHub |
+
+**Limitations and access needed:**
+
+1. **Organizer data.** The data tab requires a DrivenData login (verified). An account holder must place `gems-geodawn-numerical-features.tif`, `labels.tif`, and `sample_submission.tif` under `data/`, then run `python scripts/prepare_data.py`. The sandbox cannot download them. This is a real access limit, not a judgment call.
+2. **Registry rasters or dot coordinates.** Needed for the literal uniqueness check. The current registry holds metadata only.
+3. **The rejected upload.** The file name and SHA-256 of the file behind "Predicted values must be in range [0, 1]" are needed to diagnose the error.
+4. **Budget decision.** The three-experiment budget is exhausted. Reopening it needs an explicit owner decision.
+5. **Lane decision.** H-N3 (radiometric alteration corridor) is outside the tensor lane. It needs an owner decision and a confirmed licence. Its data are on the public USGS release (verified), not in the official feature list.
+6. **Generative-AI disclosure.** Rules §3.2 require a narrative disclosure. The team must write it.
+7. **Team eligibility.** Rules §1.3 set eligibility. Confirming it is the team's responsibility, not this repository's.
+
+**Suggested next steps (next session):**
+
+1. Place the authorized organizer files under `data/` and run `scripts/prepare_data.py`. Resolve any mismatch with the official files before changing a pin.
+2. Reconcile the local evaluator with the shared template. Run the leakage canary on each feature alone; an AUC above 0.90 counts as leakage until shown otherwise.
+3. With the budget reopened and the evaluator reconciled, test H-N1 (pseudogravity tensor) against the H1 baseline on the same holdout, with a pooled 95% CI.
+4. Obtain the registry rasters or dot coordinates for the uniqueness check.
+5. Review the H-N3 licence on the USGS release, and decide on the lane change.
+
 ## Current answer on the reported leaderboard values
 
 A saved **PUBLIC-LEADERBOARD snapshot (not a submission-page receipt and not ORGANIZER-CONFIRMED)** lists **0.2778** at rank 16 under `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1; see [`evidence/leaderboard_snapshot_20261009.json`](evidence/leaderboard_snapshot_20261009.json). The mapping from `extradr19` to the owner-maintained H33 artifact is unverified. A read-only GitHub API check of the owner's GEMSDOE32 manifest reports `receipt: null` for H33, labels it `UNSCORED`, and describes **0.2747** as projected. That is secondary owner-generated evidence, not an organizer receipt. Therefore this project cannot establish that H33 produced the public rank-16 entry, why that entry received its value, or that any repository candidate beats it. The previous anchor-proxy DTI and causal conclusions that depended on the invalid count-only formula are withdrawn and were not recomputed. Any near-miss/clustered-dot explanation is only a hypothesis, not an established mechanism. See the [2026-10-09 leaderboard review](docs/leaderboard-review-20261009.md).

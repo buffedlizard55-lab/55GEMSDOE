@@ -169,5 +169,50 @@ class SiteStatusTests(unittest.TestCase):
         self.assertIn("pooled-score contribution uncertainty", results.lower())
 
 
+    def test_session_run_card_is_negative_blocked_and_fail_closed(self) -> None:
+        card = json.loads((DOCS / "run-card-session-20261009.json").read_text())
+        self.assertEqual(card["verdict"], "NEGATIVE_BLOCKED")
+        self.assertEqual(card["submission"]["status"], "DO_NOT_DOWNLOAD_OR_SUBMIT")
+        self.assertFalse(card["submission"]["file_link_published"])
+        self.assertIsNone(card["submission"]["organizer_receipt"])
+        self.assertIsNone(card["submission"]["note"])
+        self.assertFalse(card["raster"]["generated"])
+        self.assertIsNone(card["raster"]["sha256"])
+        self.assertIsNone(card["holdout_dti"]["value"])
+        self.assertIsNone(card["holdout_dti"]["ci95"])
+        self.assertEqual(card["budget"]["new_experiments_run_in_session"], 0)
+        self.assertFalse(card["budget"]["weekly_slot_used"])
+        self.assertIn("null or NaN", card["validator_findings"]["official_format_contract"])
+        self.assertTrue(all(src.startswith("https://") for src in card["sources"]))
+
+    def test_session_leaderboard_capture_is_labelled_and_consistent(self) -> None:
+        capture = json.loads((ROOT / "evidence/leaderboard_capture_20261009_live.json").read_text())
+        self.assertTrue(capture["evidence_class"].startswith("PUBLIC-LEADERBOARD"))
+        self.assertIn("NOT ORGANIZER-CONFIRMED", capture["evidence_class"])
+        ranks = [row["rank"] for row in capture["rows"]]
+        self.assertEqual(ranks, list(range(1, len(ranks) + 1)))
+        scores = [row["best_public_dw_tversky"] for row in capture["rows"]]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        top = capture["rows"][0]
+        self.assertEqual((top["participant"], top["best_public_dw_tversky"]), ("xiaofanhu", 0.3774))
+        ext = next(row for row in capture["rows"] if row["participant"] == "extradr19")
+        self.assertEqual((ext["rank"], ext["best_public_dw_tversky"]), (17, 0.2778))
+
+    def test_submit_page_states_official_range_contract_without_download_link(self) -> None:
+        page = (DOCS / "submit.html").read_text()
+        self.assertIn("between 0 and 1", page)
+        self.assertIn("null</code> or <code>NaN", page)
+        self.assertIn("Predicted values must be in range [0, 1]", page)
+        self.assertIn("NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT", page)
+        self.assertNotIn(".tif\"", page.lower())
+
+    def test_readme_carries_user_brief_and_blockers(self) -> None:
+        readme = (ROOT / "README.md").read_text()
+        self.assertIn("## User brief", readme)
+        self.assertIn("**BLOCKED.**", readme)
+        self.assertIn("session-20261009-verification.md", readme)
+        self.assertIn("IR-55-048", (DOCS / "irregularities.md").read_text())
+
+
 if __name__ == "__main__":
     unittest.main()

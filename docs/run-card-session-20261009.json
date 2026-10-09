@@ -1,0 +1,79 @@
+{
+  "schema": "55gemsdoe.run-card.v4",
+  "run_id": "55GEMSDOE-SESSION-2026-10-09-BLOCKED-INPUTS",
+  "date_utc": "2026-10-09",
+  "verdict": "NEGATIVE_BLOCKED",
+  "verdict_detail": "No candidate was generated, evaluated, or checked. The organizer feature stack, labels, sample template, and registry rasters are absent, and the sandbox cannot reach the data host. A negative/blocked outcome is recorded as a deliverable. Nothing here is promotable.",
+  "hypothesis": {
+    "tested": "none",
+    "candidates_proposed": ["H-N1 pseudogravity-transformed magnetic tensor (in-lane)", "H-N2 normalised-source-strength gate (in-lane)", "H-N3 GeoDAWN radiometric alteration corridor (out-of-lane, owner decision)", "H-N4 DEM scarp/lineament (out-of-lane, crowded)"],
+    "source": "docs/hypotheses.md (session addendum)"
+  },
+  "mechanism": "not tested. Under the official distance-weighted Tversky formula, a dot's marginal benefit depends on its hit probability relative to about 0.2 x DTI; this is an approximate derivation and has not been verified on data.",
+  "named_non_fault_mimic": [
+    "lithologic contacts and thin dikes peak in normalised source strength and can mimic thin-sheet or 2-D sources",
+    "remanent magnetization violates the induced-field assumption of a pseudogravity transform",
+    "flight-line striping and leveling residuals mimic strike-extended structure",
+    "surface soil or lithology changes and radon can mimic a radiometric alteration signal (H-N3, not tested)"
+  ],
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "status": "NOT_RUN",
+    "evaluator_version": null,
+    "withheld_positive_count": null,
+    "value": null,
+    "ci95": null,
+    "reason": "The shared evaluator, cached feature stack, and labels are absent. No holdout was run. The recorded experiment budget is exhausted."
+  },
+  "leakage_canary": {"status": "NOT_RUN", "reason": "No feature stack available."},
+  "registry_comparisons": {
+    "status": "NOT_RUN",
+    "reason": "registry/registry.json holds metadata only: no dot coordinates, no raster hashes, and no rasters. A literal uniqueness check cannot be run.",
+    "rank_correlation_max": null,
+    "within_3px_overlap_max": null,
+    "verdict": "NOT_CHECKED"
+  },
+  "raster": {
+    "generated": false,
+    "sha256": null,
+    "reason": "No candidate raster was produced. Producing one from the absent inputs would be fabrication."
+  },
+  "validator_findings": {
+    "prepare_data_py": "FAIL: MISSING gems-geodawn-numerical-features.tif, labels.tif, sample_submission.tif (exit 1)",
+    "validate_submission_py": "FAIL: canonical organizer template and labels unavailable (run on the archived H55 40k zeros file, read-only; no output written)",
+    "format_gate": "NOT_CLEARED",
+    "official_format_contract": "EPSG 32611; 100 m; float32; single layer; values in [0,1]; outside bounds null or NaN (https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)"
+  },
+  "submission": {
+    "status": "DO_NOT_DOWNLOAD_OR_SUBMIT",
+    "file_link_published": false,
+    "name": null,
+    "note": null,
+    "organizer_receipt": null,
+    "weekly_slot_used": false
+  },
+  "budget": {
+    "experiments_used_recorded": 3,
+    "new_experiments_run_in_session": 0,
+    "weekly_slot_used": false
+  },
+  "score_attribution": {
+    "organizer_receipt": null,
+    "leaderboard_capture": "evidence/leaderboard_capture_20261009_live.json (PUBLIC-LEADERBOARD, not a receipt)",
+    "h33_0_2778_attribution": "UNSUPPORTED (no receipt; owner manifest reports receipt null)"
+  },
+  "sources": [
+    "https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/",
+    "https://www.drivendata.org/competitions/306/competition-doe-gems/data/",
+    "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+    "https://docs.nlr.gov/docs/fy26osti/96647.pdf",
+    "https://doi.org/10.5066/P93LGLVQ",
+    "https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7",
+    "https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml",
+    "https://doi.org/10.1190/1.1442807",
+    "https://doi.org/10.1190/1.3484098",
+    "https://doi.org/10.1190/1.3555343"
+  ],
+  "verification_log": "docs/session-20261009-verification.md",
+  "next_gate": "Reopen only with: authorized organizer files placed under data/ and matching the official specification; the shared evaluator and template reconciled; registry rasters or dot coordinates available; an explicit owner decision on the experiment budget; and, for H-N3, a confirmed licence."
+}
