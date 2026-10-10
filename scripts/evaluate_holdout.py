@@ -39,7 +39,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from gems55 import dti55, holdout55, io55, tensor55  # noqa: E402
+from gems55 import dti55, holdout55, io55, surfaces55, tensor55  # noqa: E402
 
 CACHE = ROOT / "data" / "cache"
 EVID = ROOT / "evidence"
@@ -61,6 +61,16 @@ def main() -> None:
     ap.add_argument("--min-sep", type=float, default=3.0)
     ap.add_argument("--out", default=None)
     ap.add_argument("--arms", default="random,ridge_only,ridge_x_dim,ridge_x_agree,tensor_full")
+    ap.add_argument("--flank-support-px", type=float, default=0.0,
+                    help="if > 0, adds arms flank_only (prior alone) and tensor_flank "
+                         "(lane score x prior), both per-fold from the VISIBLE catalogue only")
+    ap.add_argument("--un-eroded", action="store_true",
+                    help="use cached tensor factors on the six-pixel footprint edge without "
+                         "the lane's edge erosion; this is an edge-artifact sensitivity arm")
+    ap.add_argument("--registry-dir", default=None,
+                    help="registry rasters directory; every same-grid raster is budgeted, no exclusions")
+    ap.add_argument("--max-overlap", type=float, default=0.68,
+                    help="per-raster cap on the final dot overlap fraction (protocol stop is 0.70)")
     args = ap.parse_args()
 
     t0 = time.time()
@@ -74,6 +84,11 @@ def main() -> None:
     labels = z["labels"]
     footprint = z["footprint"]
     z.close()
+    score_surface = surfaces55.tensor_surface(
+        cached_score=score, ridge=ridge, dimensionality=dim,
+        strike_agreement=agree, plunge_weight=plunge, striping=striping,
+        footprint=footprint, un_eroded=args.un_eroded,
+    )
 
     grid, _ = io55.read_template()
     assert footprint.shape == grid.shape
@@ -84,15 +99,27 @@ def main() -> None:
         raise RuntimeError("segment holdout needs at least two non-empty folds")
     cat = labels == 1
 
+    cover_masks: list = []
+    if args.registry_dir:
+        cover_names, cover_masks = holdout55.registry_cover_masks(args.registry_dir, grid.shape)
+        print(f"[budget] {len(cover_masks)} registry cover masks, no exclusions, "
+              f"cap={args.max_overlap}", flush=True)
+
     base_elig = footprint & ~striping
     surfaces = {
-        "random": score,  # unused, but keeps the dict uniform
+        "random": score_surface,  # unused for seeded random emission
         "ridge_only": ridge,
         "ridge_x_dim": (ridge * (1.0 - dim)).astype(np.float32),
         "ridge_x_agree": (ridge * agree).astype(np.float32),
-        "tensor_full": score,
+        "tensor_full": score_surface,
     }
     arms = [a for a in args.arms.split(",") if a]
+    if args.flank_support_px > 0:
+        for extra in ("flank_only", "tensor_flank"):
+            if extra not in arms:
+                arms.append(extra)
+        print(f"[flank] support={args.flank_support_px} px; arms flank_only and "
+              f"tensor_flank use the per-fold VISIBLE catalogue only", flush=True)
 
     res: dict = {"config": vars(args), "n_folds": len(folds), "n_truth_total": int(cat.sum())}
     for arm in arms:
@@ -108,13 +135,36 @@ def main() -> None:
             # hide-and-recover test rather than a quadrant placement test.
             elig = base_elig & ~f.visible
             n = args.n_dots // len(folds)
-            surf = surfaces[arm]
-            dots = holdout55.emit_dots(
-                surf, elig, n, min_sep_px=args.min_sep,
-                seed=1234 + fold_i, random=(arm == "random")
-            )
+            if arm == "flank_only":
+                surf = holdout55.flank_weight(f.visible, args.flank_support_px)
+            elif arm == "tensor_flank":
+                surf = surfaces55.tensor_surface(
+                    cached_score=score, ridge=ridge, dimensionality=dim,
+                    strike_agreement=agree, plunge_weight=plunge, striping=striping,
+                    footprint=footprint, catalogue=f.visible,
+                    flank_support_px=args.flank_support_px, un_eroded=args.un_eroded,
+                )
+            else:
+                surf = surfaces[arm]
+            if cover_masks:
+                dots = holdout55.emit_dots_budgeted(
+                    surf, elig, n, min_sep_px=args.min_sep,
+                    cover_masks=cover_masks, max_overlap=args.max_overlap,
+                    seed=1234 + fold_i, random=(arm == "random"),
+                )
+            else:
+                dots = holdout55.emit_dots(
+                    surf, elig, n, min_sep_px=args.min_sep,
+                    seed=1234 + fold_i, random=(arm == "random"),
+                )
             c = dti55.dti(dots.astype(np.float32), f.truth, mask=footprint)
-            record = c.as_dict() | {"n_dots": int(dots.sum()), "n_truth": int(f.truth.sum())}
+            n_actual = int(dots.sum())
+            record = c.as_dict() | {
+                "requested_dots": int(n),
+                "n_dots": n_actual,
+                "mass_shortfall": int(n - n_actual),
+                "n_truth": int(f.truth.sum()),
+            }
             per_fold.append(record)
             for key in ("tp_w", "fp_w", "fn_w", "n_pred_pos", "n_truth"):
                 totals[key] += record[key]
@@ -130,12 +180,15 @@ def main() -> None:
             "fold_mean": float(fd.mean()),
             "fold_sd": float(fd.std(ddof=1)) if fd.size > 1 else 0.0,
             "fold_ci95": bootstrap_ci(fd, n=4000),
+            "mass_matched": all(p["mass_shortfall"] == 0 for p in per_fold),
         }
         print(
             f"[{time.time()-t0:6.1f}s] {arm:14s} pooled DTI={pooled.dti:.4f} "
-            f"(dots={pooled.n_pred_pos}) folds={np.round(fd,4).tolist()}",
+            f"(dots={pooled.n_pred_pos}; mass_matched={res[arm]['mass_matched']}) "
+            f"folds={np.round(fd,4).tolist()}",
             flush=True,
         )
+    res["all_arms_mass_matched"] = all(res[a]["mass_matched"] for a in arms)
 
     # ---------------- leakage canary -----------------------------------------
     rng = np.random.default_rng(7)
@@ -144,7 +197,7 @@ def main() -> None:
     dim_inv = zc["dim_inv"]
     zc.close()
     feats = {
-        "tensor_full_score": score,
+        "tensor_full_score": score_surface,
         "ridge": ridge,
         "one_minus_dim": (1.0 - dim).astype(np.float32),
         "strike_agree": agree,
@@ -168,6 +221,28 @@ def main() -> None:
             s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
             aucs.append(holdout55.auc(s, y))
         canary[name] = {"auc_per_fold": [float(a) for a in aucs], "auc_mean": float(np.mean(aucs))}
+    if args.flank_support_px > 0:
+        # The flank prior is a supervised feature of the candidate; the canary must
+        # cover it.  It is built from VISIBLE faults only (per fold), so a high AUC
+        # is spatial autocorrelation of the catalogue, not leakage of the hidden truth.
+        aucs = []
+        for f in folds:
+            arr = holdout55.flank_weight(f.visible, args.flank_support_px)
+            pos = f.truth
+            neg = base_elig & ~f.visible & ~f.truth
+            nidx = np.nonzero(neg.ravel())[0]
+            take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
+            negm = np.zeros(grid.shape, dtype=bool)
+            negm.ravel()[take] = True
+            y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
+            s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
+            aucs.append(holdout55.auc(s, y))
+        canary["flank_weight_visible_only"] = {
+            "auc_per_fold": [float(a) for a in aucs],
+            "auc_mean": float(np.mean(aucs)),
+            "note": ("supervised prior from VISIBLE faults only, recomputed per fold; a high "
+                     "AUC is catalogue spatial autocorrelation, not hidden-truth leakage"),
+        }
     res["leakage_canary"] = canary
     res["leakage_flagged_gt_0p90"] = sorted(
         k for k, v in canary.items() if v["auc_mean"] > 0.90
@@ -179,9 +254,11 @@ def main() -> None:
     dtheta = z2["dtheta"]
     z2.close()
     d_with, d_rand = [], []
+    n_withheld_strike_segments = 0
     for f in folds:
         segs = holdout55.strike_of_segments(f.truth, min_px=25)
-        ridge_px = base_elig & f.withheld & (score > np.quantile(score[base_elig & f.withheld], 0.98))
+        n_withheld_strike_segments += len(segs)
+        ridge_px = base_elig & f.withheld & (score_surface > np.quantile(score_surface[base_elig & f.withheld], 0.98))
         ry, rx = np.nonzero(ridge_px)
         for s in segs:
             cy, cx = int(round(s["cy"])), int(round(s["cx"]))
@@ -199,8 +276,10 @@ def main() -> None:
     dw = np.array(d_with, dtype=np.float64)
     dr = np.array(d_rand, dtype=np.float64)
     res["strike_test"] = {
-        "n_withheld_segments": int(dw.size),
-        "n_random_ridge": int(dr.size),
+        "n_withheld_segments": int(n_withheld_strike_segments),
+        "n_withheld_pixel_samples": int(dw.size),
+        "n_random_ridge_samples": int(dr.size),
+        "n_random_ridge": int(dr.size),  # backwards-compatible alias; counts samples, not segments
         "mean_abs_dtheta_withheld_deg": float(dw.mean()),
         "mean_abs_dtheta_random_deg": float(dr.mean()),
         "frac_within_20deg_withheld": float((dw <= 20).mean()),

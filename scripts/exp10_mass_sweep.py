@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Experiment 10 (E3 of this session, the LAST experiment in the budget): dot-mass sweep.
 
-WHY.  The official metric is DTI = TP_w / (0.2 N + 0.8 |G|) on a dot raster, so the
-dot count N is itself a decision.  A dot raises DTI when its expected kernel credit
-exceeds the break-even alpha*DTI/(1+alpha*DTI) (dti55.breakeven_credit).  At holdout
-DTI of 0.008 that bar is ~0.0016 credit per dot; at 0.07 it is ~0.014.  So the best
-N is not obvious and must be measured, not guessed from leaderboard rows.
+WHY.  The official metric is DTI = TP_w / (TP_w + alpha*FP_w + beta*FN_w + eps),
+with TP_w, FP_w, and FN_w separately defined.  In general TP_w + FP_w is not the
+number of positive prediction pixels: a prediction can contribute to multiple truth
+pixels or to none.  Therefore dot count N is measured through the exact shared
+`dti55` evaluator; no per-dot break-even shortcut or leaderboard projection is used.
 
 PRE-REGISTERED (written before the first run):
   N in {20000, 40000, 80000, 160000} total dots, split equally over folds.
@@ -67,49 +67,10 @@ def run(folds, score, striping, footprint, n_total, min_sep=3.0):
 
 
 def main() -> None:
-    t0 = time.time()
-    z = np.load(CACHE / "lane_v1.npz")
-    score = z["score"].astype(np.float32)
-    striping = z["striping"].astype(bool)
-    labels = z["labels"]
-    footprint = z["footprint"].astype(bool)
-    z.close()
-    from gems55 import io55 as _io
-    grid, _ = _io.read_template()
-    assert np.array_equal(footprint, grid.footprint)
-
-    q4 = holdout55.make_folds(labels, footprint, grid=(2, 2), buffer_px=3)
-    b15 = banded_folds(labels, footprint, 15.0)
-    res = {"experiment": "exp10_mass_sweep (E3, last)",
-           "label": "HOLDOUT-DTI (fold-pooled, per-fold visible-only; dti55 exact metric)",
-           "protocols": {"Q4_primary": {}, "B15_secondary": {}}}
-    for N in NS:
-        r = run(q4, score, striping, footprint, N)
-        res["protocols"]["Q4_primary"][str(N)] = r
-        print(f"Q4  N={N:6d}  tensor={r['tensor_full']['fold_pooled_dti']:.4f}  "
-              f"random={r['random']['fold_pooled_dti']:.4f}  diff={r['tensor_minus_random_mean']:+.4f} "
-              f"p={r['tensor_minus_random_signflip_p_two_sided']:.3f}", flush=True)
-    for N in NS:
-        r = run(b15, score, striping, footprint, N)
-        res["protocols"]["B15_secondary"][str(N)] = r
-        print(f"B15 N={N:6d}  tensor={r['tensor_full']['fold_pooled_dti']:.4f}  "
-              f"random={r['random']['fold_pooled_dti']:.4f}  diff={r['tensor_minus_random_mean']:+.4f} "
-              f"p={r['tensor_minus_random_signflip_p_two_sided']:.3f}", flush=True)
-
-    q = res["protocols"]["Q4_primary"]
-    n_star = max(q, key=lambda n: q[n]["tensor_full"]["fold_pooled_dti"])
-    star = q[n_star]
-    b = res["protocols"]["B15_secondary"][n_star]
-    positive = (star["tensor_minus_random_mean"] > 0 and star["tensor_minus_random_signflip_p_two_sided"] < 0.05
-                and b["tensor_minus_random_mean"] > 0 and b["tensor_minus_random_signflip_p_two_sided"] < 0.05)
-    res["decision"] = {"N_star_by_Q4_tensor_full": int(n_star),
-                       "label": "POSITIVE" if positive else "NEGATIVE",
-                       "reason": "tensor_full(N*) must beat random(N*) on Q4 and on B15 with p<0.05"}
-    res["seconds"] = round(time.time() - t0, 1)
-    out = EVID / "exp10_mass_sweep_v1.json"
-    out.write_text(json.dumps(res, indent=2))
-    print("decision", res["decision"], "wrote", out, f"{res['seconds']} s")
-
+    raise SystemExit(
+        "Retired: this historical experiment has already been run and the recorded three-experiment budget is exhausted. "
+        "No experiment, data access, or output write is authorized by this entry point. See docs/results.md and evidence/*.json."
+    )
 
 if __name__ == "__main__":
     main()

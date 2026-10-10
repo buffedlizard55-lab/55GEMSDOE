@@ -7,9 +7,6 @@
   "rasters": {
     "h33_2_b2": {
       "n_dots": 37654,
-      "TP_w_vs_visible_catalogue": 277.93795319758345,
-      "credit_per_dot": 0.007381365942465168,
-      "catalogue_proxy_DTI": 0.0049348727157372966,
       "dots_on_visible_fault_px": 0,
       "min_distance_to_mapped_fault_px": 2.23606797749979,
       "median_distance_to_mapped_fault_px": 19.6468827043885,
@@ -34,13 +31,13 @@
           "spearman": 0.0161
         }
       ],
-      "max_abs_band_spearman": 0.046893081340802965
+      "max_abs_band_spearman": 0.046893081340802965,
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 277.93795319758345,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.007381365942465168,
+      "legacy_naive_ratio_not_DTI": 0.0049348727157372966
     },
     "d28_0.2600_anchor": {
       "n_dots": 44090,
-      "TP_w_vs_visible_catalogue": 3954.7811237275546,
-      "credit_per_dot": 0.08969791616528815,
-      "catalogue_proxy_DTI": 0.06864938314078424,
       "dots_on_visible_fault_px": 0,
       "min_distance_to_mapped_fault_px": 1.0,
       "median_distance_to_mapped_fault_px": 15.0,
@@ -65,13 +62,13 @@
           "spearman": 0.0169
         }
       ],
-      "max_abs_band_spearman": 0.05026238285731797
+      "max_abs_band_spearman": 0.05026238285731797,
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 3954.7811237275546,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.08969791616528815,
+      "legacy_naive_ratio_not_DTI": 0.06864938314078424
     },
     "ours_h55": {
       "n_dots": 40000,
-      "TP_w_vs_visible_catalogue": 1526.6077796889729,
-      "credit_per_dot": 0.03816519449222432,
-      "catalogue_proxy_DTI": 0.026881440871854623,
       "dots_on_visible_fault_px": 0,
       "min_distance_to_mapped_fault_px": 1.0,
       "median_distance_to_mapped_fault_px": 23.021728866442675,
@@ -96,95 +93,63 @@
           "spearman": 0.0048
         }
       ],
-      "max_abs_band_spearman": 0.011190210686876824
-    }
-  },
-  "random_controls_footprint_restricted": {
-    "37654": {
-      "TP_w": 1504.09669774474,
-      "credit_per_dot": 0.039945203636924095,
-      "catalogue_proxy_DTI": 0.026705693375580417
-    },
-    "40000": {
-      "TP_w": 1624.176422277245,
-      "credit_per_dot": 0.04060441055693112,
-      "catalogue_proxy_DTI": 0.028599489038239646
-    },
-    "44090": {
-      "TP_w": 1762.9778510182377,
-      "credit_per_dot": 0.03998588911359124,
-      "catalogue_proxy_DTI": 0.03060279145086893
+      "max_abs_band_spearman": 0.011190210686876824,
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 1526.6077796889729,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.03816519449222432,
+      "legacy_naive_ratio_not_DTI": 0.026881440871854623
     }
   },
   "manifest_facts": {
     "h33-2-b2": {
-      "proxy_DTI_author": 0.0067,
-      "credit_per_dot_author": 0.01,
       "dots": 37654,
       "dots_on_catalogue": 0,
       "receipt": null,
-      "author_note": "flank B=2 prune on the 0.2708 base: 37,654 dots, 0 within 200 m of the catalogue; live-mirror +0.00487 in 4/4 folds, safety 2.08, projected 0.2747; UNSCORED"
+      "author_note": "flank B=2 prune on the 0.2708 base: 37,654 dots, 0 within 200 m of the catalogue; live-mirror +0.00487 in 4/4 folds, safety 2.08, projected 0.2747; UNSCORED",
+      "owner_reported_proxy_ratio_not_DTI": 0.0067,
+      "owner_reported_kernel_weight_per_dot": 0.01
     },
     "d28/0.2600-anchor": {
-      "proxy_DTI_author": 0.1618,
-      "credit_per_dot_author": 0.2154,
       "dots": 44090,
       "dots_on_catalogue": 0,
-      "receipt": null
+      "receipt": null,
+      "owner_reported_proxy_ratio_not_DTI": 0.1618,
+      "owner_reported_kernel_weight_per_dot": 0.2154
     }
   },
   "algebra": {
-    "identity": "TP_w + FN_w = |G|  =>  DTI = TP_w/(0.2N + 0.8|G|)",
-    "upper_bound": "DTI <= |G| / (0.2N + 0.8|G|) since each truth pixel can contribute at most 1.0"
+    "identity": "TP_w + FN_w = |G|",
+    "correct_general_denominator": "TP_w + alpha*FP_w + beta*(|G|-TP_w) + eps = (1-beta)*TP_w + alpha*FP_w + beta*|G| + eps",
+    "alpha_0_2_beta_0_8": "0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps",
+    "invalidated_claim": "TP_w/(0.2*N + 0.8*|G|); there is no general identity TP_w + FP_w = N"
   },
-  "what_a_target_score_requires": {
-    "0.26@N=37654": {
-      "min_abs_G_for_any_placement": 2472.2,
-      "required_TP_w_per_dot_at_that_G": 0.0171
+  "review_status": "SUPERSEDED_INVALID_METRIC_PROXY_AND_UNCONFIRMED_SCORE_ATTRIBUTION",
+  "review_note": "All stored raster summaries under this record were based on per-prediction kernel credit and the invalid count-only DTI denominator. They are not official DTI scores or valid score explanations. Local organizer data/registry rasters are absent, so exact catalogue-proxy DTI has not been recomputed.",
+  "organizer_confirmed_score_receipt": null,
+  "leaderboard_values_status": "USER-REPORTED / NOT ORGANIZER-CONFIRMED",
+  "legacy_random_controls_descriptive_only": {
+    "37654": {
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 1504.09669774474,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.039945203636924095,
+      "legacy_naive_ratio_not_DTI": 0.026705693375580417,
+      "status": "descriptive diagnostic only; not an exact DTI control"
     },
-    "0.26@N=44090": {
-      "min_abs_G_for_any_placement": 2894.8,
-      "required_TP_w_per_dot_at_that_G": 0.0171
+    "40000": {
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 1624.176422277245,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.04060441055693112,
+      "legacy_naive_ratio_not_DTI": 0.028599489038239646,
+      "status": "descriptive diagnostic only; not an exact DTI control"
     },
-    "0.2708@N=37654": {
-      "min_abs_G_for_any_placement": 2603.3,
-      "required_TP_w_per_dot_at_that_G": 0.0187
-    },
-    "0.2708@N=44090": {
-      "min_abs_G_for_any_placement": 3048.3,
-      "required_TP_w_per_dot_at_that_G": 0.0187
-    },
-    "0.2747@N=37654": {
-      "min_abs_G_for_any_placement": 2651.4,
-      "required_TP_w_per_dot_at_that_G": 0.0193
-    },
-    "0.2747@N=44090": {
-      "min_abs_G_for_any_placement": 3104.6,
-      "required_TP_w_per_dot_at_that_G": 0.0193
-    },
-    "0.2778@N=37654": {
-      "min_abs_G_for_any_placement": 2689.8,
-      "required_TP_w_per_dot_at_that_G": 0.0198
-    },
-    "0.2778@N=44090": {
-      "min_abs_G_for_any_placement": 3149.6,
-      "required_TP_w_per_dot_at_that_G": 0.0198
-    },
-    "0.3195@N=37654": {
-      "min_abs_G_for_any_placement": 3232.3,
-      "required_TP_w_per_dot_at_that_G": 0.0274
-    },
-    "0.3195@N=44090": {
-      "min_abs_G_for_any_placement": 3784.7,
-      "required_TP_w_per_dot_at_that_G": 0.0274
-    },
-    "0.3774@N=37654": {
-      "min_abs_G_for_any_placement": 4071.3,
-      "required_TP_w_per_dot_at_that_G": 0.0408
-    },
-    "0.3774@N=44090": {
-      "min_abs_G_for_any_placement": 4767.2,
-      "required_TP_w_per_dot_at_that_G": 0.0408
+    "44090": {
+      "sum_per_prediction_nearest_catalogue_kernel_weight_not_TP_w": 1762.9778510182377,
+      "mean_per_prediction_kernel_weight_not_metric_credit": 0.03998588911359124,
+      "legacy_naive_ratio_not_DTI": 0.03060279145086893,
+      "status": "descriptive diagnostic only; not an exact DTI control"
     }
-  }
+  },
+  "invalidated_target_score_table": {
+    "status": "REMOVED_NOT_RECOMPUTED",
+    "number_of_old_target_cases": 12,
+    "reason": "The table solved for |G| using an invalid DTI denominator and quantities that were not metric TP_w. It must not be used."
+  },
+  "raster_scores": "No organizer-confirmed raster scores are present in this evidence record."
 }

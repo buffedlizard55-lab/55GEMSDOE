@@ -1,0 +1,60 @@
+{
+ "evidence_class": "HOLDOUT-DTI",
+ "evaluator_version": "gems55.dti55/2.0-local",
+ "arm": "tensor_full",
+ "n_dots": 16000,
+ "min_sep_px": 3.0,
+ "withheld_positive_count": 60988,
+ "n_folds": 4,
+ "buffer_px": 3,
+ "metric": {
+  "alpha": 0.2,
+  "beta": 0.8,
+  "kernel": "triangular",
+  "radius_m": 300.0
+ },
+ "candidate": {
+  "dti": 0.03809062276096333,
+  "tp_w": 1989.5195946429067,
+  "fp_w": 15214.566921464037,
+  "fn_w": 58998.4804053571,
+  "mean_pred_cells": 16000.0
+ },
+ "candidate_ci95": [
+  0.0355741647023573,
+  0.040581089192987856
+ ],
+ "ci_method": "percentile bootstrap of 3182 spatial blocks of 40x40 px over the pooled additive DTI contribution maps",
+ "n_blocks": 3182,
+ "n_boot": 1000,
+ "bootstrap_seed": 0,
+ "random_control": {
+  "reps": 3,
+  "dti_mean": 0.03406439536674732,
+  "dti_std": 0.0005805276246577969,
+  "dti_min": 0.03369689461741388,
+  "dti_max": 0.03473365549664079,
+  "all": [
+   0.03376263598618728,
+   0.03473365549664079,
+   0.03369689461741388
+  ]
+ },
+ "lift_over_random": 1.118194594410629,
+ "comparators_same_budget": {
+  "ridge_only": 0.023263509543183923,
+  "ridge_x_dim": 0.039231183926562656
+ },
+ "cache": "/home/user/55GEMSDOE/cache/tc300.npz",
+ "elapsed_s": 41.70332360267639,
+ "raster": {
+  "file": "docs/downloads/gems55-tensor_full-n16000-sep3-20261009T211747Z-nan.tif",
+  "sha256": "927dc17f7f5d890b2f382e266ade5d775474631ee96674f8ff3cbc1f1b7c7693",
+  "size_bytes": 1516449,
+  "n_positive_cells": 16000,
+  "footprint_px": 5167373,
+  "positive_fraction_of_footprint": 0.0030963508924167077,
+  "mapped_fault_pixels_masked": 60988,
+  "built_utc": "2026-10-09T21:17:47Z"
+ }
+}

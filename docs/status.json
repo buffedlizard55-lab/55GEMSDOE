@@ -1,35 +1,29 @@
 {
   "project": "55GEMSDOE",
-  "reviewed_utc": "2026-10-09",
-  "overall_status": "format_valid_uniqueness_blocked_negative",
-  "submission_tif": "docs/downloads/h56-multiscale-tensor-persistence-40000dots-20261009T162812Z-zeros.tif",
+  "reviewed_utc": "2026-10-10",
+  "overall_status": "format_valid_duplicate_stop_holdout_negative_audit_only",
+  "submission_tif": "docs/downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.tif",
   "download_allowed": true,
+  "download_scope": "audit/review only; do not submit",
   "submit_allowed": false,
   "submit_recommended": false,
-  "why_download_is_allowed": "The all-finite audit artifact passes the local format validator after being re-read from disk: one float32 band, EPSG:32611, template shape/transform, no NaN, all values in [0,1], and 40,000 positive pixels inside the footprint. This is permission to download for audit, not permission to spend a competition slot.",
-  "why_submission_is_blocked": "The strict lane uniqueness gate stops the artifact: its continuous surface has max absolute Spearman 0.0223 across 56 registry rasters, but final-dot overlap is 0.736 or higher for two prior rasters and 1.000 for the spacing-5 lattice. The protocol says duplicate/stop when overlap exceeds 0.70. The all-finite encoding also has no organizer receipt; no score is claimed.",
+  "why_download_is_allowed": "The recommended NaN-outside TIF passes 11/11 strict local structural checks against the canonical template (single-band float32, EPSG:32611, exact shape/transform/resolution, NaN outside, finite in-footprint [0,1] values, and no mapped-catalogue hits). The all-finite zeros variant passes only 10/11 checks because it violates the null/NaN outside rule. The NaN TIF is retained for audit only; the expanded uniqueness check scanned 62 registry rasters plus four local historical candidates (66 comparisons) and returned DUPLICATE-STOP: 76% of dots are within 3 px of two PARALLEL16 reference variants, above the literal 70% limit. Do not submit; local checks are not organizer clearance.",
+  "why_submission_is_blocked": "DO NOT SUBMIT. The matched-mass HOLDOUT-DTI candidate is 0.00012284 (95% CI [0.00011438, 0.00013397], 60,988 withheld positives, evaluator src/gems55/dti55.py), below the same-evaluator tensor_full comparator 0.00030077, ridge_x_agree 0.00027391, and matched random 0.00015080. The expanded strict uniqueness check also returns DUPLICATE-STOP: max 3-pixel overlap 0.76 against two PARALLEL16 raster variants exceeds the 0.70 limit. Verdict NEGATIVE; no weekly slot used and no organizer receipt exists.",
   "holdout_dti": {
     "evidence_class": "HOLDOUT-DTI",
-    "evaluator_version": "src/gems55/dti55.py; exact published DTI formula, alpha=0.2, beta=0.8, R=300 m",
+    "evaluator_version": "src/gems55/dti55.py (local published-formula transcription, gems55.dti55/2.0-local; alpha=0.2, beta=0.8, R=300 m; not organizer-executable)",
     "withheld_positive_count": 60988,
-    "multiscale_tensor_full": 0.01727793270506305,
-    "multiscale_tensor_full_ci95": [
-      0.01612827573503906,
-      0.018468645641252373
+    "candidate": 0.00012283569338819808,
+    "candidate_ci95": [
+      0.00011438298404329026,
+      0.00013396539810979247
     ],
-    "matched_random_control": 0.014404859072739232,
-    "matched_random_control_ci95": [
-      0.013732983126265159,
-      0.015374661727613106
-    ],
-    "current_best_one_scale_arm": 0.018519270698750034,
-    "current_best_one_scale_arm_name": "ridge_x_agree (ablation/control, not the full tensor candidate)",
-    "current_best_one_scale_arm_ci95": [
-      0.01782350648872739,
-      0.019402442229139772
-    ]
+    "random": 0.00015080369376383455,
+    "tensor_full": 0.00030076700799021696,
+    "ridge_x_agree": 0.00027390592726233735
   },
+  "uniqueness_status": "DUPLICATE-STOP",
   "organizer_confirmed_score": null,
-  "sha256": "43743afdb030b739465d4754aabd8605bceef49bcc836bee93e9094807d4695f",
-  "reason": "Audit download is permitted; strict uniqueness and promotion gates are independently enforced."
+  "sha256": "57dd4ba81c6fe553166cb193f4ae40e6547f4abe5a8fdabeb9154f648d761326",
+  "reason": "The NaN-outside TIF passes strict local format checks and is downloadable for audit only; strict uniqueness is DUPLICATE-STOP and matched HOLDOUT-DTI is negative. Do not submit."
 }

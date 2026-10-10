@@ -9,4 +9,4 @@ lanes55     the lane: gated gradient-ridge surface
 dti55       exact official distance-weighted Tversky evaluator
 holdout55   hide-and-recover folds, emission, coverage-greedy placement
 """
-__all__ = ["io55", "tensor55", "fields55", "lanes55", "dti55", "holdout55"]
+__all__ = ["io55", "tensor55", "fields55", "lanes55", "dti55", "holdout55", "registry55", "surfaces55"]

@@ -25,7 +25,15 @@
         0.0123,
         0.0118
       ],
-      "wbar": 0.09157
+      "wbar": 0.09157,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.01137371408920709,
+        0.012506285910792909
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_ridge_greedy": {
       "pooled": {
@@ -43,7 +51,15 @@
         0.0026,
         0.0032
       ],
-      "wbar": 0.03475
+      "wbar": 0.03475,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.0020278958509022237,
+        0.004812104149097777
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_ridge_topn": {
       "pooled": {
@@ -61,7 +77,15 @@
         0.015,
         0.0124
       ],
-      "wbar": 0.13919
+      "wbar": 0.13919,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.010877261117424332,
+        0.014322738882575669
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_tensor_full_greedy": {
       "pooled": {
@@ -79,7 +103,15 @@
         0.0054,
         0.0059
       ],
-      "wbar": 0.05745
+      "wbar": 0.05745,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.004704681030689643,
+        0.006655318969310355
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_tensor_full_topn": {
       "pooled": {
@@ -97,7 +129,15 @@
         0.0119,
         0.0128
       ],
-      "wbar": 0.14106
+      "wbar": 0.14106,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.011603438969321023,
+        0.014156561030678975
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_tensor_x_2d_greedy": {
       "pooled": {
@@ -115,7 +155,15 @@
         0.0049,
         0.0049
       ],
-      "wbar": 0.05428
+      "wbar": 0.05428,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.004462044254787748,
+        0.006257955745212254
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_tensor_x_2d_topn": {
       "pooled": {
@@ -133,7 +181,15 @@
         0.0111,
         0.0125
       ],
-      "wbar": 0.12956
+      "wbar": 0.12956,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.010978188803389763,
+        0.012581811196610242
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_catann_greedy": {
       "pooled": {
@@ -151,7 +207,15 @@
         0.006,
         0.0053
       ],
-      "wbar": 0.33031
+      "wbar": 0.33031,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.005317293453124513,
+        0.006082706546875486
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_catann_topn": {
       "pooled": {
@@ -169,7 +233,15 @@
         0.0191,
         0.0197
       ],
-      "wbar": 0.92773
+      "wbar": 0.92773,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.018492142611508864,
+        0.01990785738849114
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_tensor_x_catann_greedy": {
       "pooled": {
@@ -187,7 +259,15 @@
         0.0102,
         0.0085
       ],
-      "wbar": 0.60306
+      "wbar": 0.60306,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.007891934448771704,
+        0.009788065551228298
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_tensor_x_catann_topn": {
       "pooled": {
@@ -205,7 +285,15 @@
         0.0229,
         0.0202
       ],
-      "wbar": 1.48927
+      "wbar": 1.48927,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.01948623595921409,
+        0.02307376404078591
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_ridge_x_catann_greedy": {
       "pooled": {
@@ -223,7 +311,15 @@
         0.0063,
         0.0063
       ],
-      "wbar": 0.47423
+      "wbar": 0.47423,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.005637132816422417,
+        0.006962867183577583
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_ridge_x_catann_topn": {
       "pooled": {
@@ -241,7 +337,15 @@
         0.0232,
         0.0231
       ],
-      "wbar": 1.56438
+      "wbar": 1.56438,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.02237432046458739,
+        0.023345679535412608
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_2d_x_catann_greedy": {
       "pooled": {
@@ -259,7 +363,15 @@
         0.0085,
         0.0085
       ],
-      "wbar": 1.00861
+      "wbar": 1.00861,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.008275833600179625,
+        0.008524166399820378
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n24000_2d_x_catann_topn": {
       "pooled": {
@@ -277,7 +389,15 @@
         0.0161,
         0.0164
       ],
-      "wbar": 1.58717
+      "wbar": 1.58717,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.01555210515413202,
+        0.01648789484586798
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_flat_random": {
       "pooled": {
@@ -295,7 +415,15 @@
         0.0179,
         0.0187
       ],
-      "wbar": 0.09034
+      "wbar": 0.09034,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.01798198704159357,
+        0.020178012958406436
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_ridge_greedy": {
       "pooled": {
@@ -313,7 +441,15 @@
         0.0036,
         0.0054
       ],
-      "wbar": 0.03037
+      "wbar": 0.03037,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.0031479669523680055,
+        0.006812033047631994
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_ridge_topn": {
       "pooled": {
@@ -331,7 +467,15 @@
         0.0247,
         0.0217
       ],
-      "wbar": 0.14166
+      "wbar": 0.14166,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.018840274094942308,
+        0.023839725905057695
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_tensor_full_greedy": {
       "pooled": {
@@ -349,7 +493,15 @@
         0.0088,
         0.0084
       ],
-      "wbar": 0.05133
+      "wbar": 0.05133,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.007241523289713238,
+        0.009678476710286762
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_tensor_full_topn": {
       "pooled": {
@@ -367,7 +519,15 @@
         0.0191,
         0.0202
       ],
-      "wbar": 0.13333
+      "wbar": 0.13333,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.019187743909787246,
+        0.021572256090212752
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_tensor_x_2d_greedy": {
       "pooled": {
@@ -385,7 +545,15 @@
         0.0073,
         0.0071
       ],
-      "wbar": 0.05032
+      "wbar": 0.05032,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.00696188200594559,
+        0.00955811799405441
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_tensor_x_2d_topn": {
       "pooled": {
@@ -403,7 +571,15 @@
         0.0199,
         0.0219
       ],
-      "wbar": 0.13298
+      "wbar": 0.13298,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.01881235118348108,
+        0.021507648816518923
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_catann_greedy": {
       "pooled": {
@@ -421,7 +597,15 @@
         0.0099,
         0.0089
       ],
-      "wbar": 0.32791
+      "wbar": 0.32791,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.008641592446347324,
+        0.009798407553652674
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_catann_topn": {
       "pooled": {
@@ -439,7 +623,15 @@
         0.0318,
         0.032
       ],
-      "wbar": 0.93769
+      "wbar": 0.93769,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.030775991695691257,
+        0.03222400830430874
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_tensor_x_catann_greedy": {
       "pooled": {
@@ -457,7 +649,15 @@
         0.0171,
         0.0151
       ],
-      "wbar": 0.54045
+      "wbar": 0.54045,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.014443882880955692,
+        0.01667611711904431
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_tensor_x_catann_topn": {
       "pooled": {
@@ -475,7 +675,15 @@
         0.0421,
         0.0388
       ],
-      "wbar": 1.25404
+      "wbar": 1.25404,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.038241088570864286,
+        0.041558911429135724
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_ridge_x_catann_greedy": {
       "pooled": {
@@ -493,7 +701,15 @@
         0.0102,
         0.01
       ],
-      "wbar": 0.46212
+      "wbar": 0.46212,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.009597608773531933,
+        0.011002391226468067
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_ridge_x_catann_topn": {
       "pooled": {
@@ -511,7 +727,15 @@
         0.0306,
         0.0294
       ],
-      "wbar": 1.25866
+      "wbar": 1.25866,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.02779020162481399,
+        0.03044979837518601
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_2d_x_catann_greedy": {
       "pooled": {
@@ -529,7 +753,15 @@
         0.0135,
         0.0133
       ],
-      "wbar": 0.86132
+      "wbar": 0.86132,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.012291571478575434,
+        0.013828428521424563
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     },
     "n40000_2d_x_catann_topn": {
       "pooled": {
@@ -547,7 +779,29 @@
         0.0266,
         0.0279
       ],
-      "wbar": 1.4242
+      "wbar": 1.4242,
+      "evidence_class": "HOLDOUT-DTI",
+      "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+      "withheld_positive_count": 60988,
+      "ci95": [
+        0.025918616930324608,
+        0.027721383069675393
+      ],
+      "ci95_method": "Student-t 95% interval over stored 5 per-fold DTI values (df=4); point estimate is the pooled-component DTI; fold values rounded to 4 decimals, interval approximate."
     }
+  },
+  "review_metadata": {
+    "review_status": "HISTORICAL_EXPLORATORY_HOLDOUT_NOT_CURRENT_PROMOTION_BEST",
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+    "withheld_positive_count": 60988,
+    "protocol": "Exploratory whole-segment holdout; five folds.",
+    "metric_parameters": {
+      "alpha": 0.2,
+      "beta": 0.8,
+      "kernel_radius_m": 300
+    },
+    "ci95_policy": "Student-t 95% interval over stored per-fold DTI values; pooled-components DTI remains the point estimate. Fold values were rounded to four decimals, so intervals are approximate.",
+    "no_experiment_rerun": true
   }
 }

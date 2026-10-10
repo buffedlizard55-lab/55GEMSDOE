@@ -25,7 +25,7 @@ taking z positive *downward* and using the upward-continuation operator
     Tyz = d2V/dydz <-> +i ky |k| V^
 
 Because Tzz is *derived* from the horizontal wavenumbers, the tensor is exactly
-traceless by construction; ``tests/test_tensor.py`` asserts that.
+traceless by construction; synthetic regression tests live in ``tests_numeric/``.
 
 References
 ----------
@@ -60,6 +60,7 @@ __all__ = [
     "gaussian_lowpass",
     "bandpass",
     "destripe",
+    "pseudogravity",
 ]
 
 
@@ -158,6 +159,57 @@ def gradient_tensor(
     return out
 
 
+def pseudogravity(
+    field: np.ndarray,
+    res_m: float,
+    *,
+    pad_frac: float = 0.05,
+    workers: int = -1,
+) -> np.ndarray:
+    """Baranov/Gunn pseudogravity transform: vertical integration of a magnetic field.
+
+    For an RTP (reduced-to-pole) magnetic anomaly ``T`` the magnetisation and the
+    inducing field are, by construction, vertical, so ``T`` is proportional to the
+    *vertical derivative* of the magnetic scalar potential ``V``.  ``V`` is
+    therefore recovered (up to a multiplicative constant that cancels in every
+    normalised product downstream) by dividing the spectrum by ``|k|``:
+
+        V^ (kx, ky) = T^ (kx, ky) / |k|      (|k| = hypot(kx, ky), V^(0) = 0)
+
+    The result plays exactly the role of a gravity potential, so the Marussi
+    tensor built from it (``gradient_tensor``) is the quantity analysed by
+    Pedersen & Rasmussen (1990) and Beiki & Pedersen (2010).  Operating on ``T``
+    directly instead would build a *third*-derivative tensor: it is still
+    traceless and still has a vanishing intermediate eigenvalue for a 2-D source,
+    but it is not the published quantity and it weights short wavelengths one
+    extra power of ``|k|``.
+
+    Sign convention: ``gradient_tensor`` uses z positive downward and maps
+    ``d/dz -> +|k|``.  Writing ``T = dV/dz`` under that same convention gives
+    ``V^ = T^/|k|`` with a *positive* sign, which is what this routine returns.
+    Every downstream product (eigenvalues, |strike| azimuth) is invariant to a
+    global sign flip of the potential, so the choice is immaterial for the lane;
+    it only matters that the convention is stated.
+    """
+    import scipy.fft as sfft
+
+    a = np.asarray(field, dtype=np.float32)
+    ny, nx = a.shape
+    pad = int(round(max(ny, nx) * pad_frac))
+    ap = _pad_mirror(a, pad)
+    kx, ky = angular_wavenumbers(ap.shape, res_m)
+    KY, KX = np.meshgrid(ky.astype(np.float32), kx.astype(np.float32), indexing="ij")
+    K = np.hypot(KX, KY)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        inv_k = np.where(K > 0, 1.0 / K, 0.0).astype(np.float32)
+    F = sfft.fft2(ap.astype(np.complex64), workers=workers, overwrite_x=True)
+    F *= inv_k
+    F[0, 0] = 0.0
+    del ap, inv_k, K, KX, KY
+    out = sfft.ifft2(F, workers=workers, overwrite_x=True).real
+    return np.ascontiguousarray(out[pad : pad + ny, pad : pad + nx].astype(np.float32))
+
+
 def gaussian_lowpass(field: np.ndarray, sigma_m: float, res_m: float) -> np.ndarray:
     """Gaussian low-pass in the wavenumber domain (mirror-padded)."""
     a = np.asarray(field, dtype=np.float64)
@@ -225,7 +277,7 @@ def sym3_eigh(T: dict[str, np.ndarray], *, chunk: int = 400_000) -> tuple[np.nda
     Uses the trigonometric closed form for a symmetric 3x3 matrix (Smith 1961;
     the standard "eigenvalues of a symmetric 3x3 matrix" algorithm), which is
     orders of magnitude faster and far more memory-frugal than
-    ``numpy.linalg.eigh`` over ~5.2 M matrices.  ``tests/test_tensor.py`` checks
+    ``numpy.linalg.eigh`` over ~5.2 M matrices. ``tests_numeric/test_core.py`` checks
     it against ``numpy.linalg.eigh`` on random tensors.
 
     Returns
@@ -337,7 +389,7 @@ def dimensionality_invariant(lam: np.ndarray) -> np.ndarray:
 
         I = 27 e3^2 / (4 (-e2)^3)
 
-    Endpoints (verified analytically in ``tests/test_tensor.py``):
+    Endpoints (verified analytically in ``tests_numeric/test_tensor.py``):
 
       * strike-extended 2-D source, l = (a, 0, -a):  e3 = 0          -> I = 0
       * equidimensional 3-D source, l = (2a, -a, -a): I              -> 1

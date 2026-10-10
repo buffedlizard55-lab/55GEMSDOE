@@ -11,7 +11,7 @@ PRE-REGISTERED before this file was first run (see docs/hypotheses.md, section H
 
   Arms (matched N per protocol):
     random       uniform over the eligible set                 (control)
-    tensor_full  lane score alone                              (reference, prior run 0.0667)
+    tensor_full  lane score alone                              (reference; prior DTI values live only in labelled evidence)
     H-A-500      lane score x exp(-d_vis / 5 px)     PRIMARY candidate
     H-A-1500     lane score x exp(-d_vis / 15 px)    secondary
     prox-500     exp(-d_vis / 5 px) alone            ablation (no tensor gate)
@@ -54,6 +54,7 @@ from pathlib import Path
 
 import numpy as np
 from scipy import ndimage
+from scipy.stats import t as student_t
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -73,11 +74,15 @@ def aggregate(per_fold: list[dict]) -> dict:
     tp = sum(p["tp_w"] for p in per_fold)
     fp = sum(p["fp_w"] for p in per_fold)
     fn = sum(p["fn_w"] for p in per_fold)
-    d = [p["dti"] for p in per_fold]
+    d = np.asarray([p["dti"] for p in per_fold], dtype=np.float64)
+    half = float(student_t.ppf(0.975, len(d) - 1) * d.std(ddof=1) / np.sqrt(len(d)))
+    mean = float(d.mean())
     return {
         "fold_pooled_dti": tp / (tp + dti55.ALPHA * fp + dti55.BETA * fn + dti55.EPS),
-        "fold_mean_dti": float(np.mean(d)),
-        "per_fold_dti": [round(x, 6) for x in d],
+        "fold_mean_dti": mean,
+        "per_fold_dti": [round(float(x), 6) for x in d],
+        "ci95": [mean - half, mean + half],
+        "ci95_method": f"Student-t 95% interval over {len(d)} per-fold DTI values (df={len(d)-1}); pooled-components DTI is the point estimate; per-fold values are stored to 6 decimals.",
         "n_withheld_truth": int(sum(p["n_truth"] for p in per_fold)),
         "n_dots": int(sum(p["n_dots"] for p in per_fold)),
     }
@@ -175,67 +180,10 @@ def run_protocol(name, folds, arrays, n_total, min_sep, footprint, striping, cat
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--tag", default="v1")
-    ap.add_argument("--n-dots", type=int, default=40000)
-    ap.add_argument("--min-sep", type=float, default=3.0)
-    ap.add_argument("--out", default=str(EVID / "exp8_visible_prior_gate_v1_n40000.json"))
-    args = ap.parse_args()
-    t0 = time.time()
-
-    z = np.load(CACHE / f"lane_{args.tag}.npz")
-    score = z["score"].astype(np.float32)
-    ridge = z["ridge"].astype(np.float32)
-    dim = z["dim"].astype(np.float32)
-    agree = z["agree"].astype(np.float32)
-    plunge = z["plunge"].astype(np.float32)
-    striping = z["striping"].astype(bool)
-    labels = z["labels"]
-    footprint = z["footprint"].astype(bool)
-    z.close()
-    grid, _ = io55.read_template()
-    assert footprint.shape == grid.shape and np.array_equal(footprint, grid.footprint)
-    cat = labels == 1
-    arrays = (score, ridge, dim, agree, plunge)
-
-    q4 = holdout55.make_folds(labels, footprint, grid=(2, 2), buffer_px=3)
-    s10 = holdout55.make_segment_folds(labels, footprint, n_folds=10, buffer_px=3, split_px=20, seed=0)
-    print(f"Q4 folds={len(q4)} truth={[int(f.truth.sum()) for f in q4]}")
-    print(f"S10 folds={len(s10)} truth={[int(f.truth.sum()) for f in s10]}", flush=True)
-
-    res = {
-        "experiment": "exp8_visible_prior_gate",
-        "label": "HOLDOUT-DTI (per-fold visible-only features; dti55 exact official metric)",
-        "evaluator": "src/gems55/dti55.py alpha=0.2 beta=0.8 R=3px (300 m triangular kernel)",
-        "n_catalogue_px": int(cat.sum()),
-        "protocols": {},
-    }
-    res["protocols"]["Q4"] = run_protocol("Q4", q4, arrays, args.n_dots, args.min_sep, footprint, striping, cat)
-    res["protocols"]["S10"] = run_protocol("S10", s10, arrays, args.n_dots, args.min_sep, footprint, striping, cat)
-
-    # ---- verdict under the pre-registered rule -------------------------------
-    verdict = {}
-    for pname, pr in res["protocols"].items():
-        a = pr["arms"]["H-A-500"]
-        ok = (
-            a["diff_vs_random_mean"] > 0
-            and a["diff_vs_random_signflip_p_two_sided"] < 0.05
-            and a["fold_pooled_dti"] > pr["arms"]["tensor_full"]["fold_pooled_dti"]
-        )
-        verdict[pname] = {"H-A-500_beats_random_and_lane_with_p_lt_0.05": bool(ok)}
-    res["pre_registered_verdict"] = verdict
-    res["promote"] = all(v["H-A-500_beats_random_and_lane_with_p_lt_0.05"] for v in verdict.values())
-    res["seconds"] = round(time.time() - t0, 1)
-
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(res, indent=2))
-    print(json.dumps({k: v for k, v in res.items() if k != "protocols"}, indent=2))
-    for pname, pr in res["protocols"].items():
-        print(pname, {a: round(v["fold_pooled_dti"], 4) for a, v in pr["arms"].items()})
-        print(pname, "canary max AUC", {c: round(v, 3) for c, v in pr["leakage_canary_auc_max"].items()})
-    print("wrote", out, f"({res['seconds']} s)")
-
+    raise SystemExit(
+        "Retired: this historical experiment has already been run and the recorded three-experiment budget is exhausted. "
+        "No experiment, data access, or output write is authorized by this entry point. See docs/results.md and evidence/*.json."
+    )
 
 if __name__ == "__main__":
     main()

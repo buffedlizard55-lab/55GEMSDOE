@@ -1,0 +1,80 @@
+{
+  "schema": "55gemsdoe.run-card.v3",
+  "run_id": "55GEMSDOE-SESSION-2026-10-09-OFFICIAL-VERIFY-AND-GATE",
+  "review_date_utc": "2026-10-09",
+  "hypothesis": {
+    "lane": "potential-field tensor dimensionality (in-lane)",
+    "candidate_under_test": null,
+    "statement": "No candidate was implemented or tested in this session. Ranked candidates H-N1 (metric-aware sparse placement, in-lane), H-N3 (heat-flow corridor, out of lane), H-N5 (electrical conductance, largely redundant with official stack), and H-N4 (slip/dilation tendency, label-leakage trap) are proposals only; see docs/session-20261009-review.md section 3."
+  },
+  "mechanism": "Not tested. The official distance-weighted Tversky metric is recall-dominant (beta 0.8 > alpha 0.2) with linear kernel credit k(d)=max(1-d/3,0) per truth pixel; a dot at distance d scores k(d) against an isolated truth pixel (synthetic check D3).",
+  "non_fault_mimic": [
+    "Lithologic contacts and dikes: elongated and strike-coherent; the tensor lane cannot separate them from faults by geometry alone.",
+    "Compact intrusions, volcanic centres, and hydrothermal systems: produce strong ridges without 2-D structure.",
+    "Survey-line striping and tie-line or levelling residuals: one-dimensional by construction; must be masked.",
+    "Acquisition seams and FFT padding artefacts: linear responses at block edges."
+  ],
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "status": "NOT_RUN",
+    "evaluator_version": null,
+    "withheld_positive_count": null,
+    "value": null,
+    "ci95": null,
+    "reason": "Competition features, labels, and shared evaluator are absent; sandbox cannot reach the DrivenData data tab (login-gated). Historical records remain invalid for promotion (docs/run-card.json)."
+  },
+  "leakage_canary": {
+    "status": "NOT_RUN",
+    "reason": "No features available."
+  },
+  "registry_comparison": {
+    "status": "NOT_RUN",
+    "rank_correlation_max": null,
+    "overlap_within_3px_max": null,
+    "reason": "Registry rasters are absent from the checkout. Historical records exceed the literal 70% limit (IR-55-030)."
+  },
+  "raster": {
+    "produced": false,
+    "sha256": null,
+    "file_link_published": false
+  },
+  "validator": {
+    "status": "NOT_RUN",
+    "reason": "No raster was produced. scripts/validate_submission.py requires the authentic organizer template, which is absent.",
+    "checks_required": [
+      "no NaN inside the footprint",
+      "values in [0,1]",
+      "CRS EPSG:32611, shape, and transform match the organizer template",
+      "single float32 band"
+    ]
+  },
+  "submission": {
+    "name": null,
+    "note": null,
+    "note_characters": 0,
+    "status": "DO_NOT_DOWNLOAD_OR_SUBMIT",
+    "file_link_published": false,
+    "organizer_receipt": null
+  },
+  "official_sources_verified": [
+    "https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/",
+    "https://docs.nlr.gov/docs/fy26osti/96647.pdf",
+    "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+    "https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7",
+    "https://www.usgs.gov/programs/earthquake-hazards/faults",
+    "https://gbcge.org/current-projects/ingenious/"
+  ],
+  "tests_run_this_session": {
+    "stdlib_guardrails": "python3 -m unittest discover -s tests -> Ran 11 tests, OK (rerun after edits)",
+    "numeric": "pytest tests_numeric in clean venv (requirements.txt) -> 30 passed, 2 skipped (rerun after edits)"
+  },
+  "budget": {
+    "experiments_used_recorded": 3,
+    "new_experiments_run_this_session": 0,
+    "synthetic_metric_checks_this_session": 3,
+    "wall_clock_budget_hours": 2,
+    "weekly_slot_used": false
+  },
+  "verdict": "negative",
+  "verdict_detail": "NOT CLEARED. No file generated. The hypothesis is not validated, no holdout exists, uniqueness and format gates cannot be run, and the leaderboard attribution of 0.2778 is unverified (public rank 17, not the top score). Promotion requires authorised data, the shared evaluator, leakage canaries, and a same-evaluator holdout win."
+}

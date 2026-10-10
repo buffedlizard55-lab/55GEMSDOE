@@ -23,6 +23,13 @@ def main():
     ok = True
     for name, pin in PINS.items():
         p = Path("data") / name
+        if not p.exists() and name == "gems-geodawn-numerical-features.tif":
+            # IR-55-034: scripts/download_competition_data.sh reassembles the stack as
+            # training_features.tif (the competition's own name); io55.feature_path()
+            # accepts both.  Check whichever name is on disk against the same pin.
+            alt = Path("data") / "training_features.tif"
+            if alt.exists():
+                p = alt
         if not p.exists():
             print(f"MISSING  {p}")
             ok = False

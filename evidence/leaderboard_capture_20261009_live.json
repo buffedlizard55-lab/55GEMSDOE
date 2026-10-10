@@ -1,0 +1,41 @@
+{
+  "schema": "55gemsdoe.leaderboard-capture.v1",
+  "evidence_class": "PUBLIC-LEADERBOARD (organizer platform page captured via fetch_page on 2026-10-09; not a submission-page receipt; NOT ORGANIZER-CONFIRMED)",
+  "source_url": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+  "capture_method": "fetch_page tool, chunk 0 of 3, 2026-10-09 UTC session. Rows 1-22 transcribed from the captured table; row 23 was cut off in the capture and is not recorded.",
+  "column": "Best public DW-Tversky (public split; private and final-round scores differ per rules section 3.2)",
+  "rows": [
+    {"rank": 1,  "participant": "xiaofanhu",            "best_public_dw_tversky": 0.3774, "submissions": 14},
+    {"rank": 2,  "participant": "alexoktaba",           "best_public_dw_tversky": 0.3361, "submissions": 26},
+    {"rank": 3,  "participant": "nchuzhoy",             "best_public_dw_tversky": 0.3262, "submissions": 6},
+    {"rank": 4,  "participant": "joeyfezster",          "best_public_dw_tversky": 0.3260, "submissions": 25},
+    {"rank": 5,  "participant": "kinghorton42",         "best_public_dw_tversky": 0.3222, "submissions": 9},
+    {"rank": 6,  "participant": "Batik Shirt Brothers", "best_public_dw_tversky": 0.3221, "submissions": 24},
+    {"rank": 7,  "participant": "DARD",                 "best_public_dw_tversky": 0.3195, "submissions": 17},
+    {"rank": 8,  "participant": "giles",                "best_public_dw_tversky": 0.3025, "submissions": 5},
+    {"rank": 9,  "participant": "ohyeah",               "best_public_dw_tversky": 0.2960, "submissions": 4},
+    {"rank": 10, "participant": "JerryDataWorks",       "best_public_dw_tversky": 0.2948, "submissions": 17},
+    {"rank": 11, "participant": "mzoorob",              "best_public_dw_tversky": 0.2902, "submissions": 28},
+    {"rank": 12, "participant": "notmyfault",           "best_public_dw_tversky": 0.2901, "submissions": 18},
+    {"rank": 13, "participant": "ndavis7",              "best_public_dw_tversky": 0.2888, "submissions": 10},
+    {"rank": 14, "participant": "GrigorSargsyan",       "best_public_dw_tversky": 0.2876, "submissions": 15},
+    {"rank": 15, "participant": "HardcoreTechGod",      "best_public_dw_tversky": 0.2854, "submissions": 6},
+    {"rank": 16, "participant": "op01",                 "best_public_dw_tversky": 0.2797, "submissions": 9},
+    {"rank": 17, "participant": "extradr19",            "best_public_dw_tversky": 0.2778, "submissions": 13},
+    {"rank": 18, "participant": "arnofault",            "best_public_dw_tversky": 0.2764, "submissions": 2},
+    {"rank": 19, "participant": "faultsofthy",          "best_public_dw_tversky": 0.2764, "submissions": 3},
+    {"rank": 20, "participant": "wonderfulbig12",       "best_public_dw_tversky": 0.2761, "submissions": 4},
+    {"rank": 21, "participant": "No Fault of Our Own",  "best_public_dw_tversky": 0.2761, "submissions": 25},
+    {"rank": 22, "participant": "newway",               "best_public_dw_tversky": 0.2752, "submissions": 6}
+  ],
+  "comparison_with_repo_snapshot": {
+    "file": "evidence/leaderboard_snapshot_20261009.json",
+    "difference": "The earlier saved snapshot lists ohyeah at rank 8 and op01 at rank 15, and extradr19 at rank 16. This capture lists giles at rank 8 (0.3025), op01 at rank 16, and extradr19 at rank 17. The earlier snapshot is not reproduced by this capture; the leaderboard order changes over time. The earlier file is left unchanged."
+  },
+  "irregularities": [
+    "The owner brief states 0.3195 is the highest score. This capture shows 0.3774 at rank 1 (xiaofanhu); 0.3195 is rank 7 (DARD).",
+    "The owner brief's 0.2778 is labelled by a site name (GEMSDOE32, h33-...). This capture shows 0.2778 under participant extradr19 at rank 17. No organizer receipt links that participant to the H33 raster.",
+    "Row 23 was cut off in the fetched capture; ranks 23 and below are not recorded."
+  ],
+  "download_or_submission_implication": "None. Leaderboard values are context only and cannot be used to clear any artifact."
+}

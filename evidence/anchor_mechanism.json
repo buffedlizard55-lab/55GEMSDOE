@@ -186,5 +186,11 @@
       "lift": 0.9614125490188599,
       "spearman": 0.001448327266309924
     }
-  ]
+  ],
+  "_review_status": {
+    "state": "RETRACTED_METHOD_ERROR",
+    "reason": "RETRACTED: prior proxy-DTI and target-score calculations assumed TP_w + FP_w = N. The official metric defines TP_w and FP_w separately; that identity is not generally valid. Do not cite numeric DTI, inferred hidden-label size, or conclusions derived from those fields. Re-run only through the canonical whole-segment holdout evaluator.",
+    "retracted_utc": "2026-10-09T18:48:54Z",
+    "replacement": "docs/leaderboard-analysis.md and scripts/evaluate_holdout.py"
+  }
 }

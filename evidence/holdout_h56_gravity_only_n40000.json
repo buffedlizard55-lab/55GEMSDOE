@@ -69,7 +69,15 @@
     "fold_ci95": [
       0.014493414476210326,
       0.01665474240858214
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+    "withheld_positive_count": 60988,
+    "ci95": [
+      0.014493414476210326,
+      0.01665474240858214
+    ],
+    "ci95_method": "4,000 bootstrap resamples of the five fold DTI values, percentile 95% interval, as recorded by scripts/evaluate_holdout.py."
   },
   "tensor_full": {
     "pooled": {
@@ -132,7 +140,15 @@
     "fold_ci95": [
       0.015809191340112487,
       0.01762383112272163
-    ]
+    ],
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+    "withheld_positive_count": 60988,
+    "ci95": [
+      0.015809191340112487,
+      0.01762383112272163
+    ],
+    "ci95_method": "4,000 bootstrap resamples of the five fold DTI values, percentile 95% interval, as recorded by scripts/evaluate_holdout.py."
   },
   "leakage_canary": {
     "tensor_full_score": {
@@ -209,5 +225,17 @@
       -3.3674773983686097
     ],
     "lift_fraction_points": 0.046766303979620866
+  },
+  "review_metadata": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "src/gems55/dti55.py (exact official distance-weighted Tversky implementation)",
+    "withheld_positive_count": 60988,
+    "metric_parameters": {
+      "alpha": 0.2,
+      "beta": 0.8,
+      "kernel_radius_m": 300
+    },
+    "ci95_method": "4,000 bootstrap resamples of the five fold DTI values, percentile 95% interval, as recorded by scripts/evaluate_holdout.py.",
+    "historical_run_not_rerun_in_current_checkout": true
   }
 }

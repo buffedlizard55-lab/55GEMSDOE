@@ -1,0 +1,476 @@
+{
+  "config": {
+    "tag": "baseline",
+    "n_dots": 200,
+    "min_sep": 3.0,
+    "out": "evidence/holdout_h57_unique_n200.json",
+    "arms": "random,ridge_x_agree,tensor_full,tensor_flank",
+    "flank_support_px": 15.0,
+    "un_eroded": true,
+    "registry_dir": "registry/rasters",
+    "max_overlap": 0.68
+  },
+  "n_folds": 5,
+  "n_truth_total": 60988,
+  "random": {
+    "pooled": {
+      "dti": 0.00015080369376383455,
+      "tp_w": 7.363912683714399,
+      "fp_w": 196.21676051329098,
+      "fn_w": 60980.63608731628,
+      "n_pred_pos": 200,
+      "n_truth": 60988
+    },
+    "per_fold": [
+      {
+        "dti": 0.00012318092209785697,
+        "tp_w": 1.195262145875635,
+        "fp_w": 39.33333333333333,
+        "fn_w": 12117.804737854123,
+        "n_pred_pos": 40,
+        "n_truth": 12119,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00023381599727793055,
+        "tp_w": 2.3118349659180066,
+        "fp_w": 38.74535599249993,
+        "fn_w": 12346.688165034082,
+        "n_pred_pos": 40,
+        "n_truth": 12349,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.0002473049877267377,
+        "tp_w": 2.4284077859603785,
+        "fp_w": 39.0,
+        "fn_w": 12261.57159221404,
+        "n_pred_pos": 40,
+        "n_truth": 12264,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00014846904259959782,
+        "tp_w": 1.4284077859603783,
+        "fp_w": 39.1380711874577,
+        "fn_w": 12014.57159221404,
+        "n_pred_pos": 40,
+        "n_truth": 12016,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.0,
+        "tp_w": 0.0,
+        "fp_w": 40.0,
+        "fn_w": 12240.0,
+        "n_pred_pos": 40,
+        "n_truth": 12240,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      }
+    ],
+    "fold_mean": 0.00015055418994042462,
+    "fold_sd": 9.96411726820637e-05,
+    "fold_ci95": [
+      7.390855325871418e-05,
+      0.00022214220252178685
+    ],
+    "mass_matched": true
+  },
+  "ridge_x_agree": {
+    "pooled": {
+      "dti": 0.00027390592726233735,
+      "tp_w": 13.375184569886635,
+      "fp_w": 191.16249189228807,
+      "fn_w": 60974.624815430114,
+      "n_pred_pos": 200,
+      "n_truth": 60988
+    },
+    "per_fold": [
+      {
+        "dti": 0.000526536778505923,
+        "tp_w": 5.109268676214328,
+        "fp_w": 36.57159221403962,
+        "fn_w": 12113.890731323785,
+        "n_pred_pos": 40,
+        "n_truth": 12119,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.0003346535835832977,
+        "tp_w": 3.30891262850296,
+        "fp_w": 38.56940131083312,
+        "fn_w": 12345.691087371497,
+        "n_pred_pos": 40,
+        "n_truth": 12349,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00010184198198075863,
+        "tp_w": 1.0,
+        "fp_w": 38.666666666666664,
+        "fn_w": 12263.0,
+        "n_pred_pos": 40,
+        "n_truth": 12264,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 7.523881850621603e-05,
+        "tp_w": 0.7238576250846033,
+        "fp_w": 39.276142374915395,
+        "fn_w": 12015.276142374914,
+        "n_pred_pos": 40,
+        "n_truth": 12016,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00032990398818033925,
+        "tp_w": 3.233145640084744,
+        "fp_w": 38.07868932583327,
+        "fn_w": 12236.766854359916,
+        "n_pred_pos": 40,
+        "n_truth": 12240,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      }
+    ],
+    "fold_mean": 0.00027363503015130695,
+    "fold_sd": 0.00018689747324153374,
+    "fold_ci95": [
+      0.00013244240421654088,
+      0.0004104806904487711
+    ],
+    "mass_matched": true
+  },
+  "tensor_full": {
+    "pooled": {
+      "dti": 0.00030076700799021696,
+      "tp_w": 14.687019535804641,
+      "fp_w": 192.7311617689126,
+      "fn_w": 60973.3129804642,
+      "n_pred_pos": 200,
+      "n_truth": 60988
+    },
+    "per_fold": [
+      {
+        "dti": 0.0004338027248393992,
+        "tp_w": 4.2094563694629175,
+        "fp_w": 37.885618083164125,
+        "fn_w": 12114.790543630537,
+        "n_pred_pos": 40,
+        "n_truth": 12119,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.0002911056120489348,
+        "tp_w": 2.878313939336083,
+        "fp_w": 38.745355992499924,
+        "fn_w": 12346.121686060664,
+        "n_pred_pos": 40,
+        "n_truth": 12349,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00010766569154492589,
+        "tp_w": 1.0571909584179366,
+        "fp_w": 38.94280904158206,
+        "fn_w": 12262.942809041582,
+        "n_pred_pos": 40,
+        "n_truth": 12264,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.0001912936856934445,
+        "tp_w": 1.8404304451269748,
+        "fp_w": 39.0,
+        "fn_w": 12014.159569554873,
+        "n_pred_pos": 40,
+        "n_truth": 12016,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00047972995033202713,
+        "tp_w": 4.701627823460729,
+        "fp_w": 38.15737865166652,
+        "fn_w": 12235.29837217654,
+        "n_pred_pos": 40,
+        "n_truth": 12240,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      }
+    ],
+    "fold_mean": 0.0003007195328917463,
+    "fold_sd": 0.00015739448425764534,
+    "fold_ci95": [
+      0.00017780487330513512,
+      0.00042363419247835746
+    ],
+    "mass_matched": true
+  },
+  "tensor_flank": {
+    "pooled": {
+      "dti": 0.00012283569338819808,
+      "tp_w": 5.998123067514101,
+      "fp_w": 194.28783172457557,
+      "fn_w": 60982.00187693249,
+      "n_pred_pos": 200,
+      "n_truth": 60988
+    },
+    "per_fold": [
+      {
+        "dti": 0.00011086723847990526,
+        "tp_w": 1.0757669884182168,
+        "fp_w": 38.924233011581784,
+        "fn_w": 12117.924233011581,
+        "n_pred_pos": 40,
+        "n_truth": 12119,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00012037255526435486,
+        "tp_w": 1.1901489052540901,
+        "fp_w": 38.86704205316384,
+        "fn_w": 12347.809851094746,
+        "n_pred_pos": 40,
+        "n_truth": 12349,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00014350459525740896,
+        "tp_w": 1.4091003217515503,
+        "fp_w": 38.59089967824845,
+        "fn_w": 12262.59089967825,
+        "n_pred_pos": 40,
+        "n_truth": 12264,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.00012370552088383183,
+        "tp_w": 1.1901489052540901,
+        "fp_w": 38.92423301158178,
+        "fn_w": 12014.809851094746,
+        "n_pred_pos": 40,
+        "n_truth": 12016,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 0.0001156076838929037,
+        "tp_w": 1.1329579468361535,
+        "fp_w": 38.98142396999972,
+        "fn_w": 12238.867042053163,
+        "n_pred_pos": 40,
+        "n_truth": 12240,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      }
+    ],
+    "fold_mean": 0.00012281151875568092,
+    "fold_sd": 1.2545041509098094e-05,
+    "fold_ci95": [
+      0.00011438298404329026,
+      0.00013396539810979247
+    ],
+    "mass_matched": true
+  },
+  "flank_only": {
+    "pooled": {
+      "dti": 6.087722733857213e-05,
+      "tp_w": 2.9726569577545807,
+      "fp_w": 196.82988999316328,
+      "fn_w": 60985.02734304224,
+      "n_pred_pos": 200,
+      "n_truth": 60988
+    },
+    "per_fold": [
+      {
+        "dti": 5.838063457602405e-05,
+        "tp_w": 0.5664789734180767,
+        "fp_w": 39.43352102658192,
+        "fn_w": 12118.433521026582,
+        "n_pred_pos": 40,
+        "n_truth": 12119,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 7.726474861439134e-05,
+        "tp_w": 0.7639320225002103,
+        "fp_w": 39.236067977499786,
+        "fn_w": 12348.2360679775,
+        "n_pred_pos": 40,
+        "n_truth": 12349,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 2.5933274350259698e-05,
+        "tp_w": 0.2546440075000701,
+        "fp_w": 39.74535599249993,
+        "fn_w": 12263.7453559925,
+        "n_pred_pos": 40,
+        "n_truth": 12264,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 5.2936139926008235e-05,
+        "tp_w": 0.5092880150001402,
+        "fp_w": 39.49071198499986,
+        "fn_w": 12015.490711985,
+        "n_pred_pos": 40,
+        "n_truth": 12016,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      },
+      {
+        "dti": 8.96242325154775e-05,
+        "tp_w": 0.8783139393360834,
+        "fp_w": 38.92423301158178,
+        "fn_w": 12239.121686060664,
+        "n_pred_pos": 40,
+        "n_truth": 12240,
+        "requested_dots": 40,
+        "n_dots": 40,
+        "mass_shortfall": 0
+      }
+    ],
+    "fold_mean": 6.0827805996432165e-05,
+    "fold_sd": 2.441978011278221e-05,
+    "fold_ci95": [
+      4.1600142318235736e-05,
+      7.843171936715236e-05
+    ],
+    "mass_matched": true
+  },
+  "all_arms_mass_matched": true,
+  "leakage_canary": {
+    "tensor_full_score": {
+      "auc_per_fold": [
+        0.4225535910553676,
+        0.4266588918131023,
+        0.4180743915117417,
+        0.42238376518808257,
+        0.41774672283496733
+      ],
+      "auc_mean": 0.4214834724806523
+    },
+    "ridge": {
+      "auc_per_fold": [
+        0.5483836783150425,
+        0.5509318959025022,
+        0.545596303204501,
+        0.5458573460386151,
+        0.5488283159722223
+      ],
+      "auc_mean": 0.5479195078865766
+    },
+    "one_minus_dim": {
+      "auc_per_fold": [
+        0.509174339879528,
+        0.507871657219208,
+        0.5009144210697978,
+        0.5081472603195739,
+        0.498009414624183
+      ],
+      "auc_mean": 0.5048234186224582
+    },
+    "strike_agree": {
+      "auc_per_fold": [
+        0.5195111822345078,
+        0.5219367191675439,
+        0.5222525230348989,
+        0.5156782046854195,
+        0.5178812285539216
+      ],
+      "auc_mean": 0.5194519715352583
+    },
+    "plunge": {
+      "auc_per_fold": [
+        0.4937989662925984,
+        0.5017582454044862,
+        0.49559588021852574,
+        0.49956888128328897,
+        0.4984476429738562
+      ],
+      "auc_mean": 0.4978339232345511
+    },
+    "dim_inv_raw": {
+      "auc_per_fold": [
+        0.4892812994058916,
+        0.4916462857316382,
+        0.4987269043542074,
+        0.49223089443242346,
+        0.501774452001634
+      ],
+      "auc_mean": 0.494731967185159
+    },
+    "flank_weight_visible_only": {
+      "auc_per_fold": [
+        0.8950530274775147,
+        0.8949837630577374,
+        0.8908775238502935,
+        0.8935835523468708,
+        0.8919944121732026
+      ],
+      "auc_mean": 0.8932984557811239,
+      "note": "supervised prior from VISIBLE faults only, recomputed per fold; a high AUC is catalogue spatial autocorrelation, not hidden-truth leakage"
+    }
+  },
+  "leakage_flagged_gt_0p90": [],
+  "strike_test": {
+    "n_withheld_segments": 13,
+    "n_random_ridge": 100000,
+    "mean_abs_dtheta_withheld_deg": 38.75343957892704,
+    "mean_abs_dtheta_random_deg": 44.993615623684136,
+    "frac_within_20deg_withheld": 0.2673992673992674,
+    "frac_within_20deg_random": 0.22198,
+    "mean_diff_ci95": [
+      -9.146759681270435,
+      -3.250338610979976
+    ],
+    "lift_fraction_points": 0.04541926739926738,
+    "n_withheld_pixel_samples": 273,
+    "n_random_ridge_samples": 100000,
+    "count_note": "Corrected IR-55-041: the old evaluator field n_withheld_segments held 273 pixel samples, not segment count. Five folds contain 13 PCA-fit connected components with min_px=25."
+  }
+}

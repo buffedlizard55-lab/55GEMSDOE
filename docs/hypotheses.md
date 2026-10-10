@@ -104,3 +104,83 @@ Evaluator `src/gems55/dti55.py` (exact official DTI). Protocols: Q4 quadrant hid
 - Secondary B = 15 px: tensor beats random at 40k (+0.0015, p = 0.008) and 160k (+0.0026, p = 0.004), not at 80k (p = 0.20). The sign depends on the protocol (IR-55-031). The primary governs under the rule.
 - Audit file: `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 ffd2a892…). Validator 12/12. Uniqueness BLOCKED under the literal 70% rule (IR-55-030). **DO NOT SUBMIT.** Download for audit only.
 - Budget: 3 of 3 experiments used.
+
+## H57 preregistration and results (2026-10-09) — tensor-dimensionality lane
+
+**Context and evidence boundary.** The user asked for a new unique competition TIF,
+for an analysis of the claimed 0.2778 H33 score, and for a same-evaluator holdout
+before any weekly slot. The local anchor audit shows that the H33 sibling manifest
+has `receipt: null` and marks its `0.2747` value “projected / UNSCORED”; therefore
+0.2778 is not treated here as an organizer-confirmed score. The measured local
+anchor forensics show a contrast between the H33 raster and a sibling raster
+labelled as a 0.2600 anchor, but both leaderboard values remain unreceipted claims.
+See [`anchor-0.2778.html`](anchor-0.2778.html) and `evidence/anchor_*.json`.
+
+### Ranked candidates before validation
+
+| Rank | Candidate; layers | Physical signature targeted | Why it could catch an omitted fault | Difference from the repo at preregistration | Expected opportunity / implementation cost | Result |
+|---|---|---|---|---|---|---|
+| 1 | **H57-A: tensor-gated off-catalogue flanks.** Bands 2 (RTP magnetics), 13 (isostatic gravity), plus visible `labels.tif` only for placement. | Existing near-2-D, strike-concordant gradient-tensor score multiplied by a quadratic off-catalogue flank prior with 15-pixel support. | DrivenData describes test faults as expert-identified faults absent from the existing public USGS database. A mapped trace is therefore a spatial prior for an unmapped nearby continuation, while tensor geometry is the geological gate. | Earlier writer used only the tensor score over the footprint; it had no visible-catalogue flank factor. | Highest prior opportunity; low/moderate code cost; no new data. Prior was explicitly a hypothesis, not an assumption about hidden labels. | **NEGATIVE.** See matched-mass result below. |
+| 2 | **H57-D: along-ridge axial strike persistence.** Bands 2 + 13. | Measure axial strike coherence and near-2-D persistence along connected ridge segments over 0.5–2 km, not just pixelwise angle agreement. | Faults tend to form connected traces with stable orientation; compact bodies and isolated derivative noise should have short, incoherent ridge fragments. | Current tensor lane computes pixelwise strike agreement and a pointwise score; it does not score segment-length/orientation persistence. | Moderate expected opportunity; medium cost; all layers already available. Not tested under this session's experiment cap. |
+| 3 | **H57-B: cross-field tensor strike consensus.** Bands 2 + 13. | Axial circular resultant of magnetic/gravity tensor strikes with resultant-length confidence, replacing the arithmetic mean of two per-field angle differences. | A structural strike can be consistent across modalities even when amplitude is weak in one; modality-specific compact responses may disagree. | No explicit circular-consensus confidence channel in the current lane. | Moderate/low expected opportunity; medium cost; no external data. Not tested. |
+| 4 | **H57-C: eigenvalue-shape stability.** Bands 2 + 13. | Require the ordered eigenvalue pattern, intermediate eigenvector and plunge to remain stable under a declared tensor sign convention. | A long 2-D trace should preserve line-of-poles geometry; compact bodies and near-degenerate tensors should be less stable. | Current code gates on a scalar dimensionality invariant and plunge, but not a local eigenvalue-shape stability statistic. | Low/moderate expected opportunity; medium cost; no external data. Not tested. |
+| 5 | **H57-E: true acquisition-block FFT.** Bands 2 + 13 plus the official GeoDAWN flight-path/block data. | Compute and edge-pad FFT tensors separately for the actual acquisition blocks, with block-local leveling and striping masks. | A real fault may continue across a seam; block/leveling edges and survey artifacts need not. | Current 55GEMSDOE implementation computes the competition-grid tensor, not separate block tensors. | Potentially high scientific value; high cost. The official ScienceBase release publicly lists `area1_flight_path.zip` (32.11 MB) and `area2_flight_path.zip` (291.55 MB), among other files, with CC0 rights. The catalog page was readable, but this sandbox's outbound host allowlist prevented fetching the binary payloads; therefore this candidate is **source-verified but not data-validated/runnable here**. |
+
+The out-of-lane proposals (lidar scarps, depth-to-basement steps, strain corridors,
+tilt zero-contours and seismicity lineaments) remain proposals only; this repository's
+assigned lane remains potential-field tensor dimensionality.
+
+### H57-A validation protocol and corrections
+
+The initial exploratory H57 run is **invalid for promotion** and is archived as
+`evidence/holdout_h57_exploratory_invalid_excluded-lattice_unmatched-mass.json`.
+It excluded the spacing-5 lattice and some arms returned fewer dots than requested,
+so its DTI values are not compared or used as evidence. This defect was found and
+logged before finalizing a TIF. The shared emitter/evaluator were fixed to enforce
+minimum spacing, use every registry raster, apply the same Euclidean 3-pixel
+coverage definition as the checker, and report mass shortfalls. The registry loader
+also reprojects prior rasters to the official grid; this matters because one prior
+file has the competition shape/CRS but a wrong origin.
+
+The valid third experiment uses the canonical cached one-scale stack and shared
+`evaluate_holdout.py` / `submission_writer.py` rule:
+
+1. Five seeded whole-segment/lattice folds, 3 px buffer, per-fold visible faults
+   derived only from visible catalogue pixels and masked pixel-exactly.
+2. 200 dots total (40 per fold), min separation 3 px. The holdout/writer used the
+   same `un-eroded` tensor-factor sensitivity surface, 15-px flank prior, hard
+   striping mask, and 56 registry budgets present at run time (0.68 cap). `random`,
+   `ridge_x_agree`, `tensor_full`, `tensor_flank`, and `flank_only` all returned
+   exactly the requested mass. A later audit expanded the registry to 62 and added
+   four local historical controls; the holdout was not rerun. Registry budget is a
+   literal uniqueness constraint, not a geological feature.
+3. DTI is pooled per the published formula (alpha 0.2, beta 0.8, 300 m kernel).
+   **HOLDOUT-DTI:** candidate `tensor_flank` = 0.00012284, 95% CI
+   [0.00011438, 0.00013397], 60,988 withheld positives. Matched random =
+   0.00015080; `tensor_full` = 0.00030077; `ridge_x_agree` = 0.00027391. Candidate
+   is lower than random and both tensor comparators. The preregistered verdict is
+   **NEGATIVE**; do not promote and do not spend a weekly slot.
+4. Leakage canary maximum single-feature AUC is 0.89330 (visible-catalogue flank
+   prior), below but close to 0.90. This is a diagnostic, not a score. The prior is
+   explicitly recognized as catalogue spatial autocorrelation, not hidden-label
+   leakage.
+5. Continuous-surface uniqueness passes before placement across all 66 comparisons
+   (62 registry + four local historical rasters), max absolute Spearman 0.2443.
+   The final-dot scan also covers 66/66, but returns **DUPLICATE-STOP**: max
+   one-sided overlap within 3 px is **0.76**, above the literal 0.70 limit. Two
+   PARALLEL16 NaN/zeros variants each trigger the stop and both rows count. The
+   random-control value 0.765 is diagnostic only and does not waive the rule. One
+   shared-registry raster was nearest-neighbor reprojected to the official template.
+6. The NaN-outside primary passes 11/11 strict local format checks. The all-finite
+   zeros diagnostic passes 10/11 and fails the exact null/NaN outside-footprint
+   check. Format validation does **not** clear the candidate: both strict uniqueness
+   and the scientific holdout are negative.
+
+The machine-readable result, SHA, note, format output, expanded registry scan and
+verdict are in `docs/run-card.json`; `docs/status.json` and the site banner say
+**download for audit: YES; submit: NO**. Primary NaN-outside TIF SHA-256:
+`57dd4ba81c6fe553166cb193f4ae40e6547f4abe5a8fdabeb9154f648d761326`.
+
+**Experiment budget:** 3/3 used (invalid exploratory H57, full-registry capacity
+diagnostic, valid matched-mass H57 holdout). No additional experiment, holdout
+rerun, or weekly slot is authorized by this session.

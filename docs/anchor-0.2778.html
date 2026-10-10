@@ -26,7 +26,7 @@ though it had been scored. Logged as <b>IR-55-12</b>.</p></div>
 against a brute-force transcription of the official formula and against the
 official worked example (3.00 / (3.00 + 0.2·1.89 + 0.8·2.00) = 0.60).</p>
 <table>
-<tr><th>measurement</th><th>h33-2-b2<br>(“0.2778”)</th><th>d28 / 0.2600<br>live anchor</th><th>ours<br>h55</th><th>uniform random<br>same size</th></tr>
+<tr><th>measurement</th><th>h33-2-b2<br>(“0.2778” claim)</th><th>d28 / “0.2600”<br>user/sibling claim</th><th>ours<br>h55</th><th>uniform random<br>same size</th></tr>
 <tr><td>dots</td><td>37,654</td><td>44,090</td><td>40,000</td><td>37,654 / 44,090</td></tr>
 <tr><td>catalogue-proxy DTI</td><td><b>0.0049</b></td><td><b>0.0686</b></td><td>0.0269</td><td>0.0267 / 0.0306</td></tr>
 <tr><td>kernel credit harvested per dot</td><td>0.0074</td><td>0.0897</td><td>0.0382</td><td>0.0399 / 0.0400</td></tr>
@@ -38,16 +38,16 @@ official worked example (3.00 / (3.00 + 0.2·1.89 + 0.8·2.00) = 0.60).</p>
 </table>
 
 <div class="callout"><h2>The finding that matters</h2>
-<p>The 0.2778-projection raster is <b>0.18× random</b> — it
+<p>The raster labelled as the 0.2778 candidate is <b>0.18× random</b> on this mapped-catalogue proxy — it
 harvests <i>less</i> kernel credit than throwing 37,654 dots at the
-footprint uniformly. The raster actually associated with a live <b>0.2600</b> is
-<b>2.24× random</b>. Between them is a factor of
-<b>13.9×</b>, and the two embody opposite
-philosophies.</p>
+footprint uniformly. The separate raster labelled by its sibling repo as a
+<b>0.2600</b> result is <b>2.24× random</b> on the
+same proxy. Neither label is an organizer receipt. The measured proxy differs by a
+factor of <b>13.9×</b>; that is not a comparison of official scores.</p>
 <p>h33 enforces “0 within 200 m of the catalogue” — measured here as a minimum
 distance of 2.236 px = 224 m (√5 px, a
 diagonal neighbour, so the 200 m rule genuinely holds) and a median of
-1.96 km. The 0.2600 anchor does the reverse: its dots sit
+1.96 km. The d28 raster labelled “0.2600” does the reverse: its dots sit
 <i>immediately adjacent</i> to mapped traces (min 1 px = 100 m,
 median 1.50 km) while never landing on them
 (0 dots on mapped pixels).</p></div>
@@ -84,10 +84,8 @@ model-free floor on how much truth must exist for any score to be attainable:</p
 <p>A footprint-uniform scatter delivers <b>0.0400 credit per dot</b>
 against the mapped catalogue at N = 44,090. Reading the table against that number:</p>
 <ul>
-<li><b>0.2600</b> needs 0.0171/dot — <i>less</i> than uniform
-random. This is the coverage plateau; it is essentially free.</li>
-<li><b>0.2778</b> needs 0.0198/dot — still below random. Also free, <i>if</i> the hidden
-set is anywhere near as findable as the mapped one.</li>
+<li>A hypothetical DTI of <b>0.2600</b> needs 0.0171/dot at N=44,090 — <i>less</i> than the mapped-catalogue uniform-random proxy. This is conditional algebra, not an organizer result.</li>
+<li>A hypothetical DTI of <b>0.2778</b> needs 0.0198/dot — still below that proxy, <i>if</i> the hidden set is anywhere near as findable as the mapped one. That assumption is unverified.</li>
 <li><b>0.3195</b> needs 0.0274/dot and <b>0.3774</b> needs
 0.0408/dot — the latter is essentially
 catalogue-level targeting. Those are not coverage results; they require the
@@ -105,23 +103,14 @@ measurement.</b> The model-free statement is only the floor: |G| ≥
 
 <h2>What we should do with this</h2>
 <ol>
-<li><b>Do not chase 0.2778.</b> It is a projection, and by the algebra it is
-below the coverage plateau anyway.</li>
-<li><b>The real target is 0.2600</b>, and it is a <i>placement</i> result, not a
-detection result. The measured mechanism is: dots immediately adjacent to mapped
-traces, never on them.</li>
+<li><b>Do not treat 0.2778 as established.</b> GEMSDOE32's manifest says `receipt: null` and “projected 0.2747; UNSCORED.” The local proxy algebra does not authenticate a leaderboard score.</li>
+<li><b>Do not treat 0.2600 as an established target either.</b> It is a user/sibling claim without a receipt. The measured local pattern is that the d28-labelled raster places dots adjacent to mapped traces, never on them; that is a hypothesis to test, not proof of an official result.</li>
 <li><b>Our raster sits at random.</b> 0.0269 proxy DTI at
 40,000 dots versus 0.0286 for uniform random — and
 2.6× below the 0.2600 anchor. That is an
 independent confirmation of this lane's NEGATIVE verdict from a completely
 different direction than the holdout.</li>
-<li><b>Highest-leverage next experiment, still in-lane:</b> keep the tensor
-strike estimator — it is the one part of this lane that tested positive — but use
-it to decide <i>which way to extend</i> from mapped traces, and place dots
-immediately adjacent to catalogue pixels instead of ≥200 m away. Concretely: for
-each mapped-fault pixel, emit along the tensor strike at 1–3 px offset, off the
-trace. This combines the measured winner (adjacency) with this lane's one
-confirmed asset (strike), and it is falsifiable on the same holdout.</li>
+<li><b>In-lane next hypothesis (not run):</b> test along-ridge axial strike persistence or a strike-oriented 1–3 px flank placement against the same whole-segment holdout. The prior H55 auxiliary strike diagnostic was not a promotion result; H57-A tested a catalogue-flank prior and was negative at matched mass. No next method is assumed to win.</li>
 </ol>
 
 <h2>Evidence classes</h2>

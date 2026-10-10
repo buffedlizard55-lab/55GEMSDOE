@@ -1,0 +1,23 @@
+{
+ "evidence_class": "HOLDOUT-PREDICTION-TEST",
+ "test": "withheld fault segments agree in strike with the tensor field more often than random detected ridges do",
+ "tol_deg": 20.0,
+ "min_px": 12,
+ "group_A_withheld_fault_components": {
+  "n": 1661,
+  "median_delta_deg": 43.419246673583984,
+  "mean_delta_deg": 43.79699378929615,
+  "fraction_within_tol": 0.25285972305839854
+ },
+ "group_B_random_ridge_components": {
+  "n": 262,
+  "ridge_pct": 0.5,
+  "clean_px": 6,
+  "median_delta_deg": 19.374991416931152,
+  "mean_delta_deg": 29.23817821586405,
+  "fraction_within_tol": 0.5038167938931297
+ },
+ "difference_A_minus_B": -0.2509570708347312,
+ "two_proportion_z": -8.345190872686697,
+ "verdict": "NOT_SUPPORTED"
+}

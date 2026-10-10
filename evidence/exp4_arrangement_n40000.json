@@ -9,7 +9,12 @@
       "fn_w": 56693.33827258995,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.10737
+      "wbar": 0.10737,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "ridge_sep3": {
       "dti": 0.041582702683625475,
@@ -18,7 +23,12 @@
       "fn_w": 58624.13529627143,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.0591
+      "wbar": 0.0591,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "ridge_sep6": {
       "dti": 0.033730680749622106,
@@ -27,7 +37,12 @@
       "fn_w": 59073.830633623016,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.04785
+      "wbar": 0.04785,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "ridge_sep10": {
       "dti": 0.025786669030011884,
@@ -36,7 +51,12 @@
       "fn_w": 59527.097880558795,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.03652
+      "wbar": 0.03652,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "ridge_sep16": {
       "dti": 0.02147010503133345,
@@ -45,7 +65,12 @@
       "fn_w": 59772.73818027557,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.03038
+      "wbar": 0.03038,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "ridge_sep24": {
       "dti": 0.01951016504281455,
@@ -54,7 +79,12 @@
       "fn_w": 59884.16076047679,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.0276
+      "wbar": 0.0276,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_sep3": {
       "dti": 0.06670118698244415,
@@ -63,7 +93,12 @@
       "fn_w": 57170.8586801753,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.09543
+      "wbar": 0.09543,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_sep6": {
       "dti": 0.05197985591965976,
@@ -72,7 +107,12 @@
       "fn_w": 58023.059537034045,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.07412
+      "wbar": 0.07412,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_sep10": {
       "dti": 0.037701728389794,
@@ -81,7 +121,12 @@
       "fn_w": 58845.62042872925,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.05356
+      "wbar": 0.05356,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_sep16": {
       "dti": 0.029703506713928456,
@@ -90,7 +135,12 @@
       "fn_w": 59303.00112256154,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.04212
+      "wbar": 0.04212,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_sep24": {
       "dti": 0.026984484851635734,
@@ -99,7 +149,12 @@
       "fn_w": 59458.16927263264,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.03825
+      "wbar": 0.03825,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_2d_sep3": {
       "dti": 0.0684608369596929,
@@ -108,7 +163,12 @@
       "fn_w": 57072.409495257874,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.09789
+      "wbar": 0.09789,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_2d_sep6": {
       "dti": 0.04928238909682987,
@@ -117,7 +177,12 @@
       "fn_w": 58181.18187501808,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.07017
+      "wbar": 0.07017,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_2d_sep10": {
       "dti": 0.03552699665194066,
@@ -126,7 +191,12 @@
       "fn_w": 58971.72314867778,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.05041
+      "wbar": 0.05041,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_2d_sep16": {
       "dti": 0.030053779095593487,
@@ -135,7 +205,12 @@
       "fn_w": 59284.67593519085,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.04258
+      "wbar": 0.04258,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     },
     "tensor_2d_sep24": {
       "dti": 0.02763781286964823,
@@ -144,7 +219,21 @@
       "fn_w": 59422.4164089102,
       "n_pred_pos": 40000,
       "n_truth": 60988,
-      "wbar": 0.03914
+      "wbar": 0.03914,
+      "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+      "evaluator_version": "scripts/exp4_arrangement.py calls src/gems55/dti55.py",
+      "withheld_positive_count": 60988,
+      "ci95": null,
+      "ci95_method": "UNAVAILABLE: per-fold DTI values were not retained; this pooled exploratory output is not eligible as a HOLDOUT-DTI promotion score."
     }
+  },
+  "review_metadata": {
+    "review_status": "HISTORICAL_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+    "evidence_class": "ARCHIVED_EXPLORATORY_DTI_NO_CI_NOT_FOR_PROMOTION",
+    "evaluator_version": "src/gems55/dti55.py",
+    "withheld_positive_count": 60988,
+    "protocol": "Exploratory arrangement sweep; script emitted per-fold predictions but retained only pooled DTI, not per-fold DTI values.",
+    "ci95": "NOT_AVAILABLE; no CI can be recovered from the stored aggregate alone.",
+    "no_experiment_rerun": true
   }
 }

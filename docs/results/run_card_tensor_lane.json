@@ -74,5 +74,9 @@
   "submission_note": "No upload. Tensor lane negative on holdout (0.0444 vs ridge 0.0578). No cleared candidate.",
   "verdict": "negative",
   "organiser_confirmed_scores": [],
-  "budget": "3 experiments (E1,E2,E3) within the 2-hour budget; no submission slot used"
+  "budget": "3 experiments (E1,E2,E3) within the 2-hour budget; no submission slot used",
+  "review_status": "SUPERSEDED_HISTORICAL_NOT_PROMOTION_EVIDENCE",
+  "promotion_use": "PROHIBITED",
+  "review_note": "Superseded historical run card. HOLDOUT-DTI values are from private local gems.metric v1; registry/validator claims are from a legacy local workflow and are not current clearance.",
+  "evaluator_provenance": "gems.metric v1 was a private local re-implementation, not the organizer or authorized shared evaluator."
 }

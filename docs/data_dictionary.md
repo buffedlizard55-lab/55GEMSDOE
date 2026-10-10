@@ -1,6 +1,6 @@
-# Feature band dictionary
+# Historical feature band dictionary
 
-Generated from `data/training_features.tif` band tags by `scripts/build_docs.py`.
+This table preserves previously recorded feature descriptions. The authorized feature raster is absent from this checkout, so the tags were not freshly read or authenticated in this review. The canonical local filename defined by `src/gems55/io55.py` is `data/gems-geodawn-numerical-features.tif`; the former `data/training_features.tif` reference was incorrect and the generator is retired. Verify against the authorized DrivenData file before relying on these descriptions.
 
 | band | description (from tag) | category | short name |
 |---|---|---|---|
