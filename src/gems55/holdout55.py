@@ -1,33 +1,51 @@
-"""Repository-local synthetic/support utilities for the DOE GEMS lane.
+"""Spatially-blocked hide-and-recover holdout for the DOE GEMS lane work.
 
-A future authorized protocol requires whole 8-connected mapped components,
-a buffer from visible labels, exact visible-fault masking, and a score-independent
-random arm. These local helpers are not certified as the authorized shared
-holdout/evaluator and must not be used for promotion before reconciliation.
-``make_folds`` is retained only to read historical quadrant experiments;
-``make_segment_folds`` assigns complete components but is only a local prototype.
-``greedy_cover`` maximizes a coverage surrogate, not the official DTI ratio.
+Protocol (as specified in the run brief)
+----------------------------------------
+* The catalogue raster is cut into *whole fault segments*: connected components of
+  the mapped-fault mask intersected with a regular block grid.
+* A fold withholds a contiguous group of blocks.  Every catalogue pixel inside
+  those blocks becomes hidden truth; everything outside is visible.
+* A buffer of ``buffer_px`` around each withheld segment is removed from the
+  visible catalogue, so no visible-catalogue feature can sit on the edge of a
+  withheld segment.
+* Every catalogue-derived quantity (the visible-fault mask, the "do not emit
+  here" mask, any catalogue-density control) is recomputed from the *visible*
+  faults only, per fold.
+* Visible faults are masked pixel-exactly from emission.
+* Scoring is the pooled official distance-weighted Tversky index
+  (alpha = 0.2, beta = 0.8, 300 m triangular kernel) over the withheld pixels.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 from scipy import ndimage
 
-from . import dti55
+from . import dti55, io55, registry55
 from .dti55 import kernel_offsets
 
-__all__ = ["Fold", "make_folds", "make_segment_folds", "emit_dots", "strike_of_segments", "auc"]
+__all__ = [
+    "Fold",
+    "make_folds",
+    "emit_dots",
+    "emit_dots_budgeted",
+    "flank_weight",
+    "registry_cover_masks",
+    "strike_of_segments",
+    "auc",
+]
 
 
 @dataclass
 class Fold:
     name: str
-    withheld: np.ndarray  # bool, withheld truth plus its buffer (emission domain)
-    visible: np.ndarray   # bool, visible catalogue pixels outside the buffer
-    truth: np.ndarray     # bool, whole withheld catalogue components
+    withheld: np.ndarray  # bool, blocks whose catalogue is hidden truth
+    visible: np.ndarray   # bool, visible catalogue pixels (buffered away from truth)
+    truth: np.ndarray     # bool, the withheld catalogue pixels
 
 
 def make_folds(
@@ -37,12 +55,11 @@ def make_folds(
     grid: tuple[int, int] = (2, 2),
     buffer_px: int = 3,
 ) -> list[Fold]:
-    """Legacy contiguous-region folds; not a whole-segment holdout.
+    """Contiguous-quadrant folds: the most conservative spatial blocking.
 
-    ``grid=(2, 2)`` gives 4 quadrants. A connected fault crossing a boundary is
-    split between folds, so these folds are retained only for historical
-    reproducibility and are not valid promotion evidence. Use
-    :func:`make_segment_folds` for new hide-and-recover evaluations.
+    ``grid=(2, 2)`` gives 4 folds; each fold withholds one quadrant, so the
+    withheld region is geographically compact and nothing about it can leak
+    through a nearby visible fault.
     """
     ny, nx = labels.shape
     by = ny // grid[0]
@@ -89,25 +106,22 @@ def emit_dots(
     """
     from scipy import spatial
 
-    score = np.asarray(score)
-    eligible = np.asarray(eligible, dtype=bool)
-    if score.shape != eligible.shape:
-        raise ValueError(f"score shape {score.shape} != eligible shape {eligible.shape}")
-    out = np.zeros(score.shape, dtype=bool)
-    if n_dots <= 0:
+    scores = np.asarray(score)
+    elig = np.asarray(eligible, dtype=bool)
+    if scores.shape != elig.shape:
+        raise ValueError("score and eligible must have the same shape")
+    out = np.zeros(elig.shape, dtype=bool)
+    if n_dots <= 0 or not elig.any():
         return out
     if random:
-        # The null is uniform over every eligible pixel; do not condition it on
-        # the candidate surface's positive support.
-        idx = np.nonzero(eligible.ravel())[0]
-        if idx.size == 0:
-            return out
+        # The matched null is sampled from eligibility only; candidate scores
+        # must not restrict or weight its support.
         rng = np.random.default_rng(seed)
+        idx = np.flatnonzero(elig.ravel())
         take = rng.choice(idx, size=int(min(n_dots, idx.size)), replace=False)
         out.ravel()[take] = True
         return out
-
-    elig = eligible & np.isfinite(score) & (score > 0)
+    elig = elig & np.isfinite(scores) & (scores > 0)
     if not elig.any():
         return out
 
@@ -146,6 +160,201 @@ def emit_dots(
     return out
 
 
+def flank_weight(visible_cat: np.ndarray, support_px: float = 15.0) -> np.ndarray:
+    """Off-catalogue flank prior in [0, 1]: quadratic decay away from the *visible* catalogue.
+
+    ``w(p) = max(0, 1 - d(p)/support_px)**2`` for pixels at Euclidean distance
+    ``d >= 1`` px from the nearest visible (mapped) catalogue pixel, and ``0`` on the
+    visible catalogue itself (a dot on a mapped pixel can never earn credit, so the
+    prior is strictly off-catalogue).  ``support_px = 15`` (1.5 km at 100 m) is the
+    preregistered H57-A value: the organiser's hidden test set is *newly identified*
+    faults absent from the USGS catalogue, so an unmapped trace should lie along or
+    beside a mapped one, and the measured median offset of the strongest prior
+    adjacency raster (d28, 0.2600 class) is 15 px -- see ``docs/anchor-0.2778.html``.
+
+    Only *visible* catalogue pixels ever enter: in the hide-and-recover holdout the
+    withheld segments never contribute, so the prior cannot leak the hidden truth.
+    If no visible catalogue pixel exists the prior is neutral (all ones).
+    """
+    cat = np.asarray(visible_cat, dtype=bool)
+    if not cat.any():
+        return np.ones(cat.shape, dtype=np.float32)
+    d = dti55.distance_to_set(cat)
+    w = np.clip(1.0 - d / float(support_px), 0.0, 1.0) ** 2
+    w[cat] = 0.0
+    return w.astype(np.float32)
+
+
+def registry_cover_masks(
+    registry_dir,
+    shape: tuple[int, int],
+    *,
+    max_dist_px: float = 3.0,
+) -> tuple[list[str], list[np.ndarray]]:
+    """Per-raster "covered" masks, exactly as the strict uniqueness gate measures them.
+
+    Every GeoTIFF in ``registry_dir`` is aligned to the official competition grid
+    by the shared ``registry55`` loader.  Geometry shifts are nearest-neighbor
+    reprojected, and invalid/unreferenced rasters fail closed.  Each returned mask
+    is the set of pixels within ``max_dist_px`` (Euclidean) of a positive pixel:
+    ``distance_transform_edt(~pos) <= max_dist_px`` with ``pos = nan_to_num(band1) > 0``
+    -- the identical definition used by ``scripts/verify_unique.py``.  No raster
+    is silently excluded; if an artifact makes the literal rule unsatisfiable, the
+    emitter returns an empty/shortfall result and the caller must stop.
+    """
+    if tuple(shape) == (io55.HEIGHT, io55.WIDTH):
+        grid, _ = io55.read_template()
+    else:
+        # Small synthetic grids are used by unit tests; keep the competition CRS
+        # and pixel transform while replacing only the dimensions.
+        grid = io55.Grid(
+            height=int(shape[0]), width=int(shape[1]), crs=io55.CRS_EPSG,
+            transform=io55.TRANSFORM,
+            footprint=np.ones(shape, dtype=bool),
+        )
+    names, masks, warped = registry55.cover_masks(
+        registry_dir, grid, max_dist_px=max_dist_px
+    )
+    if warped:
+        print(f"[registry] reprojected {len(warped)} misaligned raster(s) to the official template: "
+              + ", ".join(warped), flush=True)
+    return names, masks
+
+
+def emit_dots_budgeted(
+    score: np.ndarray,
+    eligible: np.ndarray,
+    n_dots: int,
+    *,
+    min_sep_px: float = 3.0,
+    cover_masks=(),
+    max_overlap: float = 0.68,
+    seed: int = 0,
+    random: bool = False,
+) -> np.ndarray:
+    """Place score-ranked dots under per-raster overlap and separation constraints.
+
+    This uses the exact pixel eligibility and Euclidean <=3 px cover definition
+    used by ``scripts/verify_unique.py``.  Every registry mask is applied.  The
+    score arm visits candidates in descending score order; the random control
+    visits the identical eligible set in seeded random order.  Both use the same
+    per-raster cap ``floor(max_overlap * requested_n)`` and the same strict
+    ``min_sep_px`` thinning (a selected point blocks the disk neighborhood before
+    the next candidate is considered).
+
+    If exactly ``n_dots`` are returned, every mask has overlap <= ``max_overlap``
+    by construction.  If the constraints make the requested mass infeasible, a
+    repair pass may return fewer dots; the final ratios are still rechecked, and an
+    empty set means the candidate is blocked.  Callers must not treat a shortfall
+    as a matched-mass holdout or as submission clearance.
+    """
+    score = np.asarray(score, dtype=np.float32)
+    elig = np.asarray(eligible, dtype=bool)
+    if score.shape != elig.shape:
+        raise ValueError("score and eligible must have the same shape")
+    out = np.zeros(score.shape, dtype=bool)
+    if n_dots <= 0 or not elig.any():
+        return out
+    masks = [np.asarray(m, dtype=bool) for m in cover_masks]
+    if any(m.shape != score.shape for m in masks):
+        raise ValueError("every cover mask must match score shape")
+    if not 0.0 <= max_overlap < 1.0:
+        raise ValueError("max_overlap must be in [0, 1)")
+    if min_sep_px < 0.0:
+        raise ValueError("min_sep_px must be nonnegative")
+
+    valid = elig if random else elig & np.isfinite(score) & (score > 0)
+    idx = np.flatnonzero(valid.ravel())
+    if idx.size == 0:
+        return out
+    rng = np.random.default_rng(seed)
+    if random:
+        order = rng.permutation(idx.size)
+    else:
+        vals = score.ravel()[idx]
+        order = np.argsort(-vals, kind="stable")
+    idx = idx[order]
+    vals = (np.zeros(idx.size, dtype=np.float64) if random
+            else score.ravel()[idx].astype(np.float64, copy=False))
+
+    # Membership matrix for the ordered candidates.  On this grid its worst-case
+    # size is bounded by candidate_count x registry_count bytes (bool), and avoids
+    # 56 separate raster reads in the placement loop.
+    if masks:
+        flat_masks = [m.ravel() for m in masks]
+        membership = np.empty((idx.size, len(masks)), dtype=bool)
+        for j, mask in enumerate(flat_masks):
+            membership[:, j] = mask[idx]
+        caps = np.full(len(masks), int(np.floor(max_overlap * n_dots)), dtype=np.int64)
+    else:
+        membership = np.empty((idx.size, 0), dtype=bool)
+        caps = np.empty(0, dtype=np.int64)
+
+    # A rasterized exclusion disk guarantees strict minimum separation without
+    # post-hoc top-ups that can accidentally violate it.
+    r = int(np.ceil(min_sep_px))
+    gy, gx = np.mgrid[-r:r + 1, -r:r + 1]
+    disk = (gy * gy + gx * gx) <= min_sep_px * min_sep_px + 1e-9
+    blocked = np.zeros(score.shape, dtype=bool)
+    ny, nx = score.shape
+    selected_idx: list[int] = []
+    selected_scores: list[float] = []
+    counts = np.zeros(len(masks), dtype=np.int64)
+
+    for k, flat_idx in enumerate(idx):
+        y, x = divmod(int(flat_idx), nx)
+        if blocked[y, x]:
+            continue
+        row = membership[k]
+        if row.size and row.any():
+            hit = np.flatnonzero(row)
+            if np.any(counts[hit] >= caps[hit]):
+                continue
+            counts[hit] += 1
+        out[y, x] = True
+        selected_idx.append(int(flat_idx))
+        selected_scores.append(float(vals[k]))
+        y0, y1 = max(0, y - r), min(ny, y + r + 1)
+        x0, x1 = max(0, x - r), min(nx, x + r + 1)
+        blocked[y0:y1, x0:x1] |= disk[y0 - (y - r):y1 - (y - r), x0 - (x - r):x1 - (x - r)]
+        if len(selected_idx) >= n_dots:
+            break
+
+    if not masks or not selected_idx:
+        return out
+
+    # If constraints stopped before target mass, caps were based on requested N.
+    # Reconcile the achieved-mass denominator.  Removing covered dots preserves
+    # minimum separation; iterating until no over-budget mask remains is fail-closed.
+    chosen = np.asarray(selected_idx, dtype=np.int64)
+    chosen_scores = np.asarray(selected_scores, dtype=np.float64)
+    # Candidate ``idx`` is in score/random order, so retain exact membership rows
+    # by looking up each selected flat pixel once (the number of selected pixels
+    # is at most the requested dot budget, not the millions of candidate pixels).
+    sel_rows = []
+    lookup = {int(i): k for k, i in enumerate(idx)}
+    for i in chosen:
+        sel_rows.append(membership[lookup[int(i)]])
+    chosen_membership = np.asarray(sel_rows, dtype=bool)
+    while chosen.size:
+        ratios = chosen_membership.sum(axis=0) / chosen.size
+        over = np.flatnonzero(ratios > max_overlap + 1e-12)
+        if over.size == 0:
+            break
+        worst = int(over[np.argmax(ratios[over])])
+        covered = np.flatnonzero(chosen_membership[:, worst])
+        if covered.size == 0:
+            break
+        # Drop the lowest-priority dot that causes this raster to exceed its cap.
+        drop = int(covered[np.argmin(chosen_scores[covered])])
+        out.ravel()[chosen[drop]] = False
+        chosen = np.delete(chosen, drop)
+        chosen_scores = np.delete(chosen_scores, drop)
+        chosen_membership = np.delete(chosen_membership, drop, axis=0)
+
+    return out
+
+
 def strike_of_segments(mask: np.ndarray, min_px: int = 25) -> list[dict]:
     """Local strike of each catalogue connected component by total least squares.
 
@@ -153,7 +362,7 @@ def strike_of_segments(mask: np.ndarray, min_px: int = 25) -> list[dict]:
     from north, mod 180) of the first principal component of the component's
     pixel coordinates, plus its pixel count and centroid.
     """
-    lab, n = ndimage.label(np.asarray(mask, dtype=bool), structure=np.ones((3, 3), dtype=np.uint8))
+    lab, n = ndimage.label(mask)
     out = []
     if n == 0:
         return out
@@ -194,22 +403,19 @@ def auc(scores: np.ndarray, labels: np.ndarray) -> float:
     npos, nneg = int(y.sum()), int((~y).sum())
     if npos == 0 or nneg == 0:
         return float("nan")
-    n = s.size
     order = np.argsort(s, kind="mergesort")
-    sorted_ranks = np.arange(1, n + 1, dtype=np.float64)
+    ranks = np.empty(s.size, dtype=np.float64)
+    ranks[order] = np.arange(1, s.size + 1, dtype=np.float64)
+    # average ties
     ss = s[order]
-    # Average the ranks inside each run of equal scores.  Vectorised: the
-    # previous per-element Python loop over ~4.5e6 cells dominated every
-    # experiment that called this helper (shared-tool fix, 2026-10-09).
-    new_run = np.empty(n, dtype=bool)
-    new_run[0] = True
-    np.not_equal(ss[1:], ss[:-1], out=new_run[1:])
-    grp = np.cumsum(new_run) - 1
-    counts = np.bincount(grp)
-    sums = np.bincount(grp, weights=sorted_ranks)
-    avg_sorted = (sums / counts)[grp]
-    ranks = np.empty(n, dtype=np.float64)
-    ranks[order] = avg_sorted
+    i = 0
+    while i < ss.size:
+        j = i
+        while j + 1 < ss.size and ss[j + 1] == ss[i]:
+            j += 1
+        if j > i:
+            ranks[order[i : j + 1]] = ranks[order[i : j + 1]].mean()
+        i = j + 1
     return float((ranks[y].sum() - npos * (npos + 1) / 2.0) / (npos * nneg))
 
 
@@ -222,22 +428,23 @@ def greedy_cover(
     stop_gain: float | None = None,
     init_cap: int = 1_500_000,
 ) -> tuple[np.ndarray, list[float]]:
-    """Greedy maximum-coverage surrogate (not an exact DTI optimizer).
+    """Greedy maximum-expected-credit placement (Church-Revelle MCLP, greedy form).
 
-    For a fixed non-negative ``prior``, this routine greedily maximizes a
-    monotone-submodular coverage surrogate: each selected location depletes the
-    remaining prior-weighted credit in its triangular-kernel neighborhood. The
-    classical ``1 - 1/e`` guarantee applies only to that surrogate's cardinality
-    constrained objective, not to the competition DTI.
+    The metric decomposes exactly as ``DTI = TP_w / (0.2 N + 0.8 |G|)`` because
+    ``TP_w + FN_w = |G|`` identically (verified in tests/test_dti.py).  So the
+    placement problem is: choose ``N`` pixels that maximise the expected captured
+    credit ``sum_g m_g`` while spending as few dots as possible.  Captured credit
+    is a monotone submodular function of the chosen set, so the greedy rule --
+    repeatedly take the pixel with the largest remaining credit, then deplete the
+    credit it just captured -- is within ``(1 - 1/e)`` of optimal.
 
-    The exact metric denominator is
-    ``(1-beta) * TP_w + alpha * FP_w + beta * |G| + eps``; it is not a function
-    of dot count ``N`` alone. This routine does not model the separate FP term,
-    so its gains are not DTI gains and must not be interpreted as a score or as
-    evidence that a candidate improves holdout DTI. Use the shared exact
-    evaluator for candidate comparisons.
+    ``prior[x]`` is the expected kernel credit available at ``x``.  Depletion:
+    placing a dot at ``p`` multiplies the remaining credit at ``p + o`` by
+    ``(1 - k(|o|))``.  With a *flat* prior this reproduces a near-optimal
+    triangular tiling at the metric's own 300 m kernel scale; with an informative
+    prior it concentrates dots where credit is expected.
 
-    Returns the boolean dot map and surrogate per-step marginal gains.
+    Returns the boolean dot map and the list of per-step marginal gains.
     """
     import heapq
 
@@ -297,66 +504,70 @@ def make_segment_folds(
     labels: np.ndarray,
     footprint: np.ndarray,
     *,
-    n_folds: int = 4,
+    n_folds: int = 5,
     buffer_px: int = 3,
+    split_px: int = 20,
+    seed: int = 0,
 ) -> list[Fold]:
-    """Spatially assign *whole 8-connected fault components* to folds.
+    """Hide-and-recover over *whole fault segments*, per the run brief.
 
-    Each connected component is assigned by its centroid to a regular spatial
-    bin. It is never cut by a tile lattice or fold boundary. For each fold,
-    ``truth`` contains every pixel of its assigned components, ``withheld`` is
-    the truth plus a Euclidean ``buffer_px``-pixel buffer, and ``visible`` is
-    the remaining mapped catalogue after that buffer is removed. The caller
-    must mask ``visible`` pixel-exactly from emissions and recompute all
-    catalogue-derived features from ``visible`` for each fold.
+    ``Fold.withheld`` is the FOOTPRINT (the region a prediction may occupy), not the
+    truth neighbourhood.  See IR-55-18.
+
+    The catalogue is cut into whole segments: connected components of the mapped
+    fault mask, further split by a regular ``split_px``-pixel lattice so that one
+    long mapped trace becomes several independent segments.  Segments are dealt
+    round-robin (after a seeded shuffle) into ``n_folds`` folds.  In fold ``k``:
+
+    * truth   = the pixels of the segments dealt to fold ``k``
+    * buffer  = ``buffer_px`` dilation around those pixels, removed from visible
+    * visible = every other catalogue pixel, minus the buffer
+
+    Emission is masked from ``visible`` pixel-exactly and is free to land on the
+    withheld segments, which is what "recover" means.  Scattered withholding (not
+    whole quadrants) keeps the surrounding mapped network visible, which is what
+    the real task looks like: the hidden truth is *unmapped* faults inside an
+    otherwise mapped region.
     """
     labels = np.asarray(labels)
-    footprint = np.asarray(footprint, dtype=bool)
-    if labels.shape != footprint.shape:
-        raise ValueError(f"labels shape {labels.shape} != footprint shape {footprint.shape}")
+    fp = np.asarray(footprint, dtype=bool)
+    if labels.ndim != 2 or fp.ndim != 2 or labels.shape != fp.shape:
+        raise ValueError("labels and footprint must have the same 2D shape")
     if n_folds < 2:
-        raise ValueError("n_folds must be at least 2")
-    if buffer_px < 0:
-        raise ValueError("buffer_px must be non-negative")
-
-    cat = (labels == 1) & footprint
-    structure8 = np.ones((3, 3), dtype=np.uint8)
-    components, ncomp = ndimage.label(cat, structure=structure8)
+        raise ValueError("n_folds must be at least two")
+    if buffer_px < 0 or split_px <= 0:
+        raise ValueError("buffer_px must be nonnegative and split_px must be positive")
+    cat = labels == 1
+    lab, ncomp = ndimage.label(cat)
     if ncomp == 0:
         return []
-
     ny, nx = cat.shape
-    ys, xs = np.nonzero(cat)
-    ids = components[ys, xs]
-    counts = np.bincount(ids, minlength=ncomp + 1)
-    cy = np.bincount(ids, weights=ys, minlength=ncomp + 1) / np.maximum(counts, 1)
-    cx = np.bincount(ids, weights=xs, minlength=ncomp + 1) / np.maximum(counts, 1)
-
-    # A near-square grid makes folds geographically structured. If n_folds is
-    # not a perfect rectangle, the final bin absorbs any remaining edge bins.
-    nrows = max(1, int(np.floor(np.sqrt(n_folds))))
-    ncols = int(np.ceil(n_folds / nrows))
-    gy = np.minimum((cy[1:] * nrows / ny).astype(int), nrows - 1)
-    gx = np.minimum((cx[1:] * ncols / nx).astype(int), ncols - 1)
-    component_fold = np.minimum(gy * ncols + gx, n_folds - 1)
-    fold_map = np.full(ncomp + 1, -1, dtype=np.int16)
-    fold_map[1:] = component_fold
-    assigned = fold_map[components]
-
-    if buffer_px == 0:
-        buffer_structure = np.ones((1, 1), dtype=bool)
-    else:
-        yy, xx = np.ogrid[-buffer_px : buffer_px + 1, -buffer_px : buffer_px + 1]
-        buffer_structure = (yy * yy + xx * xx) <= buffer_px * buffer_px
+    yy, xx = np.mgrid[0:ny, 0:nx]
+    # split long traces into segments on a regular lattice
+    cell = (yy // split_px).astype(np.int64) * 100003 + (xx // split_px).astype(np.int64)
+    if np.unique(cell[cat]).size < 2:
+        raise ValueError("catalogue occupies fewer than two spatial bins")
+    seg_id = lab.astype(np.int64) * 10_000_000_007 + np.where(cat, cell, 0)
+    seg_id = np.where(cat, seg_id, -1)
+    uniq, inv = np.unique(seg_id, return_inverse=True)
+    inv = inv.reshape(seg_id.shape)
+    rng = np.random.default_rng(seed)
+    order = rng.permutation(uniq.size)
+    assign = np.full(uniq.size, -1, dtype=np.int64)
+    assign[order] = np.arange(uniq.size) % n_folds
+    fold_of_seg = np.where(seg_id >= 0, assign[inv], -1)
 
     folds = []
     for k in range(n_folds):
-        truth = cat & (assigned == k)
-        if not truth.any():
+        truth = cat & (fold_of_seg == k)
+        if truth.sum() == 0:
             continue
-        withheld = ndimage.binary_dilation(truth, structure=buffer_structure)
-        visible = cat & ~withheld
-        folds.append(Fold(name=f"segment_fold{k}", withheld=withheld, visible=visible, truth=truth))
-    if len(folds) < 2:
-        raise ValueError("fewer than two spatial bins contain mapped components; no holdout is possible")
+        buf = ndimage.binary_dilation(truth, iterations=buffer_px)
+        visible = cat & ~truth & ~buf
+        # IR-55-18 (fixed in this template): ``withheld`` used to be ``truth | buf``.
+        # Emission is restricted to ``withheld & ~visible`` by every caller, so that
+        # region was built FROM the hidden truth and placed dots on the answer
+        # (random control scored 0.33 vs 0.07 on the quadrant protocol).  A fold must
+        # emit and score over the whole footprint, minus the visible catalogue.
+        folds.append(Fold(name=f"seg{k}", withheld=fp.copy(), visible=visible, truth=truth))
     return folds

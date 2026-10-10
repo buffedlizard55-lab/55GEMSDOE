@@ -1,5 +1,7 @@
 # Review log — 2026-10-09 UTC
 
+**Historical mainline review log.** It records the status and files reviewed at that time; the later H57 follow-up supersedes its earlier no-candidate/no-download statements. Current status is in the root README, `docs/run-card.json`, and `docs/status.json` (audit download only; submit NO).
+
 ## Pass 1 — implementation and scope
 
 - Re-derived the DTI denominator from `TP_w + FN_w = |G|`; replaced the false count-only identity throughout the current results narrative and added a synthetic regression case.

@@ -1,90 +1,188 @@
-# Tensor-dimensionality lane: ranked geological hypotheses
+# Candidate hypotheses before experiment H56
 
-**Review date: 2026-10-09 UTC.** These are four distinct, falsifiable hypotheses kept inside the assigned tensor-dimensionality lane. Ranking is a qualitative research priority, **not a prediction, HOLDOUT-DTI, or score**.
+**Preregistration time:** 2026-10-09 UTC. **Lane:** tensor dimensionality only.
+These are proposals, not scores and not leaderboard projections. The ordering is a
+research priority, not a measured ranking. The current implementation already has
+one-scale FFT tensors, magnetic/gravity ridge corroboration, dimensionality
+weighting, a strike-agreement weight, and a survey-line mask; the candidates below
+must therefore add a falsifiable tensor-lane property rather than rename the same
+surface.
 
-**Update — the rank-1 hypothesis (H1, joint line-source geometry) has now been implemented, canaried, swept and run.** It is the shipped artifact: `docs/downloads/gems55-tensor_full-n16000-sep3-20261009T211747Z-nan.tif`. HOLDOUT-DTI 0.0380906 [0.0355742, 0.0405811] against a mass-matched random control of 0.034064 (lift 1.118x), 60,988 withheld positives, evaluator `gems55.dti55/2.0-local`. The ablation isolates which half of H1 works: adding the near-2-D gate to a plain ridge detector is the largest measured gain (`ridge_only` 0.023264 -> `ridge_x_dim` 0.039231), while the strike-agreement half **failed its own confirmatory test** (withheld faults agree with the tensor strike in 25.3% of cases vs 50.4% for random ridges, z = -8.35). H2-H4 remain untested; the experiment budget for this session (3 runs) is used.
+## Ranking
 
-The official GEMS feature description identifies reduced-to-pole magnetic anomaly and isostatic gravity anomaly as available layers. Both grids are now staged locally and were consumed by the H1 run. Any use of acquisition polygons or line metadata must be derived from authorized files from the [official DrivenData data tab](https://www.drivendata.org/competitions/306/competition-doe-gems/data/) or the [USGS GeoDAWN data release](https://doi.org/10.5066/P93LGLVQ); neither is locally staged.
+| Rank | Candidate; layers | Physical signature targeted | Why it can find an omitted fault | Difference from this repo | Expected DTI opportunity / implementation cost |
+|---|---|---|---|---|---|
+| **1** | **Multi-scale tensor persistence.** Band 2 reduced-to-pole magnetic anomaly and band 13 isostatic gravity anomaly. | Recompute the low-pass FFT gradient tensor at two preregistered structural scales (300 m and 900 m Gaussian spatial sigma); retain the geometric mean of the two scale scores, with a separate persistence fraction for near-2-D and strike concordance. | A mapped fault continuation should preserve a strike-extended tensor geometry over a range of wavelengths, while derivative noise, block-edge ringing, shallow cultural/flight-line artefacts, and compact sources are less persistent. The test uses no catalogue geometry to create the signal, so it can target faults absent from USGS/INGENIOUS. | The repo has one 400 m low-pass surface. It does not require the same pixel to remain a near-2-D, strike-concordant ridge at more than one scale. | **Highest expected opportunity; moderate/high cost.** Only existing competition rasters are needed. The exact scales are frozen before holdout; no holdout tuning is allowed. |
+| **2** | **Cross-field tensor strike-consensus.** Band 2 RTP magnetics + band 13 isostatic gravity. | Use the axial circular resultant of the magnetic and gravity tensor strikes, rather than the current arithmetic mean of two angular differences; require a high resultant length and low dimensionality in both fields. | A fault-related boundary can be weak in one potential field but its structural strike should be coherent where both fields resolve it. A compact body or lithologic contact may produce modality-specific strikes and be down-weighted. | The current lane averages two field-specific agreement angles and ridge ranks; it has no explicit axial circular-consensus confidence or discordance channel. | **Moderate opportunity; moderate cost.** No external data. It is a distinct multi-field geometry test, but it may reduce recall when gravity is weak. |
+| **3** | **Eigenvalue-sign/shape stability.** Same bands 2 and 13. | In addition to the scalar dimensionality invariant, require the ordered eigenvalue pattern and the intermediate-eigenvector horizontal plunge to be stable under a 180°-invariant tensor sign convention at both modalities. | Long faults should produce a coherent saddle/line-of-poles signature along a trace; compact 3-D bodies and tensor degeneracies should have less stable eigenvalue ordering. This is label-independent and can find an unmapped continuation. | The current lane uses the invariant and a plunge multiplier but does not test local eigenvalue-shape stability or degeneracy margin. | **Moderate/low opportunity; moderate cost.** No external data. Risk: sign is physical-field dependent, so the test must be documented and not treated as a fault classifier by itself. |
+| **4** | **Blockwise tensor normalization with official flight-line/block masks.** Bands 2 and 13 plus GeoDAWN acquisition-block and flight-path metadata. | Compute the FFT tensor independently per official acquisition block, remove each block's robust long-wavelength level, and mask line/tie-line coherence only within that block. | The USGS data release documents four acquisition blocks and different flight specifications. A real fault can cross a block seam; an edge caused by leveling or a seam should not. Processing by the true block geometry may recover structure currently suppressed or prevent false ridges. | The repo currently uses one grid-wide FFT and a configurable along-axis profile; it does not have verified block polygons/IDs in the competition stack. | **Potentially high opportunity; high cost and currently blocked.** Official fallback is the USGS GeoDAWN ScienceBase release, DOI `10.5066/P93LGLVQ`; it is publicly listed, but the exact block polygons must be downloaded, intersected with EPSG:32611, and checksum-pinned before this candidate is viable. No implementation or score is claimed now. |
+| **5** | **RTP-to-pseudogravity tensor sensitivity ensemble.** Band 2 RTP magnetic anomaly; band 13 remains the independent gravity comparator. | Apply an explicitly declared pseudogravity Fourier transform for a small, preregistered set of magnetization-direction assumptions, then keep only strike/dimensionality responses stable across assumptions. | A fault/contact may be structurally real but its magnetic response depends on magnetization. Stability across plausible directions can suppress remanence-specific compact anomalies and retain a buried, strike-extended boundary not in the catalogue. | The current code differentiates the RTP field directly and documents that as a proxy; it does not implement the magnetic-to-pseudogravity transform or a direction-sensitivity test. | **Potentially moderate opportunity; high cost/high risk.** No new dataset is required, but a magnetization direction is an assumption. The method is not viable for a submission until the transform convention and its effect on synthetic fields are independently tested. |
 
-## Candidate ranking
+## Source checks and external-data gate
 
-| Rank | Geological hypothesis | Required layers | Physical signature to test | Why it could find an uncatalogued fault | Difference from current repository method | Expected value (qualitative; not a score) | Expected cost and main risk |
+The official competition problem page was fetched on 2026-10-09 and supports the
+following statements:
+
+* The task is fault prediction for geothermal-resource mapping, not direct vent
+  detection. It lists RTP magnetic anomaly and isostatic gravity among the provided
+  features and defines the distance-weighted Tversky metric with alpha 0.2, beta
+  0.8, and 300 m support: [DrivenData problem description](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/).
+* The official source for the survey context is the USGS GeoDAWN data release,
+  DOI [10.5066/P93LGLVQ](https://doi.org/10.5066/P93LGLVQ), with the USGS overview
+  at [usgs.gov/data/geodawn...](https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and).
+  The overview states that the release contains flight-path information and four
+  acquisition blocks, and describes magnetic tie-line leveling and micro-leveling.
+* The tensor rationale is grounded in the cited peer-reviewed literature: [Pedersen
+  & Rasmussen (1990), DOI 10.1190/1.1442807](https://doi.org/10.1190/1.1442807),
+  [Beiki & Pedersen (2010), DOI 10.1190/1.3484098](https://doi.org/10.1190/1.3484098),
+  and [Beiki, Pedersen & Nazi (2011), DOI 10.1190/1.3555343](https://doi.org/10.1190/1.3555343).
+  The 2011 abstract explicitly makes the pseudogravity transform conditional on a
+  known magnetization direction; this is why candidate 5 is not silently assumed.
+  An open explanation of the dimensionality invariant is [Karimi & Kletetschka
+  (2024), Scientific Reports](https://pmc.ncbi.nlm.nih.gov/articles/PMC11333590/).
+
+Candidates 1, 2, and 3 use only the already placed competition rasters, so they do
+not need a new external-data license. Candidate 4 is **not runnable yet** until the
+USGS block/flight metadata are downloaded and aligned. Candidate 5 needs no new
+file but does need a synthetic transform validation; neither candidate 4 nor 5 is
+allowed to enter a submission slot on a projection.
+
+## Frozen validation plan
+
+1. Establish the current holdout best with the canonical `src/gems55/dti55.py`,
+   `scripts/evaluate_holdout.py`, and `scripts/submission_writer.py`. Hold out
+   whole catalogue segments with a 3-pixel buffer, recompute catalogue-derived
+   masks per fold, mask visible faults pixel-exactly, and pool TP/FP/FN before the
+   DTI ratio.
+2. Test each feature/rule alone as a leakage canary. Any AUC above 0.90 is leakage
+   until explained. Numbers must carry the evaluator version, withheld-positive
+   count, and 95% CI.
+3. Run no more than three experiments. H56 is selected because it is the only
+   candidate that adds a scale-persistence invariant without new data. It must
+   beat the preregistered ridge/strike-consensus holdout best; otherwise its result
+   is a negative deliverable.
+4. Run the continuous-surface uniqueness check before placement and the final-dot
+   check after placement. A rank correlation above 0.90 or more than 70% of dots
+   within 3 pixels of one registry raster is a duplicate and stops the run.
+5. Write a TIF only after the format validator, uniqueness checks, and holdout
+   evidence are recorded. A format-valid TIF is not an organizer-confirmed score.
+
+## Prior-run status
+
+The previous one-scale tensor run used a quadrant-style evaluator and is **not the
+current baseline** for this experiment. It is retained as historical evidence, not
+combined with the segment holdout below. The evaluator design correction is logged
+in `docs/irregularities.md` and the new results will replace stale status claims.
+
+## Out-of-lane hypotheses H-B to H-F (2026-10-09, tensor-lane final pass)
+
+These are **proposals only**. None has been implemented or evaluated. AGENTS.md keeps this checkout to the tensor-dimensionality lane, so each one needs lane approval before any work. Gain labels are priors, not measurements, and are not HOLDOUT-DTI.
+
+**Metric-shortcut correction:** an earlier draft stated a per-dot break-even threshold `α·DTI/(1+α·DTI)` and a derived value of 0.0149. That shortcut has not been established from the official weighted DTI with both `TP_w` and `FP_w` terms; it is withdrawn and must not guide placement, candidate ranking, or promotion. Use the canonical evaluator on the full prediction instead. H-A (visible-prior gate) was tested earlier and failed, so it is not repeated here.
+
+| Rank | Hypothesis | Layers (band no., `docs/data_dictionary.md`) | Physical reasoning | Expected DTI gain (prior) | Implementation cost | Status |
 |---|---|---|---|---|---|---|
-| **1** | **Joint line-source geometry:** uncatalogued faults produce laterally persistent, near-two-dimensional potential-field structure more often than compact intrusive/vent sources. | Competition band 2 (reduced-to-pole magnetic anomaly) and band 13 (isostatic gravity anomaly); authorized footprint and acquisition-block/flight-line masks for processing. | Per-field gradient-tensor eigenstructure consistent with a strike-extended source; a stable intermediate-eigenvector strike that agrees with the local ridge tangent; corroboration between fields. | Mapped fault traces are an incomplete surface catalogue. A buried or weakly expressed fault can still separate magnetic/density domains; distinguishing line-like sources from compact bodies may reduce competition from already-mapped intrusive centers. No catalogue extension is used to create the prediction itself. | This is the existing prototype's central idea (tensor dimensionality plus strike gating), not a claim of novelty. The prototype currently averages field dimensionality and strike-agreement products. It does **not** establish that each of the four USGS acquisition blocks was independently processed; 64-pixel normalization tiles are not acquisition polygons. | **High information value, not a score estimate:** directly tests the prototype’s core source-geometry assumption; a gain is plausible only if line-source behaviour generalizes beyond the historical folds. | **Moderate-to-high compute and high validation cost.** Two large FFT tensor calculations, eigenanalysis, edge/block checks, per-feature leakage canaries, and whole-component holdout. Main risk: lithologic contacts and dikes have the same planar signature. **Measured outcome: lift 1.118x over a mass-matched random control; the dimensionality half is validated, the strike half is falsified.** |
-| **2** | **Faulted-basement step:** some uncatalogued faults offset a magnetic/density boundary and produce a paired, signed tensor response rather than only a single high-gradient ridge. | Bands 2 and 13; block/flight-line masks; no new competition layer. | Co-located ridge/edge pair with a reproducible sign or eigenframe transition across strike, consistent in both fields and stable at adjacent smoothing scales. | A basement offset may have little surface expression and may not be represented in the mapped fault catalogue, while the potential fields respond to the subsurface density/susceptibility boundary. | The current lane ranks ridge strength, near-2-D geometry, and strike agreement; it does not explicitly require the predicted cross-strike tensor polarity/paired-lobe pattern. This would add a preregistered physical edge-topology test, not a new ML family. | **Moderate potential value:** a preregistered polarity test could improve selectivity over ridge strength, but fault prevalence and score effect are unknown. | **Moderate compute; high interpretation cost.** Requires fixed sign convention, scale selection, and synthetic checks. Main risk: intrusive contacts, remanent magnetization, or correction seams create paired lobes. |
-| **3** | **Altered damage corridor:** geothermal-fluid alteration along some faults weakens or broadens the magnetic response relative to the gravity response, while the structural strike remains coherent. | Bands 2 and 13; same official grid and masks. | Cross-field mismatch in tensor amplitude/dimensionality, but compatible quasi-2-D strike and spatial continuity; test the signed and normalized field differences rather than raw amplitude. | A hydrothermal damage zone can alter susceptibility without a proportional density contrast. The differential tensor response could highlight a concealed structural corridor not obvious in either single-field ridge map. | The prototype combines normalized magnetic/gravity ridge ranks geometrically and averages dimensionality; it does not model a directional cross-property residual or an alteration-specific mismatch. | **Moderate but low-confidence potential value:** may expose altered fault corridors, but their prevalence and cross-survey stability are unknown; no expected score gain can be estimated. | **Moderate compute; high scientific risk.** Requires careful scale normalization and blind calibration. Main mimics are remanent magnetization, unequal survey resolution, and non-fault alteration. No external geothermal layer is assumed. |
-| **4** | **Fault-tip and relay-zone curvature:** fault tips, bends, and stepovers create localized rotation or loss of coherence in tensor strike at the edge of a longer planar source. | Bands 2 and 13; authorized footprint and processing masks. | Spatially coherent strike rotation/curvature across a fixed neighborhood, supported by near-2-D tensor structure in both fields; distinguish a localized bend from random eigenvector instability. | Fault segmentation can leave short tips or relay structures unmapped even where the longer fault system is known. Tensor strike changes may expose those discontinuities without simply extending a catalogued line. | Current code compares a local strike estimate with a ridge tangent at one effective scale; it does not explicitly score spatial strike curvature or relay geometry. | **Low-to-moderate potential value:** could add localized tips or relays, but likely affects less area and orientation noise may dominate; unmeasured. | **Lower-to-moderate compute, high false-positive risk.** Local derivatives are inexpensive once tensor fields are cached, but orientation uncertainty and contacts can imitate curvature. |
+| 1 | **H-F: 1 m lidar DEM scarp detection.** Fault scarps in young alluvium show as topographic steps. | 1 m DEM from USGS 3DEP (not in the competition stack) | Quaternary faults in the label set usually show as scarps. A scarp map is the most direct independent evidence for an unmapped trace. | High (potentially largest, unquantified) | High: 3DEP tiles unreachable from this sandbox (curl returned 000 for the prd-tnm S3 host); large download; scarp detector needs its own canary | Blocked on data access; out of lane |
+| 2 | **H-B: depth-to-basement step.** A fault offsets the magnetic basement, so the depth surface shows a step across the trace. | 15 (depth to basement), 2 (RTP mag) | A fault can offset basement without a surface trace, so the step is independent of mapping. | Moderate (partly redundant with ridge detectors on band 2) | Medium: derivative of an existing band, co-location with ridges, sensitivity to basement-model interpolation | Out of lane; not built |
+| 3 | **H-D: geodetic strain-rate corridors.** Unmapped faults sit in deforming crust. | 4 (second invariant), 7 (shear rate), 8 (dilatation rate) | Strain accumulates on structures whether or not they are mapped. | Low–moderate (coarse grid; interpolation artefacts likely) | Low–medium: bands provided; leakage canary first | Out of lane; not built |
+| 4 | **H-C: tilt-angle zero-contour.** Zero-contours of the tilt angle locate horizontal edges. | 6 (tilt / total curvature) | Standard edge-location method (citation not verified in this session; do not cite until it is). | Low–moderate. Highly redundant with the tensor lane's ridges, which use the same field derivatives. | Low: band provided; contouring is simple | Out of lane; not built |
+| 5 | **H-E: seismicity lineaments.** Earthquake density and distance trace active structures. | 10 (distance to earthquake), 16 (earthquake intensity) | Seismicity clusters along active faults. | Low. Leakage risk: derived from an external catalogue, so the canary must run first. | Low: bands provided | Out of lane; not built |
 
-## Evaluation boundary and budget
+Ordering: rank 1 has the largest physical upside but is blocked, so its cost is high and its gain is untested. Ranks 2–4 use bands already in the stack, so their costs are lower, but their redundancy with the tensor lane limits their gain. Rank 5 is cheap but carries leakage risk.
 
-- The top-ranked idea has an existing prototype, but the historical holdout is invalid for promotion: quadrant withholding can split connected faults, the nominal random arm was filtered by the score's positive support, and the stored interval is a bootstrap over fold DTI rather than a pooled-score CI. See [`docs/run-card.json`](run-card.json) and [`docs/results.md`](results.md).
-- The repository-local holdout utilities assign whole 8-connected components by spatial centroid, apply an explicit Euclidean buffer, and draw random controls uniformly from eligible pixels. They are not the authorized shared evaluator; synthetic tests do not replace reconciliation with that template or a full data-backed evaluation.
-- The recorded three-experiment limit for this session is **used** (canary + arm sweep; morphology/dot-count sweep; preregistered final run with CI, ablation and strike test). Do not run a candidate to get around it. Any later experiment requires an explicitly reopened budget, the shared evaluator/writer/uniqueness checker, authorized data, per-feature leakage canaries, and a same-evaluator holdout win before submission-slot promotion.
-- Required decision protocol: pooled `HOLDOUT-DTI`, alpha 0.2, beta 0.8, 300 m triangular kernel; report evaluator version, withheld-positive count, and a spatially justified 95% CI. A projection is not a score.
-- Check continuous-surface uniqueness before placement and final-dot uniqueness after placement. **The current artifact breaches the literal >70% three-pixel-overlap stop rule and passes the chance-adjusted comparison.** Both are reported side by side on `docs/download.html`; the raw statistic rises with the reference raster's own coverage and cannot separate a copy from two independent detectors on the same terrain (worst case: reference coverage 0.9987 vs observed 0.9971, excess over chance -1.23).
+## Tensor-lane final pass — HOLDOUT-DTI (2026-10-09, h55 audit file)
 
-## Official and scientific sources
+Evaluator `src/gems55/dti55.py` (exact official DTI). Protocols: Q4 quadrant hide-and-recover (PRIMARY) and B = 15 px distance-banded whole-segment folds (SECONDARY). Withheld positives 60,988. Audit page: `docs/h55-160k-audit.html`.
 
-- [DrivenData problem description and official feature/metric contract](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)
-- [DrivenData data tab](https://www.drivendata.org/competitions/306/competition-doe-gems/data/) — authorized competition rasters; login required.
-- [USGS GeoDAWN data release, DOI 10.5066/P93LGLVQ](https://doi.org/10.5066/P93LGLVQ) — source for public survey/block context, not a substitute for organizer data provenance.
-- [Pedersen & Rasmussen (1990), “The gradient tensor of potential field anomalies: Some implications on data collection and data processing of maps”](https://doi.org/10.1190/1.1442807)
-- [Beiki & Pedersen (2010), eigenvector analysis of the gravity-gradient tensor](https://doi.org/10.1190/1.3484098)
-- [Beiki, Pedersen & Nazi (2011), eigenvector analysis of aeromagnetic/pseudogravity tensors](https://doi.org/10.1190/1.3555343)
+| Experiment | What it tested | Result |
+|---|---|---|
+| exp8 run 2 | H-A visible-prior gate | Q4 fails (H-A-500 0.0521 vs random 0.0742); promote = false |
+| exp9 | H-A at distance bands 3, 15, 30 px | H-A fails at every band ≥ 1.5 km (B15: H-A-500 0.0001, worse than random in all 10 folds) |
+| exp10 | Dot-mass sweep, N ∈ {20k, 40k, 80k, 160k} | Q4 tensor_full 0.0459 / 0.0666 / 0.0889 / 0.1019 vs random 0.0422 / 0.0742 / 0.1202 / 0.1627 |
 
-A tensor dimensionality or eigenvector signature is a source-geometry observation, not proof of faulting. Each candidate must be checked against contacts, dikes, intrusions, alteration systems, acquisition artifacts, and independent geological evidence.
+- **Pre-registered N\* = 160,000** (argmax of tensor_full on Q4; upper edge of the grid, so the largest N tested). Label **NEGATIVE**. Q4 loses to random at 40k, 80k and 160k. At 20k it is +0.0030 (p = 0.25, not significant).
+- Secondary B = 15 px: tensor beats random at 40k (+0.0015, p = 0.008) and 160k (+0.0026, p = 0.004), not at 80k (p = 0.20). The sign depends on the protocol (IR-55-031). The primary governs under the rule.
+- Audit file: `docs/downloads/audit-h55-160k/h55-tensor2d-strikegate-160000dots-20261009T164334Z-zeros.tif` (sha256 ffd2a892…). Validator 12/12. Uniqueness BLOCKED under the literal 70% rule (IR-55-030). **DO NOT SUBMIT.** Download for audit only.
+- Budget: 3 of 3 experiments used.
 
-## Session addendum (2026-10-09): mechanism, new candidates, ranking, and validation plan
+## H57 preregistration and results (2026-10-09) — tensor-dimensionality lane
 
-**Status: proposals only.** No candidate was implemented, rasterized, or evaluated in this session. The assigned lane is potential-field tensor dimensionality. Candidates X1 and X2 stay inside it. X3 and X4 are outside it and need an explicit owner decision before any work. The experiment budget is exhausted, and no valid holdout exists. Every claim below is either verified against the sources in [`docs/session-20261009-verification.md`](session-20261009-verification.md) or labelled as a derivation or hypothesis.
+**Context and evidence boundary.** The user asked for a new unique competition TIF,
+for an analysis of the claimed 0.2778 H33 score, and for a same-evaluator holdout
+before any weekly slot. The public-page 0.2778 row has no receipt or verified
+file/account mapping to H33. The owner-maintained H33 manifest has `receipt: null`
+and labels a separate `0.2747` value projected/UNSCORED. Earlier local anchor-proxy
+DTI, hidden-truth-size, ratio, and causal conclusions used invalid metric algebra
+and are **withdrawn**, not evidence for any hypothesis. The H57-A flank factor was
+an unvalidated proposal; its matched holdout was negative. See
+[`anchor-0.2778.html`](anchor-0.2778.html) for the corrected metric identity and
+receipt boundary.
 
-### A. Metric mechanism: why sparse, near-miss dots can score well (derived; not verified on data)
+### Ranked candidates before validation
 
-The official metric is `DTI = TP_w / (TP_w + 0.2 FP_w + 0.8 FN_w)` with the triangular kernel `k(d)=max(1-d/300 m, 0)` ([official formula](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)). Two identities follow from the definitions:
+| Rank | Candidate; layers | Physical signature targeted | Why it could catch an omitted fault | Difference from the repo at preregistration | Expected opportunity / implementation cost | Result |
+|---|---|---|---|---|---|---|
+| 1 | **H57-A: tensor-gated off-catalogue flanks.** Bands 2 (RTP magnetics), 13 (isostatic gravity), plus visible `labels.tif` only for placement. | Existing near-2-D, strike-concordant gradient-tensor score multiplied by a quadratic off-catalogue flank prior with 15-pixel support. | DrivenData describes test faults as expert-identified faults absent from the existing public USGS database. A mapped trace is therefore a spatial prior for an unmapped nearby continuation, while tensor geometry is the geological gate. | Earlier writer used only the tensor score over the footprint; it had no visible-catalogue flank factor. | Highest prior opportunity; low/moderate code cost; no new data. Prior was explicitly a hypothesis, not an assumption about hidden labels. | **NEGATIVE.** See matched-mass result below. |
+| 2 | **H57-D: along-ridge axial strike persistence.** Bands 2 + 13. | Measure axial strike coherence and near-2-D persistence along connected ridge segments over 0.5–2 km, not just pixelwise angle agreement. | Faults tend to form connected traces with stable orientation; compact bodies and isolated derivative noise should have short, incoherent ridge fragments. | Current tensor lane computes pixelwise strike agreement and a pointwise score; it does not score segment-length/orientation persistence. | Moderate expected opportunity; medium cost; all layers already available. Not tested under this session's experiment cap. |
+| 3 | **H57-B: cross-field tensor strike consensus.** Bands 2 + 13. | Axial circular resultant of magnetic/gravity tensor strikes with resultant-length confidence, replacing the arithmetic mean of two per-field angle differences. | A structural strike can be consistent across modalities even when amplitude is weak in one; modality-specific compact responses may disagree. | No explicit circular-consensus confidence channel in the current lane. | Moderate/low expected opportunity; medium cost; no external data. Not tested. |
+| 4 | **H57-C: eigenvalue-shape stability.** Bands 2 + 13. | Require the ordered eigenvalue pattern, intermediate eigenvector and plunge to remain stable under a declared tensor sign convention. | A long 2-D trace should preserve line-of-poles geometry; compact bodies and near-degenerate tensors should be less stable. | Current code gates on a scalar dimensionality invariant and plunge, but not a local eigenvalue-shape stability statistic. | Low/moderate expected opportunity; medium cost; no external data. Not tested. |
+| 5 | **H57-E: true acquisition-block FFT.** Bands 2 + 13 plus the official GeoDAWN flight-path/block data. | Compute and edge-pad FFT tensors separately for the actual acquisition blocks, with block-local leveling and striping masks. | A real fault may continue across a seam; block/leveling edges and survey artifacts need not. | Current 55GEMSDOE implementation computes the competition-grid tensor, not separate block tensors. | Potentially high scientific value; high cost. The official ScienceBase release publicly lists `area1_flight_path.zip` (32.11 MB) and `area2_flight_path.zip` (291.55 MB), among other files, with CC0 rights. The catalog page was readable, but this sandbox's outbound host allowlist prevented fetching the binary payloads; therefore this candidate is **source-verified but not data-validated/runnable here**. |
 
-- `TP_w + FN_w = |G|`, the total of ground-truth weight, so `D = 0.2 TP_w + 0.2 FP_w + 0.8 |G|`.
-- Each dot of probability mass `p` adds `p*q*k` in expectation to `TP_w` (where `q` is the chance it hits an unmatched truth at kernel weight `k`) and `p*(1 - q k)` to `FP_w`. So its expected contribution to `D` is `0.2 p`, a fixed cost.
+The out-of-lane proposals (lidar scarps, depth-to-basement steps, strain corridors,
+tilt zero-contours and seismicity lineaments) remain proposals only; this repository's
+assigned lane remains potential-field tensor dimensionality.
 
-A dot raises the score when its expected kernel-weighted hit exceeds the breakeven `q k > alpha * DTI`, which is independent of `p`. At DTI ≈ 0.28 that is about 0.056. This needs an exact-hit chance above about 6%, or above about 8% at 1 px (100 m), where the kernel weight is 0.67 (for example, 0.08 × 0.67 = 0.053, which is below the threshold). This is the same single-match threshold the repository documents as `breakeven_credit`, but the derivation above is first-order: it ignores interactions between dots, the max over nearby predictions, and the constant `|G|`.
+### H57-A validation protocol and corrections
 
-**Consequence (hypothesis):** under this metric, high-recall dotted predictions with low hit probabilities can beat sparse high-confidence maps, and uniqueness pressure (the 70% three-pixel rule) limits how far that can go. This is a candidate explanation for the owner-listed dotted entries (about 0.25–0.28 in the owner's site list, which is not verified against the organizer's board). It is **not** an explanation of H33. The H33 raster, the mapping from GEMSDOE32 to extradr19, and any organizer receipt are all absent (see [`docs/leaderboard-review-20261009.md`](leaderboard-review-20261009.md)).
+The initial exploratory H57 run is **invalid for promotion** and is archived as
+`evidence/holdout_h57_exploratory_invalid_excluded-lattice_unmatched-mass.json`.
+It excluded the spacing-5 lattice and some arms returned fewer dots than requested,
+so its DTI values are not compared or used as evidence. This defect was found and
+logged before finalizing a TIF. The shared emitter/evaluator were fixed to enforce
+minimum spacing, use every registry raster, apply the same Euclidean 3-pixel
+coverage definition as the checker, and report mass shortfalls. The registry loader
+also reprojects prior rasters to the official grid; this matters because one prior
+file has the competition shape/CRS but a wrong origin.
 
-The parallel session (PR #14) proposes a different set in its own review, including H-N1 *metric-aware sparse placement*, which is a placement method on an existing surface rather than a new physical layer. Candidates X1–X4 here are new physical layers or transforms. They are complementary to that placement method, and no candidate from either set has been validated.
+The valid third experiment uses the canonical cached one-scale stack and shared
+`evaluate_holdout.py` / `submission_writer.py` rule:
 
-### B. Candidates not yet tried
+1. Five seeded whole-segment/lattice folds, 3 px buffer, per-fold visible faults
+   derived only from visible catalogue pixels and masked pixel-exactly.
+2. 200 dots total (40 per fold), min separation 3 px. The holdout/writer used the
+   same `un-eroded` tensor-factor sensitivity surface, 15-px flank prior, hard
+   striping mask, and 56 registry budgets present at run time (0.68 cap). `random`,
+   `ridge_x_agree`, `tensor_full`, `tensor_flank`, and `flank_only` all returned
+   exactly the requested mass. A later audit expanded the registry to 62 and added
+   four local historical controls; the holdout was not rerun. Registry budget is a
+   literal uniqueness constraint, not a geological feature.
+3. DTI is pooled per the published formula (alpha 0.2, beta 0.8, 300 m kernel).
+   **HOLDOUT-DTI:** candidate `tensor_flank` = 0.00012284, 95% CI
+   [0.00011438, 0.00013397], 60,988 withheld positives. Matched random =
+   0.00015080; `tensor_full` = 0.00030077; `ridge_x_agree` = 0.00027391. Candidate
+   is lower than random and both tensor comparators. The preregistered verdict is
+   **NEGATIVE**; do not promote and do not spend a weekly slot.
+4. Leakage canary maximum single-feature AUC is 0.89330 (visible-catalogue flank
+   prior), below but close to 0.90. This is a diagnostic, not a score. The prior is
+   explicitly recognized as catalogue spatial autocorrelation, not hidden-label
+   leakage.
+5. Continuous-surface uniqueness passes before placement across all 66 comparisons
+   (62 registry + four local historical rasters), max absolute Spearman 0.2443.
+   The final-dot scan also covers 66/66, but returns **DUPLICATE-STOP**: max
+   one-sided overlap within 3 px is **0.76**, above the literal 0.70 limit. Two
+   PARALLEL16 NaN/zeros variants each trigger the stop and both rows count. The
+   random-control value 0.765 is diagnostic only and does not waive the rule. One
+   shared-registry raster was nearest-neighbor reprojected to the official template.
+6. The NaN-outside primary passes 11/11 strict local format checks. The all-finite
+   zeros diagnostic passes 10/11 and fails the exact null/NaN outside-footprint
+   check. Format validation does **not** clear the candidate: both strict uniqueness
+   and the scientific holdout are negative.
 
-Each entry names the layers, the physical signature, why it might find an uncatalogued fault, how it differs from the repository, and the cost. "Obtainable" is checked against the source as stated.
+The machine-readable result, SHA, note, format output, expanded registry scan and
+verdict are in `docs/run-card.json`; `docs/status.json` and the site banner say
+**download for audit: YES; submit: NO**. Primary NaN-outside TIF SHA-256:
+`57dd4ba81c6fe553166cb193f4ae40e6547f4abe5a8fdabeb9154f648d761326`.
 
-| ID | Lane | Layer(s) | Physical signature targeted | Why it could find a missing fault | Difference from the repository | Cost and main mimic | Obtainable |
-|---|---|---|---|---|---|---|---|
-| **X1** | In lane | Band 2 RTP magnetic; inclination and declination for the survey date from [NOAA NCEI IGRF calculators](https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml) (verified reachable); the GeoDAWN release states that IGRF was used for magnetic processing ([ScienceBase](https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7)). | Gradient-tensor dimensionality and strike on a pseudogravity-transformed magnetic field. The transform recasts an induced magnetic anomaly so that the tensor analysis of [Beiki et al. (2011)](https://doi.org/10.1190/1.3555343) applies. | Buried faults separate magnetic domains. A pseudogravity tensor can show 2-D structure that a direct RTP tensor blurs. | The repository computes only a direct-RTP tensor proxy and records that no pseudogravity transform is claimed (IR-55-036, `src/gems55/lanes55.py`). | Moderate: one Fourier transform plus the existing tensor pipeline. Mimic: remanent magnetization breaks the induced-field assumption of the transform; also dikes. | Yes for the field parameters (NOAA). The raster needs the authorized feature file. |
-| **X2** | In lane | Bands 2 and 13. | Normalised source strength (NSS), built from the same eigenvalues, peaks over 2-D and 3-D compact sources, thin sheets, and contacts ([EarthDoc corrigendum, EG12020](https://www.earthdoc.org/content/journals/10.1071/EG12020_CO); abstract verified, original not fetched). The proposal is that, used together with the dimensionality index, NSS could separate a thin 2-D sheet from a compact body (hypothesis, not tested). | It adds a rotation-invariant amplitude test that the current gate lacks. | The repository does not compute NSS (grep verified). It uses dimensionality, eigenratio, and strike only. | Low, since the eigenvalues already exist. Mimic: contacts and thin dikes peak in NSS. | Yes (method from published literature); needs the authorized feature file. |
-| **X3** | **Out of lane (owner decision needed)** | GeoDAWN aeroradiometric grids (potassium, thorium, uranium, total count). These are **not** among the official features listed on the [problem page](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/). | Hypothesised signature (not sourced in this session): potassium enrichment and thorium depletion associated with hydrothermal alteration along structural corridors. | Alteration can show along a fault even where mapping is absent. This is a data source the official feature list does not provide, so it is a candidate for an overlooked signal. | Not used anywhere in the repository (grep verified). | Moderate. Mimics: soil and lithology, wet ground, and radon. Licence terms **not verified** here; the rules allow external data only under a licence that permits sharing ([rules](https://docs.nlr.gov/docs/fy26osti/96647.pdf)). Source obtainable by the account holder; not downloadable from this sandbox. | The release page is verified ([USGS DOI](https://doi.org/10.5066/P93LGLVQ)); file-level download was not performed. |
-| **X4** | **Out of lane; crowded** | 1-m DEM from the official links file; scarp and lineament detection. | Fault scarps in bare-earth DEM. | Scarps are a direct expression of young faults, but other public entries already use scarp methods (for example `r7-nms3-dem10-scarp`). | Not in the repository. | Moderate to high. Mimics: erosion, roads, and terraces. The DEM links file is not reachable from this sandbox. | Not verified. Deprioritized because of crowding. |
-
-### C. Ranking (qualitative, not a score)
-
-Ranked by expected improvement in DTI multiplied by implementation cost. None of the expected values is a score.
-
-1. **X1, pseudogravity tensor (in lane).** It closes a documented gap in the method the project names, at moderate cost.
-2. **X2, NSS gate (in lane).** It is cheap, but its gain is uncertain because contacts also peak in NSS.
-3. **X3, radiometric alteration corridor (out of lane).** It may be the most overlooked signal. It needs an owner decision, a confirmed licence, and an account holder to fetch the data.
-4. **Existing H1 to H4.** H1 is the current prototype; H2 to H4 are unchanged.
-5. **X4, DEM scarps.** Deprioritized because of crowding and an unverified data path.
-
-### D. Validation plan (not run; required before any slot)
-
-- **Gate order:** the H1 baseline and a random control are both scored with the same evaluator. Then X1 or X2 is scored on the same holdout. Only a win over the same-evaluator baseline counts.
-- **Holdout:** whole 8-connected fault segments withheld with a 3-px buffer, and visible faults masked pixel-exactly. Metric: pooled DTI with α=0.2, β=0.8, and the 300 m triangular kernel, reported with the evaluator version, withheld-positive count, and a 95% CI from pooled contributions (not folds).
-- **Leakage canary:** each feature is tested alone first. An AUC above 0.90 is treated as leakage until shown otherwise.
-- **Uniqueness:** check surface correlation before placement and dot overlap after placement. The literal stop rules are rank correlation above 0.90 and over 70% of dots within 3 px of any registry raster. The registry rasters or dot coordinates are absent (IR-55-054).
-- **Budget:** the three-experiment record is exhausted. Running any of these needs an explicit owner decision to reopen the budget.
-
-### E. Sources used in this addendum
-
-- [Official problem description and metric](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)
-- [Official rules (NLR PDF)](https://docs.nlr.gov/docs/fy26osti/96647.pdf)
-- [USGS GeoDAWN data release, DOI 10.5066/P93LGLVQ](https://doi.org/10.5066/P93LGLVQ) and [ScienceBase item](https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7)
-- [NOAA NCEI magnetic-field calculators](https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml)
-- [Beiki, Pedersen & Nazi (2011), doi 10.1190/1.3555343](https://doi.org/10.1190/1.3555343) · [Beiki & Pedersen (2010), doi 10.1190/1.3484098](https://doi.org/10.1190/1.3484098) · [Pedersen & Rasmussen (1990), doi 10.1190/1.1442807](https://doi.org/10.1190/1.1442807)
-- [EarthDoc corrigendum on normalised source strength, EG12020](https://www.earthdoc.org/content/journals/10.1071/EG12020_CO)
+**Experiment budget:** 3/3 used (invalid exploratory H57, full-registry capacity
+diagnostic, valid matched-mass H57 holdout). No additional experiment, holdout
+rerun, or weekly slot is authorized by this session.

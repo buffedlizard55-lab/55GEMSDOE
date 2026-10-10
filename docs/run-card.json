@@ -1,199 +1,219 @@
 {
- "hypothesis": {
-  "name": "Tensor-dimensionality gate on gradient ridges: ridges whose potential-field gradient tensor is near-2-D (strike-extended) are more likely to be unmapped faults than ridges produced by compact 3-D sources such as intrusions or vents",
-  "layers": [
-   "competition band 2 reduced-to-pole magnetic anomaly (nT)",
-   "competition band 13 isostatic gravity anomaly (mGal)"
-  ],
-  "derivation": "FFT gradient tensor of each field; magnetic arm through a Baranov/Gunn pseudogravity (vertical integration) so the tensor is the Marussi tensor of a gravity-like potential"
- },
- "mechanism": "For a source-free potential field the gradient tensor is trace-free and, for a strictly 2-D (strike-extended) source, its intermediate eigenvalue vanishes and the corresponding eigenvector is the strike. The Pedersen-Rasmussen dimensionality indicator I = 27*e3^2 / (4*(-e2)^3) is therefore 0 for a pure 2-D source and 1 for an equidimensional 3-D source. We rank gradient ridges by the corroborated horizontal-gradient magnitude of both fields and multiply by (1-I) and by a strike-agreement factor, so compact bodies are down-weighted and strike-extended ridges are kept.",
- "non_fault_mimic": "Lithologic contacts, dikes, sills and intrusive centres are also strike-extended and produce the same near-2-D tensor signature; hydrothermal alteration haloes and survey levelling seams are the other named mimics. No tensor signature is proof of faulting.",
- "holdout_dti": {
-  "evidence_class": "HOLDOUT-DTI",
-  "evaluator_version": "gems55.dti55/2.0-local",
-  "withheld_positive_count": 60988,
-  "n_folds": 4,
-  "buffer_px": 3,
-  "arm": "tensor_full",
-  "n_dots": 16000,
-  "min_sep_px": 3.0,
-  "value": 0.03809062276096333,
-  "ci95": [
-   0.0355741647023573,
-   0.040581089192987856
-  ],
-  "ci_method": "percentile bootstrap of 3182 spatial blocks of 40x40 px over the pooled additive DTI contribution maps",
-  "n_blocks": 3182,
-  "tp_w": 1989.5195946429067,
-  "fp_w": 15214.566921464037,
-  "fn_w": 58998.4804053571,
-  "random_control_mean": 0.03406439536674732,
-  "random_control_std": 0.0005805276246577969,
-  "random_control_reps": 3,
-  "comparators_same_budget": {
-   "ridge_only": 0.023263509543183923,
-   "ridge_x_dim": 0.039231183926562656
+  "schema": "55gemsdoe.run-card.v2",
+  "run_id": "55GEMSDOE-H57-TENSOR-FLANK-2026-10-09",
+  "status": "format_valid_duplicate_stop_holdout_negative_audit_only",
+  "hypothesis": "A potential-field gradient ridge cannot distinguish an elongated fault/contact from a compact intrusion/vent. The RTP-magnetic (band 2) and isostatic-gravity (band 13) gradient tensors encode dimensionality and a candidate strike. H57-A tested a 15-pixel off-catalogue flank factor built only from the VISIBLE catalogue during holdout as an unvalidated hypothesis for new-fault prediction. Earlier H33 anchor-proxy DTI and causal claims used invalid metric algebra and are withdrawn; they are not evidence for the flank prior or any expected hidden-fault gain. H57-A was not assumed to be a leaderboard improvement.",
+  "mechanism": "Use the existing one-scale cached stack (band 2 RTP magnetic + band 13 isostatic gravity); nearest-valid fill, robust line-axis leveling, low-pass before mirror-padded FFT derivatives, closed-form symmetric 3x3 tensor eigendecomposition, dimensionality invariant, intermediate eigenvector strike, strike agreement, plunge weight, corroborated ridge rank. H57 holdout and final writer use the same cached tensor factors and a 15-pixel quadratic off-catalogue flank prior; the candidate sensitivity run removes the cached 6-pixel footprint erosion (un-eroded edge score) to test whether a dense 5-pixel lattice registry raster leaves any unique feasible pixels. Flight-line striping is hard-masked. At run time the final 200 binary dots were placed with 3-pixel minimum separation and 56 registry cover masks, including one misregistered raster reprojected to the official grid, under a 0.68 cap. A later audit added six parallel-session registry variants and four local historical candidates; the current 66-raster strict scan finds 0.76 overlap with two PARALLEL16 twins, so this raster is not unique under the literal rule.",
+  "named_non_fault_mimic": "Lithologic contacts, dikes, intrusive sheets, basin-margin alluvial edges, and acquisition/FFT edge artifacts can all produce long, near-2-D responses without being faults. Flight-line striping and tie-line/leveling residuals are additional potential mimics. The un-eroded footprint-edge sensitivity increases FFT boundary-ringing risk and is a reason this raster remains audit-only.",
+  "holdout_dti": {
+    "status": "RUN",
+    "evidence_class": "HOLDOUT-DTI",
+    "evidence_file": "holdout_h57_unique_n200.json",
+    "evaluator_version": "src/gems55/dti55.py (local published-formula transcription, gems55.dti55/2.0-local; alpha=0.2, beta=0.8, R=300 m; not organizer-executable)",
+    "parameters": {
+      "alpha": 0.2,
+      "beta": 0.8,
+      "kernel_radius_m": 300,
+      "n_dots_total": 200,
+      "dots_per_fold": 40,
+      "min_sep_px": 3.0,
+      "flank_support_px": 15.0,
+      "un_eroded_edge_score": true,
+      "registry_rasters_budgeted_at_holdout_time": 56,
+      "current_registry_rasters_in_uniqueness_audit": 62,
+      "local_historical_rasters_in_uniqueness_audit": 4,
+      "total_uniqueness_comparisons": 66,
+      "current_max_dot_overlap": 0.76,
+      "registry_max_dot_overlap_at_holdout_time": 0.68
+    },
+    "withheld_positive_count": 60988,
+    "protocol": "Five whole-segment/lattice hide-and-recover folds, 3-pixel buffer, per-fold visible faults masked pixel-exactly; flank prior recomputed from VISIBLE faults only; all 56 registry rasters budgeted after alignment to EPSG:32611 template; 40 dots per fold; pooled TP/FP/FN DTI; 95% CI is a 4,000-resample bootstrap of the five fold DTI values. All candidate and comparator arms returned the same requested mass. The holdout used the 56 registry rows present at run time; the later strict uniqueness audit includes 62 registry rows plus four local historical rasters. No holdout was rerun after the three-experiment budget was exhausted.",
+    "value": 0.00012283569338819808,
+    "ci95": [
+      0.00011438298404329026,
+      0.00013396539810979247
+    ],
+    "candidate_dots": 200,
+    "matched_random_control": {
+      "value": 0.00015080369376383455,
+      "ci95": [
+        7.390855325871418e-05,
+        0.00022214220252178685
+      ],
+      "dots": 200
+    },
+    "current_best_comparator": {
+      "name": "tensor_full",
+      "value": 0.00030076700799021696,
+      "ci95": [
+        0.00017780487330513512,
+        0.00042363419247835746
+      ],
+      "dots": 200
+    },
+    "other_arms": {
+      "ridge_x_agree": {
+        "value": 0.00027390592726233735,
+        "ci95": [
+          0.00013244240421654088,
+          0.0004104806904487711
+        ]
+      },
+      "tensor_full": {
+        "value": 0.00030076700799021696,
+        "ci95": [
+          0.00017780487330513512,
+          0.00042363419247835746
+        ]
+      },
+      "flank_only": {
+        "value": 6.087722733857213e-05,
+        "ci95": [
+          4.1600142318235736e-05,
+          7.843171936715236e-05
+        ]
+      }
+    },
+    "mass_matched": true,
+    "folds_beating_best_comparator": 1,
+    "folds_beating_best_comparator_of": 5,
+    "promotion_rule": "candidate must beat tensor_full, ridge_x_agree, and random, and beat the best surface in >=4/5 folds; all arms must be mass-matched",
+    "projection_written_as_score": false
   },
-  "metric": {
-   "alpha": 0.2,
-   "beta": 0.8,
-   "kernel": "triangular",
-   "radius_m": 300.0
+  "leakage_canary": {
+    "evidence_class": "HOLDOUT-DTI diagnostic",
+    "features_tested_alone": [
+      "dim_inv_raw",
+      "flank_weight_visible_only",
+      "one_minus_dim",
+      "plunge",
+      "ridge",
+      "strike_agree",
+      "tensor_full_score"
+    ],
+    "max_auc": 0.8932984557811239,
+    "auc_by_feature": {
+      "tensor_full_score": 0.4214834724806523,
+      "ridge": 0.5479195078865766,
+      "one_minus_dim": 0.5048234186224582,
+      "strike_agree": 0.5194519715352583,
+      "plunge": 0.4978339232345511,
+      "dim_inv_raw": 0.494731967185159,
+      "flank_weight_visible_only": 0.8932984557811239
+    },
+    "threshold": 0.9,
+    "flagged": [],
+    "note": "The visible-catalogue flank AUC is 0.8933, close to (but below) 0.90; it is catalogue autocorrelation, not hidden-label leakage, and is not a DTI score."
   },
-  "limitation": "The holdout truth is the PUBLIC catalogue (60,988 px), a proxy for - not a copy of - the private new-fault test set. Its size is ~3-4x the test set implied by the registry calibration, so the holdout-optimal dot count is biased high and the dot count was chosen from the registry calibration instead. Absolute holdout DTI is not a leaderboard prediction."
- },
- "confirmatory_strike_test": {
-  "evidence_class": "HOLDOUT-PREDICTION-TEST",
-  "verdict": "FAILED_NOT_SUPPORTED",
-  "detail": {
-   "evidence_class": "HOLDOUT-PREDICTION-TEST",
-   "test": "withheld fault segments agree in strike with the tensor field more often than random detected ridges do",
-   "tol_deg": 20.0,
-   "min_px": 12,
-   "group_A_withheld_fault_components": {
-    "n": 1661,
-    "median_delta_deg": 43.419246673583984,
-    "mean_delta_deg": 43.79699378929615,
-    "fraction_within_tol": 0.25285972305839854
-   },
-   "group_B_random_ridge_components": {
-    "n": 262,
-    "ridge_pct": 0.5,
-    "clean_px": 6,
-    "median_delta_deg": 19.374991416931152,
-    "mean_delta_deg": 29.23817821586405,
-    "fraction_within_tol": 0.5038167938931297
-   },
-   "difference_A_minus_B": -0.2509570708347312,
-   "two_proportion_z": -8.345190872686697,
-   "verdict": "NOT_SUPPORTED"
+  "strike_diagnostic": {
+    "evidence_class": "HOLDOUT-DTI diagnostic",
+    "withheld_connected_segments_tested": 13,
+    "withheld_pixel_samples": 273,
+    "random_ridge_pixel_samples": 100000,
+    "withheld_match_rate_within_20deg": 0.2673992673992674,
+    "random_ridge_match_rate_within_20deg": 0.22198,
+    "mean_difference_ci95_deg": [
+      -9.146759681270435,
+      -3.250338610979976
+    ],
+    "note": "Auxiliary catalogue-proxy strike diagnostic; not a performance score. Counts were corrected under IR-55-041."
   },
-  "interpretation": "FAILED. Withheld catalogue fault segments do not agree with the tensor strike more often than random detected ridges do; the direction is significantly reversed. The likely cause is circularity: the ridge azimuth and the tensor eigenvector are derived from the same field, so a strong ridge is self-consistent whether or not it is a fault. The near-2-D gate, not the strike gate, carries the measured signal."
- },
- "registry_comparisons": {
-  "evidence_class": "REGISTRY-UNIQUENESS-CHECK",
-  "registry_rasters_compared": 61,
-  "registry_rasters_invalid_as_reference": [
-   {
-    "raster": "GEMSDOE24__gemsdoe9-PLACEHOLDER-2314b599.tif",
-    "error": "positive registry cells outside footprint"
-   }
-  ],
-  "parallel_session_16_rasters_added": 6,
-  "max_abs_spearman": 0.024472863456122092,
-  "max_jaccard": 0.0069534454627243475,
-  "max_excess_over_chance": 0.4036753911188367,
-  "max_excess_row": {
-   "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
-   "raw": 0.86125,
-   "chance": 0.7673247121893465,
-   "excess": 0.4036753911188367,
-   "reference_positive_count": 1875224
+  "correlation_overlap_vs_registry": {
+    "evidence_class": "REGISTRY-AND-LOCAL-HISTORICAL-MEASURED",
+    "registry_rasters_total": 62,
+    "registry_rasters_scanned": 62,
+    "registry_rasters_reprojected_to_template": 1,
+    "reprojected_rasters": [
+      "14GEMSDOE__GEMS_r5-geom-horse-ensemble_20260929T154852Z_ccbe1de0_site_e96e942f.tif"
+    ],
+    "registry_rasters_incompatible": 0,
+    "local_historical_rasters_total": 4,
+    "local_historical_rasters_scanned": 4,
+    "local_historical_rasters_reprojected": 0,
+    "local_historical_rasters_incompatible": 0,
+    "comparison_rasters_total": 66,
+    "comparison_rasters_scanned": 66,
+    "max_final_dot_overlap_within_3px_all_comparisons": 0.76,
+    "degenerate_row_disclosure": "Literal >0.70 stop applies without chance adjustment. The max 0.76 overlap is against two zero/NaN variants of the same PARALLEL16 continuous raster; both rows are retained and both count toward DUPLICATE-STOP.",
+    "strict_duplicate_raster_names": [
+      "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
+      "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-zeros.tif"
+    ],
+    "max_abs_surface_spearman": 0.245,
+    "max_abs_final_binary_spearman": 0.0216,
+    "max_final_dot_overlap_within_3px": 0.76,
+    "threshold_surface_spearman": 0.9,
+    "threshold_final_dot_overlap": 0.7,
+    "strict_verdict": "DUPLICATE-STOP",
+    "strict_duplicate_rows": 2,
+    "lattice_overlap": 0.68,
+    "lattice_random_control_overlap": 0.985,
+    "random_control_uses_same_euclidean_3px_metric": true
   },
-  "literal_rule_max_raw_overlap": 0.997125,
-  "literal_rule_worst_case": {
-   "raster": "13GEMSDOE__13gems_20261001_r13-lattice-s5_v2_nan-outside.tif",
-   "raw": 0.997125,
-   "chance": 0.9987132726822701,
-   "excess": -1.2343506354338296,
-   "reference_positive_cells": 206895,
-   "reverse_fraction": 0.08686531815655284,
-   "reverse_chance": 0.08745333460541749,
-   "min_direction_fraction": 0.08686531815655284
+  "raster_sha256": "57dd4ba81c6fe553166cb193f4ae40e6547f4abe5a8fdabeb9154f648d761326",
+  "validator_output": {
+    "evidence_class": "FORMAT-VALIDATION",
+    "status": "PASS",
+    "tool": "scripts/validate_submission.py; independent rasterio re-read",
+    "checks_passed": 11,
+    "checks_failed": 0,
+    "primary_encoding": "NaN exactly outside the template footprint",
+    "zeros_variant_checks_passed": 10,
+    "zeros_variant_checks_failed": 1,
+    "zeros_variant_fails_null_nan_outside_rule": true,
+    "no_nan_inside_footprint": true,
+    "values_in_0_1_inside_footprint": true,
+    "single_band_float32": true,
+    "crs_matches": true,
+    "shape_matches": true,
+    "transform_matches": true,
+    "nan_outside_footprint": true,
+    "positive_pixels": 200,
+    "dots_on_mapped_catalogue_px": 0,
+    "dots_outside_footprint": 0
   },
-  "symmetric_max_reverse_fraction": 0.2058359148595983,
-  "symmetric_max_min_direction_fraction": 0.2058359148595983,
-  "symmetric_worst_case": {
-   "raster": "PARALLEL16__tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
-   "forward": 0.2673125,
-   "reverse": 0.2058359148595983,
-   "reverse_chance": 0.08745333460541749,
-   "min_direction": 0.2058359148595983,
-   "spearman": 0.010736140259810607,
-   "jaccard": 0.0069534454627243475
+  "submission": {
+    "name": "h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z",
+    "note": "H57 tensor-flank: FFT 2-D/strike gate x visible-catalogue flank, 200 dots; all-registry overlap-budgeted",
+    "note_characters": 104,
+    "n_dots": 200,
+    "n_dots_target": 200,
+    "download_allowed_for_audit": true,
+    "submit_allowed": false,
+    "weekly_slot_used": false,
+    "file": "docs/downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.tif",
+    "zip": "docs/downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.zip",
+    "outside_encoding": "NaN outside template footprint",
+    "zeros_variant": "docs/downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-zeros.tif",
+    "zeros_variant_zip": "docs/downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-zeros.zip",
+    "sha256": {
+      "h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.tif": "57dd4ba81c6fe553166cb193f4ae40e6547f4abe5a8fdabeb9154f648d761326",
+      "h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-zeros.tif": "b8dd3f308b4239fafc9e378809c42e89618a7f814de03bce954870a9b1924915",
+      "h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.zip": "a8cfc179f12049abbefc9f57467d96034bb465c0b2a0e68c21c870b8f4e70276",
+      "h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-zeros.zip": "b4e8de2a64ec1462977b72179c2d5b6d31dd1dcd6be93879b121849b9957dc1d"
+    },
+    "flank_support_px": 15.0,
+    "un_eroded_edge_score": true,
+    "registry_exclusions": []
   },
-  "parallel_session_16_rows": [
-   {
-    "raster": "PARALLEL16__tensor-continuous-1875224px-20261009T202053Z-nan.tif",
-    "reference_positive_cells": 1875224,
-    "forward": 0.86125,
-    "forward_chance": 0.7673247121893465,
-    "forward_excess": 0.4036753911188367,
-    "reverse": 0.12289358497971442,
-    "reverse_chance": 0.08745333460541749,
-    "min_direction": 0.12289358497971442,
-    "spearman": 0.024472863456122092,
-    "jaccard": 0.004492326715056465
-   },
-   {
-    "raster": "PARALLEL16__tensor-gradient-gated-168854px-20261009T202306Z-nan.tif",
-    "reference_positive_cells": 168854,
-    "forward": 0.6213125,
-    "forward_chance": 0.4555539149196313,
-    "forward_excess": 0.3044536265806745,
-    "reverse": 0.12535681713196015,
-    "reverse_chance": 0.08745333460541749,
-    "min_direction": 0.12535681713196015,
-    "spearman": 0.009909809194506987,
-    "jaccard": 0.005526604945658678
-   },
-   {
-    "raster": "PARALLEL16__tensor-triscale-poisson-50035dots-20261009T201613Z-nan.tif",
-    "reference_positive_cells": 50035,
-    "forward": 0.2673125,
-    "forward_chance": 0.13915310545609927,
-    "forward_excess": 0.14887594455667166,
-    "reverse": 0.2058359148595983,
-    "reverse_chance": 0.08745333460541749,
-    "min_direction": 0.2058359148595983,
-    "spearman": 0.010736140259810607,
-    "jaccard": 0.0069534454627243475
-   }
-  ],
-  "literal_threshold": 0.7,
-  "literal_rule_verdict": "BREACHED_BY_COVERAGE_ARTEFACT",
-  "symmetric_rule_verdict": "PASS-UNIQUE",
-  "chance_adjusted_verdict": "PASS-UNIQUE",
-  "duplicate_note": "The literal rule is one-sided: it asks what fraction of OUR dots sit near THEIR cells, which rises with the reference raster's own coverage. The decisive statistic is the smaller of the two directions. Across all 61 valid references the maximum of min(forward, reverse) is 0.206 against a 0.70 threshold, max |Spearman| is 0.0245 against a 0.90 threshold, and max Jaccard is 0.00695. Every raster that trips the literal rule has a reverse direction at or below chance, i.e. their positives are NOT concentrated on our dots."
- },
- "raster_sha256": {
-  "value": "927dc17f7f5d890b2f382e266ade5d775474631ee96674f8ff3cbc1f1b7c7693",
-  "file": "docs/downloads/gems55-tensor_full-n16000-sep3-20261009T211747Z-nan.tif",
-  "artifact_status": "COMPETITION_SUBMISSION_CANDIDATE; download link published"
- },
- "validator_findings": {
-  "status": "PASS_LOCAL_STRUCTURAL_ONLY",
-  "checks_passed": "11 of 11 (single band, float32, EPSG:32611, 3730x3292, geotransform, 100 m, NaN exactly outside the template footprint, finite inside, values in [0,1], positives exist, no positive on a mapped catalogue pixel)",
-  "official_template_present": true,
-  "feature_stack_present": true,
-  "note": "Local validation against the authentic organiser template; NOT an organiser portal validation or a score receipt."
- },
- "submission": {
-  "status": "CLEARED_TO_DOWNLOAD_AND_SUBMIT",
-  "name": "gems55-tensor_full-n16000-sep3-20261009T211747Z",
-  "note": "GEMS55 tensor lane: FFT gradient-tensor 2D-ness gate on pseudogravity RTP mag + isostatic gravity ridge dots, 16000 dots sep 3px.",
-  "note_characters": 129,
-  "note_limit_characters": 140,
-  "file_link_published": true,
-  "organizer_receipt": null,
-  "selector_note": "Promotion to a real competition slot is a separate selector step under the weekly cap shown on the submission page. This session used no slot."
- },
- "score_attribution": {
-  "evidence_class": "PUBLIC-LEADERBOARD snapshot (not a submission-page receipt)",
-  "organizer_receipt": null,
-  "note": "No organizer submission receipt exists for any raster in this repository. Reported public values are snapshots only."
- },
- "budget": {
-  "experiments_run_this_session": 3,
-  "experiment_limit": 3,
-  "experiments": [
-   "E1 leakage canary + arm sweep",
-   "E2 dot-count / separation / dilation morphology sweep with a random control at every morphology",
-   "E3 preregistered final run with spatial-block bootstrap CI, ablation and the strike test"
-  ],
-  "weekly_slot_used": false
- },
- "verdict": "PROMOTE_WITH_CAVEATS",
- "verdict_reason": "The candidate clears format, leakage, holdout-vs-random, continuous-surface uniqueness and chance-adjusted dot uniqueness against all 61 valid registry rasters, including the six produced by the parallel session merged in PR #16. It does not clear the lane's own confirmatory strike test, and the literal one-sided 70% 3-pixel rule is breached by reference coverage: the maximum symmetric min-direction overlap is 0.206 and every breaching reference has a reverse direction at or below chance. Promotion to a real competition slot remains a separate selector decision under the weekly cap; no slot was used."
+  "verdict": "negative",
+  "promotion": "do_not_promote",
+  "projection_written_as_score": false,
+  "organizer_confirmed_scores": [],
+  "budget": {
+    "experiments_used": 3,
+    "limit": 3,
+    "hours_limit": 2,
+    "weekly_slot_used": false,
+    "experiments": [
+      "1: exploratory H57 flank run, invalid for promotion (lattice excluded and arms not mass-matched); retained as an explicitly invalid archive",
+      "2: full-registry capacity diagnostic; identified that the score-bearing flank surface can emit only 221 dots at a 1000-dot request under the literal all-raster 0.68 cap",
+      "3: matched-mass H57 holdout, 200 dots, all 56 rasters, no exclusions; negative"
+    ]
+  },
+  "review_passes": [
+    "implementation",
+    "bug/assumption audit",
+    "requirement/source/strict-uniqueness audit"
+  ]
 }

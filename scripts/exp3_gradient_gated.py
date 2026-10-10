@@ -38,20 +38,20 @@ def nms_skeleton(score: np.ndarray, valid: np.ndarray, sigma: float = 1.0) -> np
         smoothed = ndimage.gaussian_filter(score.astype(np.float64), sigma)
     else:
         smoothed = score.astype(np.float64)
-    
+
     # Compute gradient direction
     gy, gx = np.gradient(smoothed)
     gmag = np.hypot(gx, gy)
-    
+
     # For each pixel, check if it's a local maximum in the gradient direction
     # This is the standard NMS approach for edge detection
     ny, nx = score.shape
     skeleton = np.zeros_like(score, dtype=bool)
-    
+
     # Quantize gradient direction to 4 angles (0, 45, 90, 135)
     angle = np.arctan2(gy, gx) * 180 / np.pi
     angle = angle % 180  # 0-180 degrees
-    
+
     # For each direction, compare with neighbors along that direction
     for theta_min, theta_max, dy1, dx1, dy2, dx2 in [
         (0, 22.5, 0, 1, 0, -1),      # horizontal gradient -> check vertically
@@ -66,24 +66,24 @@ def nms_skeleton(score: np.ndarray, valid: np.ndarray, sigma: float = 1.0) -> np
         # Check neighbors
         n1 = np.zeros_like(smoothed)
         n2 = np.zeros_like(smoothed)
-        
+
         # Shift for neighbor 1
         sy1, sx1 = max(0, dy1), max(0, dx1)
         ey1, ex1 = min(ny, ny + dy1), min(nx, nx + dx1)
         ny1, nx1 = max(0, -dy1), max(0, -dx1)
         n1[ny1:ny1 + (ey1 - sy1), nx1:nx1 + (ex1 - sx1)] = \
             smoothed[sy1:ey1, sx1:ex1]
-        
+
         # Shift for neighbor 2
         sy2, sx2 = max(0, dy2), max(0, dx2)
         ey2, ex2 = min(ny, ny + dy2), min(nx, nx + dx2)
         ny2, nx2 = max(0, -dy2), max(0, -dx2)
         n2[ny2:ny2 + (ey2 - sy2), nx2:nx2 + (ex2 - sx2)] = \
             smoothed[sy2:ey2, sx2:ex2]
-        
+
         is_max = mask & (smoothed >= n1) & (smoothed >= n2)
         skeleton |= is_max
-    
+
     return skeleton & valid
 
 
@@ -105,7 +105,7 @@ def main() -> None:
     # Compute gradient tensors
     print("\n[2/6] Computing gradient tensors...")
     res = io55.RES_M
-    
+
     # Field preparation: bandpass filter
     bp_rtp, _ = fields55.prepare_field(
         rtp, rtp_valid, res, along_axis=0,
@@ -151,7 +151,7 @@ def main() -> None:
 
     # Build the detection surface
     print("\n[4/6] Building detection surface...")
-    
+
     # Robust block normalization of gradient magnitudes
     def robust_norm(x, v, block=64):
         ny, nx = x.shape
@@ -198,12 +198,12 @@ def main() -> None:
     dim_avg = (0.5 * (dim_rtp + dim_grav)).astype(np.float32)
     del dim_rtp, dim_grav
     gc.collect()
-    
+
     # Weight: 1 for near-2D (dim~0), 0 for compact 3D (dim~1)
     # Use power law: w = (1-dim)^power
     dim_power = 0.5  # moderate gating
     w2d = np.clip(1.0 - dim_avg, 0.0, 1.0) ** dim_power
-    
+
     # Combined score: ridge * dimensionality weight
     score = (ridge * w2d).astype(np.float32)
     del ridge, w2d

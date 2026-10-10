@@ -1,30 +1,31 @@
 #!/usr/bin/env python3
-"""Hide-and-recover holdout for the tensor-dimensionality lane.
+"""Shared holdout evaluator for the tensor-dimensionality lane.
 
-Protocol (preregistered, matches the standing brief)
----------------------------------------------------
-* Folds: WHOLE 8-connected catalogue components assigned to a spatially
-  structured set of bins by component centroid.  A component is never cut.
-* Buffer: every withheld component is dilated by ``--buffer-px`` (default 3 px =
-  300 m); those pixels belong to neither the visible catalogue nor the truth.
-* Visible faults: masked pixel-exactly from the emitted prediction.
-* Catalogue-derived features: NONE.  Every arm below is built only from the
-  geophysical tensor cache, so no arm can see the withheld segments.
-* Scoring: pooled distance-weighted Tversky index, alpha = 0.2, beta = 0.8,
-  300 m triangular kernel (3 px at 100 m).  Per-fold truth contributions and
-  per-fold-bin false-positive contributions are pooled; the bins partition the
-  footprint, so every prediction cell and every truth cell is counted once.
-* Leakage canary: every single feature is scored alone (AUC of the withheld
-  truth against far-field negatives).  AUC > 0.90 is LEAKAGE until proven
-  otherwise.
-* Every arm is compared with a mass-matched uniform random control drawn over
-  the same eligible set, independent of the score surface.
+Protocol
+--------
+5-fold *whole-segment* spatial CV ("hide and recover"):
 
-The fast pooled evaluator is verified against the literal ``dti55`` reference
-implementation before the sweep starts (see ``_selfcheck``).
+* the catalogue is split into whole connected traces and 20-pixel lattice
+  segments; a seeded assignment withholds complete segments and buffers them by
+  3 px.  No withheld segment is used as a visible catalogue feature.
+* each fold emits ``n_dots / 5`` unit dots over the full scored footprint, while
+  all visible catalogue pixels are masked pixel-exactly.  The held-out segment
+  truth is the only positive set for that fold.
+* fold TP/FP/FN contributions are pooled before taking one official DTI.  This
+  mirrors the organiser's pooled aggregation and avoids averaging fold ratios.
+* a matched uniform-random arm is evaluated with the identical eligible mask.
 
-Outputs a JSON record under ``evidence/``.  No submission slot is touched.
+Arms at matched mass:
+  random        uniform over the eligible set (the null)
+  ridge_only    horizontal-gradient ridge rank, no tensor gating
+  ridge_x_dim   ridge x (1 - dimensionality)
+  ridge_x_agree ridge x strike-agreement
+  tensor_full   the whole lane score (ridge x 2-D gate x strike agreement x plunge)
+
+Also runs the leakage canary (single-feature AUC against the hidden truth) and
+the strike test (withheld-fault strike vs the tensor strike).
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,427 +35,265 @@ import time
 from pathlib import Path
 
 import numpy as np
-from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from gems55 import dti55, holdout55, io55, tensor55  # noqa: E402
 
-CACHE = ROOT / "cache" / "tc300.npz"
+from gems55 import dti55, holdout55, io55, surfaces55, tensor55  # noqa: E402
 
-
-# --------------------------------------------------------------------------- #
-# cache loading
-# --------------------------------------------------------------------------- #
-def _dequant(a: np.ndarray) -> np.ndarray:
-    if a.dtype == np.uint8:
-        return a.astype(np.float32) / 255.0
-    if a.dtype == np.int16:
-        return a.astype(np.float32) / 100.0
-    return a.astype(np.float32)
+CACHE = ROOT / "data" / "cache"
+EVID = ROOT / "evidence"
 
 
-def load_cache(path: Path = CACHE) -> dict:
-    z = np.load(path)
-    return {k: (z[k].astype(bool) if z[k].dtype == bool else _dequant(z[k])) for k in z.files}
+def bootstrap_ci(x: np.ndarray, n: int = 2000, seed: int = 0) -> tuple[float, float]:
+    rng = np.random.default_rng(seed)
+    if x.size == 0:
+        return (float("nan"), float("nan"))
+    idx = rng.integers(0, x.size, size=(n, x.size))
+    m = x[idx].mean(axis=1)
+    return (float(np.quantile(m, 0.025)), float(np.quantile(m, 0.975)))
 
 
-# --------------------------------------------------------------------------- #
-# scoring surfaces (geophysical only; labels.tif is never read here)
-# --------------------------------------------------------------------------- #
-def _rank01(x: np.ndarray, valid: np.ndarray) -> np.ndarray:
-    out = np.zeros(x.shape, dtype=np.float64)
-    idx = np.nonzero(valid.ravel())[0]
-    v = x.ravel()[idx]
-    v = np.where(np.isfinite(v), v, -np.inf)
-    order = np.argsort(v, kind="stable")
-    ranks = np.empty(v.size, dtype=np.float64)
-    ranks[order] = np.arange(v.size, dtype=np.float64)
-    ranks /= max(v.size - 1, 1)
-    out.ravel()[idx] = ranks
-    return out
-
-
-def _block_norm(x: np.ndarray, valid: np.ndarray, block: int = 64) -> np.ndarray:
-    ny, nx = x.shape
-    out = np.zeros_like(x, dtype=np.float64)
-    for y0 in range(0, ny, block):
-        for x0 in range(0, nx, block):
-            sl = (slice(y0, min(y0 + block, ny)), slice(x0, min(x0 + block, nx)))
-            v = valid[sl]
-            if v.sum() < 25:
-                continue
-            vals = x[sl][v]
-            med = float(np.median(vals))
-            mad = float(np.median(np.abs(vals - med))) * 1.4826
-            out[sl] = np.where(v, (x[sl] - med) / max(mad, 1e-12), 0.0)
-    return out
-
-
-def build_arm_surfaces(C: dict, footprint: np.ndarray, *, strike_sigma_deg: float = 25.0,
-                       dim_variant: str = "invariant") -> dict[str, np.ndarray]:
-    valid = footprint & np.isfinite(C["mag_s300_hg"]) & np.isfinite(C["grav_s300_hg"])
-    ridge_m = _rank01(np.clip(_block_norm(C["mag_s300_hg"], valid), 0, None), valid)
-    ridge_g = _rank01(np.clip(_block_norm(C["grav_s300_hg"], valid), 0, None), valid)
-    ridge = np.sqrt(np.clip(ridge_m, 0, 1) * np.clip(ridge_g, 0, 1))
-    ridge_max = np.maximum(ridge_m, ridge_g)
-
-    key = "dim_inv" if dim_variant == "invariant" else "dim_eig"
-    dim = 0.5 * (C[f"mag_s300_{key}"] + C[f"grav_s300_{key}"])
-    w2d = np.clip(1.0 - dim, 0.0, 1.0)
-
-    dth = 0.5 * (
-        tensor55.angular_difference_deg(C["mag_s300_strike"], C["mag_s300_ridge_az"])
-        + tensor55.angular_difference_deg(C["grav_s300_strike"], C["grav_s300_ridge_az"])
-    )
-    agree = np.exp(-((dth / strike_sigma_deg) ** 2)).astype(np.float32)
-    plunge = 0.5 * (C["mag_s300_plunge"] + C["grav_s300_plunge"])
-
-    base = np.where(valid, 1.0, 0.0).astype(np.float32)
-    S = {
-        "tensor_full": base * ridge * w2d * agree * plunge,
-        "ridge_only": base * ridge,
-        "ridge_max_only": base * ridge_max,
-        "ridge_x_agree": base * ridge * agree,
-        "ridge_x_dim": base * ridge * w2d,
-        "ridge_x_plunge": base * ridge * plunge,
-        "dim_gate_only": base * w2d,
-        "agree_only": base * agree,
-        "plunge_only": base * plunge,
-        "dim_only": base * dim,
-        "ridge_mag_only": base * ridge_m,
-        "ridge_grav_only": base * ridge_g,
-    }
-    for k in S:
-        S[k] = np.where(valid, np.clip(np.nan_to_num(S[k]), 0.0, 1.0), 0.0).astype(np.float32)
-    S["_valid"] = valid
-    S["_strike"] = np.where(agree > 0.5, C["mag_s300_strike"], C["grav_s300_strike"]).astype(np.float32)
-    S["_dim"] = dim.astype(np.float32)
-    S["_dtheta"] = dth
-    S["_agree"] = agree
-    return S
-
-
-# --------------------------------------------------------------------------- #
-# emission
-# --------------------------------------------------------------------------- #
-def dilate_disk(r_px: float) -> np.ndarray:
-    r = int(np.ceil(r_px))
-    yy, xx = np.ogrid[-r : r + 1, -r : r + 1]
-    return (yy * yy + xx * xx) <= r_px * r_px + 1e-9
-
-
-def emit(score: np.ndarray, eligible: np.ndarray, *, top_pct: float, dilate_px: int,
-         value: float = 1.0) -> np.ndarray:
-    """Binary emission: eligible cells in the top ``top_pct`` percent, dilated."""
-    s = np.where(eligible, score, -np.inf)
-    n = int(eligible.sum())
-    if n == 0:
-        return np.zeros(score.shape, dtype=np.float32)
-    k = int(round(n * top_pct / 100.0))
-    k = max(1, min(k, n))
-    thr = float(np.partition(s[eligible], n - k)[n - k])
-    sel = eligible & (score >= thr)
-    if dilate_px > 0:
-        sel = ndimage.binary_dilation(sel, structure=dilate_disk(float(dilate_px)))
-    sel &= eligible
-    return np.where(sel, value, 0.0).astype(np.float32)
-
-
-def emit_dots(score: np.ndarray, eligible: np.ndarray, *, n_dots: int, min_sep_px: float,
-              dilate_px: int = 0) -> np.ndarray:
-    """Isolated dots: non-maximum suppression at ``min_sep_px`` then the top ``n_dots``.
-
-    This is the morphology every top-scoring registry raster uses: single,
-    mutually separated cells at value 1.  Two dots closer than the kernel radius
-    cannot both add true-positive credit (the metric takes a *max*, not a sum),
-    so packing them tighter than ``min_sep_px`` only buys false positives.
-
-    Non-maximum suppression with a disk of radius ``min_sep_px`` already
-    guarantees the separation (two local maxima cannot lie inside each other's
-    disk), so the exact-pair cKDTree pass in ``holdout55.emit_dots`` only breaks
-    rare ties; it is skipped here for speed.  A regression check is printed once
-    per run.
-    """
-    r = int(np.ceil(min_sep_px))
-    yy, xx = np.mgrid[-r : r + 1, -r : r + 1]
-    disk = (yy**2 + xx**2) <= min_sep_px**2 + 1e-9
-    elig = eligible & np.isfinite(score) & (score > 0)
-    sm = np.where(elig, score, -np.inf).astype(np.float32)
-    local_max = ndimage.maximum_filter(sm, footprint=disk, mode="nearest")
-    peaks = elig & (score >= local_max)
-    idx = np.nonzero(peaks.ravel())[0]
-    if idx.size == 0:
-        return np.zeros(score.shape, dtype=np.float32)
-    vals = score.ravel()[idx]
-    k = min(int(n_dots), idx.size)
-    take = idx[np.argpartition(-vals, k - 1)[:k]] if k < idx.size else idx
-    sel = np.zeros(score.shape, dtype=bool)
-    sel.ravel()[take] = True
-    if dilate_px > 0:
-        sel = ndimage.binary_dilation(sel, structure=dilate_disk(float(dilate_px)))
-        sel &= eligible
-    return sel.astype(np.float32)
-
-
-# --------------------------------------------------------------------------- #
-# fast pooled evaluator
-# --------------------------------------------------------------------------- #
-class PooledEvaluator:
-    """Pre-computes everything that depends only on the fold geometry.
-
-    For each fold k:
-      * ``w``         full-grid kernel credit max_g k(d(x,g))  (float32)
-      * ``bin``       the disjoint footprint partition cell used for FP pooling
-      * ``nbr_idx``   (n_truth, m) flat indices of the kernel disk around each
-                      truth cell, clipped to the grid
-      * ``nbr_w``     (n_truth, m) triangular weights k(|offset|)
-      * ``nbr_ok``    (n_truth, m) bool, False where the offset left the grid
-    """
-
-    def __init__(self, folds, bins, shape):
-        self.folds = folds
-        self.bins = bins
-        ny, nx = shape
-        offs = dti55.kernel_offsets(dti55.R_PX)
-        offs = [(dy, dx, w) for dy, dx, w in offs if w > 0.0]
-        self.offs = offs
-        self.shape = shape
-        self.parts = []
-        for k, f in enumerate(folds):
-            w64 = dti55.kernel_credit(f.truth, dti55.R_PX)
-            w = w64.astype(np.float32)
-            ys, xs = np.nonzero(f.truth)
-            m = len(offs)
-            idx = np.zeros((ys.size, m), dtype=np.int64)
-            ww = np.zeros((ys.size, m), dtype=np.float64)
-            ok = np.zeros((ys.size, m), dtype=bool)
-            for j, (dy, dx, wt) in enumerate(offs):
-                yy = ys + dy
-                xx = xs + dx
-                good = (yy >= 0) & (yy < ny) & (xx >= 0) & (xx < nx)
-                ok[:, j] = good
-                idx[:, j] = np.where(good, np.clip(yy, 0, ny - 1) * nx + np.clip(xx, 0, nx - 1), 0)
-                ww[:, j] = wt
-            b = bins[k]
-            self.parts.append({
-                "w": w,
-                "one_minus_w_bin": (1.0 - w64[b]).astype(np.float64),
-                "bin_flat": np.nonzero(b.ravel())[0],
-                "nbr_idx": idx, "nbr_w": ww, "nbr_ok": ok,
-                "n_truth": int(ys.size),
-            })
-
-    def pooled(self, preds: list[np.ndarray]) -> dict:
-        TP = FP = 0.0
-        n_pred = 0
-        for p, part in zip(preds, self.parts):
-            flat = np.asarray(p, dtype=np.float32).ravel()
-            # float64 accumulation: a float32 sum over ~30k truth cells loses
-            # ~1e-2 absolute precision, which is larger than the self-check
-            # tolerance against the float64 reference in dti55.
-            vals = np.where(part["nbr_ok"],
-                            flat[part["nbr_idx"]].astype(np.float64) * part["nbr_w"], 0.0)
-            TP += float(vals.max(axis=1).sum())
-            FP += float(np.dot(flat[part["bin_flat"]].astype(np.float64),
-                               part["one_minus_w_bin"].astype(np.float64)))
-            n_pred += int((flat > 0).sum())
-        n_truth = sum(part["n_truth"] for part in self.parts)
-        FN = float(n_truth) - TP
-        return {"dti": dti55.dti_from_totals(TP, FP, FN), "tp_w": TP, "fp_w": FP,
-                "fn_w": FN, "n_truth": n_truth,
-                "mean_pred_cells": n_pred / max(len(self.parts), 1)}
-
-    def selfcheck(self, preds: list[np.ndarray], tol: float = 1e-4) -> dict:
-        """Verify the fast path against the literal ``dti55`` reference, per fold.
-
-        ``dti55.dti`` scores the prediction over the whole grid; the pooled
-        protocol charges false positives only inside the fold's own bin, so the
-        reference FP is recomputed explicitly on that same bin.
-        """
-        ref_tp = ref_fp = ref_fn = 0.0
-        for k, (p, f) in enumerate(zip(preds, self.folds)):
-            r = dti55.dti(p, f.truth)
-            ref_tp += r.tp_w
-            ref_fn += r.fn_w
-            pf = np.asarray(p, dtype=np.float64)
-            w = dti55.kernel_credit(f.truth, dti55.R_PX)
-            b = self.bins[k]
-            ref_fp += float(np.sum(pf[b] * (1.0 - w)[b]))
-        fast = self.pooled(preds)
-        worst = max(abs(fast["tp_w"] - ref_tp), abs(fast["fp_w"] - ref_fp),
-                    abs(fast["fn_w"] - ref_fn))
-        return {"max_abs_component_error": float(worst), "tolerance": tol,
-                "passed": bool(worst <= tol)}
-
-
-def spatial_bins(footprint: np.ndarray, nrows: int, ncols: int) -> list[np.ndarray]:
-    ny, nx = footprint.shape
-    by = int(np.ceil(ny / nrows))
-    bx = int(np.ceil(nx / ncols))
-    out = []
-    for i in range(nrows):
-        for j in range(ncols):
-            m = np.zeros((ny, nx), dtype=bool)
-            m[i * by:(i + 1) * by, j * bx:(j + 1) * bx] = True
-            out.append(m & footprint)
-    return out
-
-
-def main() -> int:
+def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--cache", type=Path, default=CACHE)
-    ap.add_argument("--n-folds", type=int, default=4)
-    ap.add_argument("--buffer-px", type=int, default=3)
-    ap.add_argument("--n-dots", type=int, nargs="+",
-                    default=[8000, 12000, 16000, 20000, 25000, 30000, 37654, 45000, 60000])
-    ap.add_argument("--min-sep", type=float, nargs="+", default=[3.0, 5.0])
-    ap.add_argument("--dilate-px", type=int, nargs="+", default=[0, 1])
-    ap.add_argument("--arms", type=str, nargs="+", default=None)
-    ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--random-each", action="store_true",
-                    help="run the mass-matched uniform random control at every morphology")
-    ap.add_argument("--control-reps", type=int, default=3)
-    ap.add_argument("--limit-arms", type=int, default=0)
-    ap.add_argument("--out", type=Path, default=ROOT / "evidence" / "holdout55_v1.json")
+    ap.add_argument("--tag", default="v1")
+    ap.add_argument("--n-dots", type=int, default=40000)
+    ap.add_argument("--min-sep", type=float, default=3.0)
+    ap.add_argument("--out", default=None)
+    ap.add_argument("--arms", default="random,ridge_only,ridge_x_dim,ridge_x_agree,tensor_full")
+    ap.add_argument("--flank-support-px", type=float, default=0.0,
+                    help="if > 0, adds arms flank_only (prior alone) and tensor_flank "
+                         "(lane score x prior), both per-fold from the VISIBLE catalogue only")
+    ap.add_argument("--un-eroded", action="store_true",
+                    help="use cached tensor factors on the six-pixel footprint edge without "
+                         "the lane's edge erosion; this is an edge-artifact sensitivity arm")
+    ap.add_argument("--registry-dir", default=None,
+                    help="registry rasters directory; every same-grid raster is budgeted, no exclusions")
+    ap.add_argument("--max-overlap", type=float, default=0.68,
+                    help="per-raster cap on the final dot overlap fraction (protocol stop is 0.70)")
     args = ap.parse_args()
 
     t0 = time.time()
+    z = np.load(CACHE / f"lane_{args.tag}.npz")
+    score = z["score"]
+    ridge = z["ridge"]
+    dim = z["dim"]
+    agree = z["agree"]
+    plunge = z["plunge"]
+    striping = z["striping"]
+    labels = z["labels"]
+    footprint = z["footprint"]
+    z.close()
+    score_surface = surfaces55.tensor_surface(
+        cached_score=score, ridge=ridge, dimensionality=dim,
+        strike_agreement=agree, plunge_weight=plunge, striping=striping,
+        footprint=footprint, un_eroded=args.un_eroded,
+    )
+
     grid, _ = io55.read_template()
-    labels = io55.read_labels()
-    footprint = np.asarray(grid.footprint, dtype=bool)
-    C = load_cache(args.cache)
-    S = build_arm_surfaces(C, footprint)
-    valid = S["_valid"]
+    assert footprint.shape == grid.shape
+    folds = holdout55.make_segment_folds(
+        labels, footprint, n_folds=5, buffer_px=3, split_px=20, seed=0
+    )
+    if len(folds) < 2:
+        raise RuntimeError("segment holdout needs at least two non-empty folds")
+    cat = labels == 1
 
-    folds = holdout55.make_segment_folds(labels, footprint, n_folds=args.n_folds,
-                                         buffer_px=args.buffer_px)
-    nrows = max(1, int(np.floor(np.sqrt(len(folds)))))
-    ncols = int(np.ceil(len(folds) / nrows))
-    bins = spatial_bins(footprint, nrows, ncols)
-    while len(bins) < len(folds):
-        bins.append(bins[-1])
-    bins = bins[:len(folds)]
-    n_pooled = sum(int(f.truth.sum()) for f in folds)
-    print(f"{len(folds)} folds (grid {nrows}x{ncols}); pooled withheld positives = {n_pooled}",
-          flush=True)
-    for f in folds:
-        print(f"   {f.name}: truth={int(f.truth.sum())} visible={int(f.visible.sum())}", flush=True)
+    cover_masks: list = []
+    if args.registry_dir:
+        cover_names, cover_masks = holdout55.registry_cover_masks(args.registry_dir, grid.shape)
+        print(f"[budget] {len(cover_masks)} registry cover masks, no exclusions, "
+              f"cap={args.max_overlap}", flush=True)
 
-    ev = PooledEvaluator(folds, bins, footprint.shape)
-
-    arm_names = args.arms or [k for k in S if not k.startswith("_")]
-    if args.limit_arms:
-        arm_names = arm_names[:args.limit_arms]
-
-    # ---------------- leakage canary --------------------------------------- #
-    far = footprint & ~ndimage.binary_dilation(labels == 1, iterations=6)
-    canary = {}
-    for name in arm_names + ["_dim", "_dtheta", "_agree"]:
-        s = S[name]
-        aucs, lifts = [], []
-        for f in folds:
-            y = np.zeros(s.shape, dtype=bool)
-            y[f.truth] = True
-            sub = f.truth | far
-            aucs.append(holdout55.auc(s[sub], y[sub]))
-            # mean score on the withheld truth vs on far-field negatives
-            lifts.append(float(np.mean(s[f.truth]) / max(np.mean(s[far]), 1e-12)))
-        canary[name] = {"auc_mean": float(np.nanmean(aucs)),
-                        "auc_folds": [float(a) for a in aucs],
-                        "mean_score_lift_vs_farfield": float(np.nanmean(lifts))}
-    print("\n--- leakage canary (AUC vs withheld truth; negatives >=600 m from any mapped fault) ---",
-          flush=True)
-    for k, v in canary.items():
-        flag = "LEAKAGE-SUSPECT (>0.90)" if v["auc_mean"] > 0.90 else "ok"
-        print(f"  {k:18s} AUC={v['auc_mean']:.4f}  lift={v['mean_score_lift_vs_farfield']:.2f}x  {flag}",
-              flush=True)
-
-    # ---------------- pooled DTI sweep ------------------------------------- #
-    checked = False
-    results = {}
-    print("\n--- pooled HOLDOUT-DTI sweep ---", flush=True)
-    for name in arm_names:
-        surf = S[name]
-        morph = {}
-        for nd in args.n_dots:
-            for sep in args.min_sep:
-                for dp in args.dilate_px:
-                    preds = [emit_dots(surf, valid & ~f.visible, n_dots=nd,
-                                       min_sep_px=sep, dilate_px=dp) for f in folds]
-                    if not checked:
-                        sc = ev.selfcheck(preds)
-                        print(f"  [selfcheck] fast vs literal dti55: {sc}", flush=True)
-                        if not sc["passed"]:
-                            raise SystemExit("fast evaluator disagrees with dti55 reference")
-                        checked = True
-                    morph[(nd, sep, dp)] = ev.pooled(preds)
-        rows = [{"n_dots": nd, "min_sep_px": sep, "dilate_px": dp, **r}
-                for (nd, sep, dp), r in morph.items()]
-        best = max(rows, key=lambda r: r["dti"])
-        # mass-matched uniform random control.  With ``--random-each`` it is run
-        # at EVERY morphology, because the metric's false-positive term is cheap
-        # (alpha = 0.2) and a concentrated candidate can lose to a uniformly
-        # spread control purely through clustering; comparing at matched count
-        # per morphology is the only honest comparison.
-        ctrl_dti, ctrl_rows = [], []
-        morphs = rows if args.random_each else [best]
-        for row in morphs:
-            reps = 1 if args.random_each else args.control_reps
-            d_vals = []
-            for rep in range(reps):
-                nd, sep, dp = row["n_dots"], row["min_sep_px"], row["dilate_px"]
-                preds = []
-                for k, f in enumerate(folds):
-                    elig = valid & ~f.visible
-                    ref = emit_dots(surf, elig, n_dots=nd, min_sep_px=sep, dilate_px=dp)
-                    n_sel = int((ref > 0).sum())
-                    idx = np.nonzero(elig.ravel())[0]
-                    rng = np.random.default_rng(args.seed + 1000 * rep + k)
-                    out = np.zeros(surf.shape, dtype=np.float32)
-                    take = rng.choice(idx, size=min(n_sel, idx.size), replace=False)
-                    out.ravel()[take] = 1.0
-                    preds.append(out)
-                r = ev.pooled(preds)
-                ctrl_rows.append({"morphology": [nd, sep, dp], **r})
-                d_vals.append(r["dti"])
-            if args.random_each:
-                row["random_control_dti"] = float(np.mean(d_vals))
-                row["lift_over_random"] = float(row["dti"] / max(np.mean(d_vals), 1e-12))
-            ctrl_dti.extend(d_vals)
-        results[name] = {
-            "best": best,
-            "sweep": rows,
-            "random_control_reps": ctrl_rows,
-            "random_control_dti_mean": float(np.mean(ctrl_dti)),
-            "random_control_dti_min": float(np.min(ctrl_dti)),
-            "random_control_dti_max": float(np.max(ctrl_dti)),
-            "lift_over_random": float(best["dti"] / max(np.mean(ctrl_dti), 1e-12)),
-        }
-        print(f"  {name:18s} best DTI={best['dti']:.6f} (n_dots={best['n_dots']} "
-              f"sep={best['min_sep_px']} dilate {best['dilate_px']})  random={np.mean(ctrl_dti):.6f}  "
-              f"lift={best['dti']/max(np.mean(ctrl_dti),1e-12):.2f}x  "
-              f"[{time.time()-t0:.0f}s]", flush=True)
-
-    out = {
-        "evidence_class": "HOLDOUT-DTI",
-        "evaluator_version": dti55.EVALUATOR_VERSION,
-        "withheld_positive_count": int(n_pooled),
-        "n_folds": len(folds),
-        "buffer_px": args.buffer_px,
-        "footprint_px": int(footprint.sum()),
-        "metric": {"alpha": dti55.ALPHA, "beta": dti55.BETA,
-                   "kernel": "triangular", "radius_m": dti55.R_PX * io55.RES_M},
-        "cache": str(args.cache),
-        "canary": canary,
-        "arms": results,
-        "elapsed_s": time.time() - t0,
+    base_elig = footprint & ~striping
+    surfaces = {
+        "random": score_surface,  # unused for seeded random emission
+        "ridge_only": ridge,
+        "ridge_x_dim": (ridge * (1.0 - dim)).astype(np.float32),
+        "ridge_x_agree": (ridge * agree).astype(np.float32),
+        "tensor_full": score_surface,
     }
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(out, indent=1))
-    print(f"\nwrote {args.out}  ({time.time()-t0:.0f}s)")
-    return 0
+    arms = [a for a in args.arms.split(",") if a]
+    if args.flank_support_px > 0:
+        for extra in ("flank_only", "tensor_flank"):
+            if extra not in arms:
+                arms.append(extra)
+        print(f"[flank] support={args.flank_support_px} px; arms flank_only and "
+              f"tensor_flank use the per-fold VISIBLE catalogue only", flush=True)
+
+    res: dict = {"config": vars(args), "n_folds": len(folds), "n_truth_total": int(cat.sum())}
+    for arm in arms:
+        # Each fold has its own information set.  Do not union the predictions
+        # before scoring: a pixel masked as visible in one fold is not the same
+        # information state as that pixel in another fold.  Pool the exact
+        # TP/FP/FN totals instead, as the organiser does for the leaderboard.
+        per_fold = []
+        totals = {"tp_w": 0.0, "fp_w": 0.0, "fn_w": 0.0, "n_pred_pos": 0, "n_truth": 0}
+        for fold_i, f in enumerate(folds):
+            # Predictions may occur anywhere in the footprint.  Only visible
+            # catalogue pixels are forbidden; otherwise this is a true
+            # hide-and-recover test rather than a quadrant placement test.
+            elig = base_elig & ~f.visible
+            n = args.n_dots // len(folds)
+            if arm == "flank_only":
+                surf = holdout55.flank_weight(f.visible, args.flank_support_px)
+            elif arm == "tensor_flank":
+                surf = surfaces55.tensor_surface(
+                    cached_score=score, ridge=ridge, dimensionality=dim,
+                    strike_agreement=agree, plunge_weight=plunge, striping=striping,
+                    footprint=footprint, catalogue=f.visible,
+                    flank_support_px=args.flank_support_px, un_eroded=args.un_eroded,
+                )
+            else:
+                surf = surfaces[arm]
+            if cover_masks:
+                dots = holdout55.emit_dots_budgeted(
+                    surf, elig, n, min_sep_px=args.min_sep,
+                    cover_masks=cover_masks, max_overlap=args.max_overlap,
+                    seed=1234 + fold_i, random=(arm == "random"),
+                )
+            else:
+                dots = holdout55.emit_dots(
+                    surf, elig, n, min_sep_px=args.min_sep,
+                    seed=1234 + fold_i, random=(arm == "random"),
+                )
+            c = dti55.dti(dots.astype(np.float32), f.truth, mask=footprint)
+            n_actual = int(dots.sum())
+            record = c.as_dict() | {
+                "requested_dots": int(n),
+                "n_dots": n_actual,
+                "mass_shortfall": int(n - n_actual),
+                "n_truth": int(f.truth.sum()),
+            }
+            per_fold.append(record)
+            for key in ("tp_w", "fp_w", "fn_w", "n_pred_pos", "n_truth"):
+                totals[key] += record[key]
+        pooled = dti55.DTIResult(
+            dti=dti55.dti_from_totals(totals["tp_w"], totals["fp_w"], totals["fn_w"]),
+            tp_w=totals["tp_w"], fp_w=totals["fp_w"], fn_w=totals["fn_w"],
+            n_pred_pos=int(totals["n_pred_pos"]), n_truth=int(totals["n_truth"]),
+        )
+        fd = np.array([p["dti"] for p in per_fold])
+        res[arm] = {
+            "pooled": pooled.as_dict(),
+            "per_fold": per_fold,
+            "fold_mean": float(fd.mean()),
+            "fold_sd": float(fd.std(ddof=1)) if fd.size > 1 else 0.0,
+            "fold_ci95": bootstrap_ci(fd, n=4000),
+            "mass_matched": all(p["mass_shortfall"] == 0 for p in per_fold),
+        }
+        print(
+            f"[{time.time()-t0:6.1f}s] {arm:14s} pooled DTI={pooled.dti:.4f} "
+            f"(dots={pooled.n_pred_pos}; mass_matched={res[arm]['mass_matched']}) "
+            f"folds={np.round(fd,4).tolist()}",
+            flush=True,
+        )
+    res["all_arms_mass_matched"] = all(res[a]["mass_matched"] for a in arms)
+
+    # ---------------- leakage canary -----------------------------------------
+    rng = np.random.default_rng(7)
+    canary = {}
+    zc = np.load(CACHE / f"lane_{args.tag}.npz")
+    dim_inv = zc["dim_inv"]
+    zc.close()
+    feats = {
+        "tensor_full_score": score_surface,
+        "ridge": ridge,
+        "one_minus_dim": (1.0 - dim).astype(np.float32),
+        "strike_agree": agree,
+        "plunge": plunge,
+        "dim_inv_raw": dim_inv,
+    }
+    for name, arr in feats.items():
+        aucs = []
+        for f in folds:
+            # The negative sample is drawn from the same fold's eligible
+            # information state.  No distance-to-visible-fault channel is
+            # invented here; catalogue-derived controls must be recomputed per
+            # fold, not borrowed from fold zero.
+            pos = f.truth
+            neg = base_elig & ~f.visible & ~f.truth
+            nidx = np.nonzero(neg.ravel())[0]
+            take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
+            negm = np.zeros(grid.shape, dtype=bool)
+            negm.ravel()[take] = True
+            y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
+            s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
+            aucs.append(holdout55.auc(s, y))
+        canary[name] = {"auc_per_fold": [float(a) for a in aucs], "auc_mean": float(np.mean(aucs))}
+    if args.flank_support_px > 0:
+        # The flank prior is a supervised feature of the candidate; the canary must
+        # cover it.  It is built from VISIBLE faults only (per fold), so a high AUC
+        # is spatial autocorrelation of the catalogue, not leakage of the hidden truth.
+        aucs = []
+        for f in folds:
+            arr = holdout55.flank_weight(f.visible, args.flank_support_px)
+            pos = f.truth
+            neg = base_elig & ~f.visible & ~f.truth
+            nidx = np.nonzero(neg.ravel())[0]
+            take = rng.choice(nidx, size=int(min(200_000, nidx.size)), replace=False)
+            negm = np.zeros(grid.shape, dtype=bool)
+            negm.ravel()[take] = True
+            y = np.concatenate([np.ones(int(pos.sum())), np.zeros(int(negm.sum()))])
+            s = np.concatenate([arr[pos], arr[negm]]).astype(np.float64)
+            aucs.append(holdout55.auc(s, y))
+        canary["flank_weight_visible_only"] = {
+            "auc_per_fold": [float(a) for a in aucs],
+            "auc_mean": float(np.mean(aucs)),
+            "note": ("supervised prior from VISIBLE faults only, recomputed per fold; a high "
+                     "AUC is catalogue spatial autocorrelation, not hidden-truth leakage"),
+        }
+    res["leakage_canary"] = canary
+    res["leakage_flagged_gt_0p90"] = sorted(
+        k for k, v in canary.items() if v["auc_mean"] > 0.90
+    )
+
+    # ---------------- strike test --------------------------------------------
+    z2 = np.load(CACHE / f"lane_{args.tag}.npz")
+    strike = z2["strike"]
+    dtheta = z2["dtheta"]
+    z2.close()
+    d_with, d_rand = [], []
+    n_withheld_strike_segments = 0
+    for f in folds:
+        segs = holdout55.strike_of_segments(f.truth, min_px=25)
+        n_withheld_strike_segments += len(segs)
+        ridge_px = base_elig & f.withheld & (score_surface > np.quantile(score_surface[base_elig & f.withheld], 0.98))
+        ry, rx = np.nonzero(ridge_px)
+        for s in segs:
+            cy, cx = int(round(s["cy"])), int(round(s["cx"]))
+            win = (slice(max(0, cy - 4), cy + 5), slice(max(0, cx - 4), cx + 5))
+            seg_px = f.truth[win]
+            if seg_px.sum() < 5:
+                continue
+            sy, sx = np.nonzero(seg_px)
+            vals = strike[win][sy, sx]
+            d_with.extend(tensor55.angular_difference_deg(np.full(vals.shape, s["azimuth_deg"]), vals).tolist())
+        if ry.size:
+            pick = rng.choice(ry.size, size=int(min(20000, ry.size)), replace=False)
+            rr = rng.random(pick.size) * 180.0
+            d_rand.extend(tensor55.angular_difference_deg(rr, strike[ry[pick], rx[pick]]).tolist())
+    dw = np.array(d_with, dtype=np.float64)
+    dr = np.array(d_rand, dtype=np.float64)
+    res["strike_test"] = {
+        "n_withheld_segments": int(n_withheld_strike_segments),
+        "n_withheld_pixel_samples": int(dw.size),
+        "n_random_ridge_samples": int(dr.size),
+        "n_random_ridge": int(dr.size),  # backwards-compatible alias; counts samples, not segments
+        "mean_abs_dtheta_withheld_deg": float(dw.mean()),
+        "mean_abs_dtheta_random_deg": float(dr.mean()),
+        "frac_within_20deg_withheld": float((dw <= 20).mean()),
+        "frac_within_20deg_random": float((dr <= 20).mean()),
+        "mean_diff_ci95": bootstrap_ci(dw - dr.mean()),
+        "lift_fraction_points": float((dw <= 20).mean() - (dr <= 20).mean()),
+    }
+    print("[strike]", json.dumps(res["strike_test"], indent=2), flush=True)
+
+    EVID.mkdir(parents=True, exist_ok=True)
+    out = Path(args.out) if args.out else EVID / f"holdout_{args.tag}_n{args.n_dots}.json"
+    out.write_text(json.dumps(res, indent=2))
+    print("wrote", out, f"({time.time()-t0:.1f}s)")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

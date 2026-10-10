@@ -1,0 +1,23 @@
+[budget] 55 registry cover masks (excluded: ['lattice-s5']), cap=0.68
+[flank] support=15.0 px; arms flank_only and tensor_flank use the per-fold VISIBLE catalogue only
+[  76.1s] random         pooled DTI=0.0155 (dots=40000) folds=[0.014, 0.0148, 0.0153, 0.0155, 0.0177]
+[  92.3s] ridge_only     pooled DTI=0.0183 (dots=40000) folds=[0.0177, 0.0177, 0.0169, 0.0205, 0.0186]
+[ 109.0s] ridge_x_dim    pooled DTI=0.0180 (dots=40000) folds=[0.0183, 0.0174, 0.0181, 0.0183, 0.0182]
+[ 124.7s] ridge_x_agree  pooled DTI=0.0186 (dots=40000) folds=[0.0186, 0.018, 0.0176, 0.0202, 0.0187]
+[ 141.3s] tensor_full    pooled DTI=0.0176 (dots=40000) folds=[0.019, 0.0174, 0.0175, 0.0168, 0.0174]
+[ 178.3s] flank_only     pooled DTI=0.0021 (dots=3945) folds=[0.002, 0.0021, 0.0025, 0.0026, 0.0015]
+[ 227.0s] tensor_flank   pooled DTI=0.0308 (dots=25493) folds=[0.0305, 0.0303, 0.0303, 0.0321, 0.031]
+[strike] {
+  "n_withheld_segments": 273,
+  "n_random_ridge": 100000,
+  "mean_abs_dtheta_withheld_deg": 38.75343957892704,
+  "mean_abs_dtheta_random_deg": 44.93615026707449,
+  "frac_within_20deg_withheld": 0.2673992673992674,
+  "frac_within_20deg_random": 0.22252,
+  "mean_diff_ci95": [
+    -9.089294324660786,
+    -3.1928732543703284
+  ],
+  "lift_fraction_points": 0.0448792673992674
+}
+wrote evidence/holdout_h57_flank_budgeted_n40000.json (239.3s)

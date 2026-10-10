@@ -1,12 +1,13 @@
 # Agent working agreement
 
-Before every work session, read the root `README.md` (including its "Read first — standing brief" section, which holds the verbatim user brief), `docs/run-card.json`, `docs/session-20261009-review.md`, `docs/hypotheses.md`, and `docs/irregularities.md`. The README records the current user brief and verified status.
+Before each work session, read the root `README.md`, `docs/run-card.json`, `docs/status.json`, `docs/hypotheses.md`, and `docs/irregularities.md`. Treat dated session/review records as historical evidence; the README and current run card/status are the starting brief.
 
-- Work only on the Arena-assigned branch; do not change branches or edit sibling repositories.
+- Work only on the Arena-assigned branch; do not switch branches or edit sibling repositories.
 - The only assigned scientific lane is potential-field tensor dimensionality. Do not implement a different family to force a deliverable.
-- Reuse the canonical cached stack, evaluator, writer, and uniqueness checker. Do not create a private evaluator/writer fork. The former duplicate `gems/` implementation has been removed. `src/gems55/` is the sole local implementation, but is not certified as the organizer/shared evaluator; reconcile it with the authorized shared template before any promotion use. Local synthetic-test fixes are not an official evaluator validation.
+- Reuse the canonical cached stack, evaluator, writer, validator, and uniqueness checker. Do not create private forks. `src/gems55/dti55.py` is a local published-formula transcription, not organizer-executable or organizer-certified.
+- Apply the uniqueness gate literally: if more than 70% of final dots are within 3 Euclidean pixels of any reference raster, stop. Do not use symmetric, chance-adjusted, or random-control overlap to waive the threshold; report those only as diagnostics.
 - Do not make up a TIFF, score, receipt, registry scan, or validation result. A format-valid raster is not automatically scientifically cleared or slot-approved.
-- Do not publish a download CTA unless holdout, leakage-canary, pre-placement and final-dot uniqueness, and format gates all pass. Historical TIFFs are preserved under `evidence/historical_artifacts/`, outside the published site, but none is a cleared deliverable. Current status: no approved download / do not submit.
-- Treat user- and sibling-repository-reported leaderboard numbers as claims unless linked to an organizer submission-page receipt. Label all candidate evaluation results `HOLDOUT-DTI` with evaluator version, withheld-positive count, and 95% CI.
-- Respect the three-experiment / two-hour budget and keep promotion separate from experimentation.
-- Review all changes at least three times: first implementation, bug/assumption audit, and final requirement/source audit. Keep a negative result if the evidence is negative or unavailable.
+- Do not publish a submit CTA unless holdout, leakage-canary, pre-placement and final-dot uniqueness, and format gates all pass. The current H57 NaN-outside TIF is available for audit only; submit is NO. The expanded 66-raster scan returns `DUPLICATE-STOP` at 0.76 (>0.70), the matched holdout is negative, and the zeros-outside variant fails the strict outside-footprint validator. Do not submit or spend a weekly slot.
+- Treat user- and sibling-repository-reported leaderboard numbers as claims unless linked to an organizer submission-page receipt. Label candidate evaluation results `HOLDOUT-DTI` with evaluator version, withheld-positive count, and 95% CI.
+- Respect the three-experiment / two-hour budget. No fourth experiment or holdout rerun is authorized by the current brief; promotion remains a separate selector step.
+- Review changes in at least three passes: implementation, bug/assumption audit, and final requirement/source audit. Preserve a negative result when evidence is negative or unavailable.

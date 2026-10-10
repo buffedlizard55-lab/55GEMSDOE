@@ -1,6 +1,8 @@
 # 2026-10-09 leaderboard attribution review
 
-**Disposition: no organizer-confirmed score, no explanation of the reported 0.2778, and no evidence that this repository beats a leaderboard entry. No raster was generated, no experiment or data download was performed, and no submission slot was used in this review.** The full promotion state remains `NOT CLEARED — DO NOT DOWNLOAD OR SUBMIT`.
+**Historical review record, not the current status source.** Its statements that no raster was generated and no download was cleared describe the review captured here. The later H57 status is in the root README, `docs/run-card.json`, and `docs/status.json`: audit download = YES for the NaN-outside TIF only; submit = NO because the expanded 66-raster scan returns DUPLICATE-STOP and the matched holdout is negative.
+
+**Disposition within this review:** no organizer-confirmed score, no explanation of the reported 0.2778, and no evidence that this repository beats a leaderboard entry. No raster was generated, no experiment or data download was performed, and no submission slot was used during the review period.
 
 ## Evidence classes
 

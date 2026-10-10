@@ -1,90 +1,103 @@
----
+# Results — H57 tensor-flank holdout (negative; audit-only TIF)
 
-## Current result (2026-10-09) — cleared with caveats
+**Review date:** 2026-10-10 UTC. Every performance value in this report is
+**HOLDOUT-DTI**, not an organizer-confirmed leaderboard score. The NaN-outside
+primary is format-valid for audit, but the expanded strict scan returns
+**DUPLICATE-STOP** and the candidate loses its matched-mass holdout. It is
+**DO NOT SUBMIT**. No weekly slot or organizer submission was used.
 
-**HOLDOUT-DTI 0.0380906, 95 % CI [0.0355742, 0.0405811].** Evidence class `HOLDOUT-DTI`, evaluator
-`gems55.dti55/2.0-local`, **60,988** withheld positives, 4 disjoint fault-segment folds, 3 px buffer,
-exact visible-fault masking, pooled DTI (alpha 0.2, beta 0.8, 300 m triangular kernel). Interval:
-percentile bootstrap over **3,182** spatial blocks of 40 x 40 px, 1,000 draws. Not an organizer receipt.
+## H57-A hypothesis and evaluator
 
-| quantity | value |
-| --- | --- |
-| TP_w / FP_w / FN_w | 1989.52 / 15214.57 / 58998.48 |
-| mass-matched random control | 0.034064 +/- 0.000581 (3 reps) |
-| lift over control | 1.118x |
-| positive budget | 16,000 dots = 0.31% of the 5,167,373-px footprint |
-| artifact sha256 | `927dc17f7f5d890b2f382e266ade5d775474631ee96674f8ff3cbc1f1b7c7693` |
+H57-A combines the cached tensor-dimensionality lane (bands 2 RTP magnetic and 13
+isostatic gravity) with a 15-pixel quadratic flank prior derived from visible
+catalogue faults. A sensitivity option recomputes the same cached tensor formula
+without the normal six-pixel footprint erosion, to test feasible edge pixels left
+by a spacing-5 registry lattice. This can increase FFT boundary-ringing artifacts;
+see `docs/irregularities.md` IR-55-042.
 
-Ablation at the identical budget: `ridge_only` 0.023264 (cell-limited
-to 9,628 NMS peaks), `ridge_x_dim` 0.039231,
-`tensor_full` 0.038091.
+- Canonical evaluator: `src/gems55/dti55.py`, regression-tested against brute
+  force and the official worked example.
+- Formula: alpha 0.2, beta 0.8, triangular support radius 300 m (3 px at 100 m).
+- Five seeded whole-segment/lattice folds, 3 px buffer, visible catalogue mask
+  recomputed per fold and masked pixel-exactly; DTI components pooled.
+- 200 total binary dots (40 per fold), min separation 3 px. Each candidate,
+  comparator and random arm was mass-matched.
+- Withheld positives: 60,988. CI: bootstrap of 4,000 resamples of the five fold
+  DTI values; it is not an organizer uncertainty interval.
 
-### The confirmatory test failed — reported, not dropped
+| Arm | HOLDOUT-DTI | 95% CI | Dots | Role |
+|---|---:|---:|---:|---|
+| Uniform random, registry-budgeted | **0.00015080** | 0.00007391–0.00022214 | 200 | matched null |
+| Ridge × strike agreement, registry-budgeted | **0.00027391** | 0.00013244–0.00041048 | 200 | one-scale comparator |
+| Full tensor lane, registry-budgeted | **0.00030077** | 0.00017780–0.00042363 | 200 | best same-run arm |
+| H57-A tensor × visible-catalogue flank, registry-budgeted | **0.00012284** | 0.00011438–0.00013397 | 200 | candidate; negative |
+| Flank prior alone, registry-budgeted | **0.00006088** | 0.00004160–0.00007843 | 200 | diagnostic ablation |
 
-The lane predicted that withheld fault strikes would match the tensor strike more often than random
-detected ridges do. Measured: **NOT_SUPPORTED**. Group A (withheld catalogue fault segments,
-n = 1,661) median 43.4 deg, 25.3% within 20 deg.
-Group B (random detected ridges, n = 262) median 19.4 deg,
-50.4% within 20 deg. Two-proportion z = -8.35.
+The H57-A candidate loses to random and to both tensor comparators. Its verdict
+is **NEGATIVE**; it does not meet the promotion rule, and no weekly slot should be
+spent on it. These catalogue holdout values are not predictions of organizer
+leaderboard performance.
 
-Group A's median is indistinguishable from the 45 deg median of a uniform distribution on [0, 90]:
-at catalogue fault segments the tensor strike carries no information about the fault's own strike.
-Group B's low median is at least partly circular — the ridge azimuth and the tensor eigenvector come
-from the same field, so a strong ridge is self-consistent whether or not it is a fault.
+## Leakage canary and strike diagnostic
 
-### Historical records below
+All single features were tested against fold-specific withheld positives and
+eligible negatives. Maximum AUC was **0.89330**, from the visible-catalogue flank
+prior, below the 0.90 canary threshold but close to it. This is a diagnostic, not
+an accuracy score; the flank channel is catalogue spatial autocorrelation and the
+per-fold prior is built from visible faults only.
 
-Everything after this line predates the current clearance run and is retained for audit only.
+Corrected strike diagnostic (IR-55-041): 13 connected withheld components passed
+the minimum-size rule, represented by 273 pixel samples. The within-20° match was
+26.7% for withheld pixel samples versus 22.2% for 100,000 sampled random-ridge
+pixels. This is a catalogue proxy, not a promotion result. The historical JSON
+field had called the 273 pixel samples “segments”; the count label is corrected
+in the current evidence.
 
-# Results and evidence status
+## Registry, format and artifact
 
-**Current disposition: no valid promotion result; no download or submission is cleared.** This review corrected code/documentation and ran regression tests only. It did not rerun a geological experiment, download competition data, or submit anything. The experiment log records the three-experiment budget as already used.
+- **Pre-placement continuous-surface gate:** PASS-SURFACE-UNIQUE; all 62 shared
+  registry rasters plus four archived local historical TIFs were scanned (66/66);
+  max absolute Spearman **0.2443** (<0.90).
+- **Final-dot gate:** **DUPLICATE-STOP**; all 66 comparisons scanned; max one-sided
+  overlap within 3 Euclidean pixels is **0.76** (>0.70). Two PARALLEL16 NaN/zeros
+  encodings of the same continuous raster each trigger the literal stop and both
+  rows count. Their random-control overlap is 0.765, but control-adjusted similarity
+  is diagnostic only. No row is excluded. One registry raster is reprojected to the
+  official template before comparison (IR-55-039).
+- **TIF validator:** the NaN-outside primary passes **11/11** strict local checks;
+  the all-finite `-zeros.tif` diagnostic passes 10/11 and fails exactly the
+  null/NaN-outside-footprint check. Both use one float32 band, EPSG:32611,
+  3730×3292, 100 m template geometry; the primary has finite in-footprint values
+  in [0,1] and no positive on mapped catalogue pixels.
+- **Primary audit file:**
+  [`downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.tif`](downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.tif)
+- **NaN-outside ZIP:**
+  [`downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.zip`](downloads/h57-tensor-flank-r15-uneroded-registry56-n200-20261009T200831Z-nan.zip)
+- **Primary SHA-256:** `57dd4ba81c6fe553166cb193f4ae40e6547f4abe5a8fdabeb9154f648d761326`
+- **Portal note (104/140 chars):** `H57 tensor-flank: FFT 2-D/strike gate x visible-catalogue flank, 200 dots; all-registry overlap-budgeted`
+- **Submission decision:** audit download = **YES** (NaN primary only); submit to
+  DrivenData = **NO**. Both DUPLICATE-STOP and the negative holdout block this
+  raster. No weekly slot, organizer submission, receipt, or confirmed score exists.
 
-## Metric algebra correction
+## Why the claimed 0.2778 H33 result is not established
 
-The official definitions give `TP_w + FN_w = |G|`, because for each truth pixel the matched-credit maximum and its complement sum to one. Substituting this identity into the distance-weighted Tversky denominator gives
+The saved public-page value 0.2778 is not tied by a submission receipt or verified
+file/account mapping to H33. The owner-maintained GEMSDOE32 manifest records
+`receipt: null` for H33 and labels a separate 0.2747 value projected/UNSCORED.
+Earlier local anchor-proxy DTI values, hidden-truth-size calculations, ratios, and
+causal explanations are **withdrawn**: they treated prediction-side kernel sums as
+`TP_w` and used an invalid count-only denominator. They are not scores, estimates,
+or promotion evidence. The corrected metric identity and evidence boundary are in
+[`anchor-0.2778.html`](anchor-0.2778.html). Nothing here explains the leaderboard
+entry or establishes that a candidate beats it.
 
-```text
-DTI = TP_w / (TP_w + alpha*FP_w + beta*FN_w + eps)
-    = TP_w / ((1-beta)*TP_w + alpha*FP_w + beta*|G| + eps)
-```
+See [`run-card.json`](run-card.json), [`status.json`](status.json), and the machine
+readable [`holdout_h57_unique_n200.json`](../evidence/holdout_h57_unique_n200.json).
 
-For `alpha=0.2`, `beta=0.8`, the denominator is
+## Historical comparison
 
-```text
-0.2*TP_w + 0.2*FP_w + 0.8*|G| + eps
-```
-
-It is **not** generally `0.2*N + 0.8*|G|`: `TP_w + FP_w = N` is not an identity. A synthetic regression case in `tests_numeric/test_core.py` has one truth pixel, a unit prediction on it, and a second unit prediction one pixel away. Then `TP_w=1`, `FP_w=1/3`, `FN_w=0`, and the exact DTI is `0.9375`; the invalid count-only formula gives `5/6`. Claims, tables, target-size calculations, and “coverage plateau” conclusions based on the count-only formula are withdrawn.
-
-The old `breakeven_credit` helper also used an incorrect marginal threshold. Its corrected `alpha*DTI` expression is explicitly limited to isolated single-match assumptions; it is not a generic per-dot rule. The greedy coverage routine maximizes a submodular **surrogate** and does not optimize the full DTI ratio because it omits the separate FP term.
-
-## Historical canonical-local HOLDOUT-DTI record — not valid for promotion
-
-- **HOLDOUT-DTI (historical; invalid for promotion)** — evaluator version: unversioned pre-audit `src/gems55/dti55.py` local transcription; withheld-positive count: **60,988**. Tensor-lane pooled value: **0.06670118698244415**; stored fold-bootstrap interval: **[0.05600790445991459, 0.08934589204746593]**.
-- **HOLDOUT-DTI random-control record (historical; invalid control)** — same evaluator version, withheld-positive count, and stored interval method. Value: **0.07572925371015232**; stored interval: **[0.05711247628318898, 0.12139421481046019]**. The random branch was filtered by `score > 0` before sampling, so it was not uniform over the eligible domain.
-- Both used quadrant folds; a connected mapped fault crossing a quadrant boundary could be split between visible and withheld labels. The stored interval bootstraps four fold DTI values and is not a pooled-DTI confidence interval. These are retained as historical records, not as scientific clearance or an established negative result.
-
-## Separate legacy HOLDOUT-DTI record — not comparable
-
-- **HOLDOUT-DTI (historical; separate private evaluator; not comparable)** — evaluator version `gems.metric v1` (private re-implementation), withheld-positive count **60,594**. E1 ridge baseline **0.0578** (95% CI **[0.0499, 0.0652]**); E2 dimensionality-weighted ridge **0.0463** (95% CI **[0.0398, 0.0523]**); E3 tensor/strike-gated lane **0.0444** (95% CI **[0.0383, 0.0502]**).
-- These values came from a different evaluator and fold implementation; they cannot be pooled with or used to “replicate” the canonical-local record. They also do not clear the user-required protocol.
-
-No experiment was run and no new **HOLDOUT-DTI** was produced in this review. The records below were already present on the current `main` history and are included here only so they are not mistaken for new or promotion-grade results. Repository-local utility code has synthetic coverage for whole-component assignment, Euclidean buffering, score-independent random placement, and additive metric terms. It is not certified as the authorized shared evaluator; data-dependent local runners are retired, and the experiment budget is exhausted. Reconcile with the authorized template and explicitly reopen the budget before any future experiment.
-
-## Additional archived holdout records — not promotion-grade
-
-- **HOLDOUT-DTI (historical H56 multiscale full tensor; not promotion-grade):** evaluator `src/gems55/dti55.py` (the original record gives no explicit evaluator version; local implementation is not reconciled with the authorized shared evaluator); **60,988 withheld positives**; α=0.2, β=0.8, 300 m triangular kernel; 40,000 dots. Candidate value **0.01727793270506305**, stored 95% CI **[0.01612827573503906, 0.018468645641252373]**. The matched random control is **0.014404859072739232**, 95% CI **[0.013732983126265159, 0.015374661727613106]**; the one-scale ridge × strike-agreement comparator is **0.018519270698750034**, 95% CI **[0.01782350648872739, 0.019402442229139772]**. The source reports five whole-segment/lattice folds, a 3 px buffer, visible-fault masking, and pooled components, but the intervals resample the five fold DTI values rather than pooled-score contributions. The candidate did not beat the recorded comparator. It is not promotion evidence. Source: `evidence/holdout_h56_ms300_900_n40000.json`.
-- **HOLDOUT-DTI (historical H55 exp10 Q4 tensor_full; not promotion-grade):** evaluator `src/gems55/dti55.py` (no explicit version recorded; local and unreconciled); **60,988 withheld positives**; α=0.2, β=0.8, 300 m triangular kernel; 160,000 dots. Recorded candidate value **0.1019**, stored 95% CI **[0.0877, 0.1185]**. The interval is a t interval over four Q4 quadrant-fold DTI values (df=3), not pooled-score contribution uncertainty; quadrants can split connected faults. The final run card does not include a 95% CI for its random control, so that control is not repeated here as a score. This record is not a valid test of the required whole-segment protocol. Source: `evidence/exp10_mass_sweep_v1.json` and `docs/run-card-h55-160k.json`.
-
-These historical values are reported with evaluator/source, withheld-positive count, and stored interval to preserve provenance; their protocol/evaluator limitations disqualify them from promotion. No current valid **HOLDOUT-DTI** exists.
-
-## Score attribution and leaderboard
-
-A saved **PUBLIC-LEADERBOARD snapshot (not a submission-page receipt, not ORGANIZER-CONFIRMED)** lists **0.2778** at rank 17 under `extradr19`, **0.3195** at rank 7, and **0.3774** at rank 1; see `evidence/leaderboard_snapshot_20261009.json`. The snapshot does not identify raster hashes. A read-only check of the owner-maintained GEMSDOE32 artifact manifest reports `receipt: null` for H33, labels it `UNSCORED`, and describes **0.2747** as projected. The mapping from `extradr19` to H33 is unverified; the owner manifest is secondary evidence, not an organizer receipt. Accordingly, this repository cannot establish that H33 received the public rank-17 entry, explain why that entry received its value, or claim that any current candidate beats a leaderboard value.
-
-## Geological and submission conclusions
-
-The tensor-dimensionality lane remains a geologically plausible source-geometry hypothesis, not a validated locator. Existing evidence is insufficient to assert a valid holdout win, an experiment failure under the required protocol, or a submission-slot promotion. Separate historical final-dot reports fail the literal uniqueness rule: H55 40k raw overlap 84.13%, H55 160k 84.01%, and H56 40k maximum overlap 1.000 (with a second row at 0.736), each against a 70% stop limit. These candidate-specific reports are not a fresh scan and must not be combined. Format metadata inspection is partial and not organizer validation. Older E1/E3 registry JSON files report 632 rasters for different candidates and legacy snapshots, so those counts are not a current scan or a substitute for the 56-raster reports. Do not download or submit any archived raster.
-
-See the machine-readable [run card](run-card.json), [source register](sources.md), [hypothesis shortlist](hypotheses.md), and [irregularity log](irregularities.md).
+The prior H56 multi-scale tensor-persistence run remains archived in
+[`run-card-h56.json`](run-card-h56.json) and `evidence/holdout_h56_ms300_900_n40000.json`.
+It was negative versus its one-scale comparator and failed the old literal dot
+uniqueness gate before the H57 registry loader began aligning every prior raster.
+Do not use H56 results as the current H57 score.

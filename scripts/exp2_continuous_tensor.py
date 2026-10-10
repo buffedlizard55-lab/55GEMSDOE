@@ -81,10 +81,10 @@ def main() -> None:
     # as a proxy (not the actual competition metric, but a diagnostic)
     truth = labels == 1
     thresholds = [0.02, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30]
-    
+
     best_dti = 0.0
     best_thresh = 0.10
-    
+
     for thresh in thresholds:
         pred_t = np.where(score > thresh, score, 0.0).astype(np.float64)
         pred_t = np.clip(pred_t, 0.0, 1.0)
@@ -111,11 +111,11 @@ def main() -> None:
     print("\n[4/5] Building continuous prediction field...")
     pred = np.where(score > use_thresh, score, 0.0).astype(np.float32)
     pred = np.clip(pred, 0.0, 1.0)
-    
+
     # Ensure zero outside footprint
     pred[~footprint] = 0.0
     pred[~valid] = 0.0
-    
+
     n_pos = int((pred > 0).sum())
     pos_vals = pred[pred > 0]
     print(f"  Positive pixels: {n_pos:,}")
@@ -126,7 +126,7 @@ def main() -> None:
     print("\n[5/5] Writing output...")
     ts = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     n_dots = n_pos
-    
+
     # Zeros-outside variant
     out_name = f"tensor-continuous-{n_dots}px-{ts}-zeros.tif"
     out_path = ROOT / "docs" / "downloads" / out_name
