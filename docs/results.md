@@ -81,19 +81,17 @@ in the current evidence.
 
 ## Why the claimed 0.2778 H33 result is not established
 
-The 0.2778 value, 0.3195/0.3774 values, and sibling leaderboard values in the
-owner brief are unverified claims. GEMSDOE32's audit manifest (as inspected in
-`docs/anchor-0.2778.html`) records the H33 entry with `receipt: null` and calls
-0.2747 a projection/UNSCORED. The local measured proxy for the H33 raster is
-0.00493 against the mapped catalogue, below the matched uniform-random proxy;
-that proxy is not the organizer's hidden-label score. The metric algebra explains
-why “could exceed 0.2778” cannot be concluded from this holdout: new hidden-label
-coverage is unknown and no receipt verifies the anchor. The current H57 candidate
-is demonstrably negative on its own matched catalogue holdout, so there is no
-scientific basis to claim it beats the organizer leaderboard.
+The saved public-page value 0.2778 is not tied by a submission receipt or verified
+file/account mapping to H33. The owner-maintained GEMSDOE32 manifest records
+`receipt: null` for H33 and labels a separate 0.2747 value projected/UNSCORED.
+Earlier local anchor-proxy DTI values, hidden-truth-size calculations, ratios, and
+causal explanations are **withdrawn**: they treated prediction-side kernel sums as
+`TP_w` and used an invalid count-only denominator. They are not scores, estimates,
+or promotion evidence. The corrected metric identity and evidence boundary are in
+[`anchor-0.2778.html`](anchor-0.2778.html). Nothing here explains the leaderboard
+entry or establishes that a candidate beats it.
 
-See [`anchor-0.2778.html`](anchor-0.2778.html),
-[`run-card.json`](run-card.json), [`status.json`](status.json), and the machine
+See [`run-card.json`](run-card.json), [`status.json`](status.json), and the machine
 readable [`holdout_h57_unique_n200.json`](../evidence/holdout_h57_unique_n200.json).
 
 ## Historical comparison

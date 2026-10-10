@@ -39,7 +39,12 @@ status and fixes are summarized at the end. Current decision: the NaN-outside au
 Earlier fixes in this session, recorded before the merge (pre-merge register IR-55-001…024 is in commit 28919e5): per-fold leakage canary (IR-55-017), segment-fold leak with withheld = full footprint (IR-55-018), and the registry rebuild from `registry.json` (IR-55-016).
 
 - **IR-55-025 (Medium). Validator resolution check was shape-based.** The "resolution is 100 m" check compared the shape, not the pixel size. Fixed in `scripts/validate_submission.py`: the check reads |a| and |e| from the transform. The historical 12/12 zero-outside count is superseded: the strict current validator requires NaN exactly outside the footprint (see IR-55-049), so the zeros diagnostic now fails.
-- **IR-55-026 (Low). Feature-raster naming mismatch.** `prepare_data.py` and `run_tensor_lane.py` looked for `training_features.tif`, but the file on disk is `gems-geodawn-numerical-features.tif`. The same sha256 pin applies. Fixed once in both scripts. `prepare_data.py` exits 0 with all three pins OK. Done.
+- **IR-55-026 (Low; historical, clarified by IR-55-034). Feature-raster naming.**
+  An earlier local runner expected `training_features.tif`; the repository's
+  canonical path is `gems-geodawn-numerical-features.tif`, defined in
+  `src/gems55/io55.py`. Current preparation checks use the canonical path and
+  perform hash/grid/content validation. The competition rasters are absent from
+  this checkout, so no current pin pass or data-preparation success is claimed. Done.
 - **IR-55-027 (Medium). Sidecar selection picked the lexicographically last file.** "160000" sorts before "40000". `scripts/make_final_card.py` now writes `docs/run-card-h55-160k.json` for the audit file, and the stale `evidence/runcard.json` is superseded. Done.
 - **IR-55-028 (High). Striping axis is unreconciled.** ScienceBase (Glen & Earney 2024, doi 10.5066/P93LGLVQ) says flight lines run at azimuth 90° (E–W). The lane masks rows (E–W lines). `evidence/striping_diagnostic.json` reports N–S on real RTP data, but its own coherence numbers are equal (0.185 along x, 0.187 along y). A crude high-pass test here (row-means std 6.3 vs column-means std 8.9; y/x gradient RMS 0.77) leans N–S. If the striping is N–S, the lane's 21% mask is on the wrong axis. Open: the flight-line shapefile (not reachable from the sandbox) would settle it. Do not cite the lane striping mask until then.
 - **IR-55-029 (Medium). Two striping counts from two detectors.** 86,947 px (129 rows, z>4, `gems/tensor.py`, `docs/results/tensor_lane_results.json`) and 1,105,919 px (21.4%, coherence-based `gems55` mask, thresh 0.55, lag 60 px, `data/cache/lane_v1.meta.json`). These are not a miscount. Both are reported; the shipped audit file uses the 1,105,919-px mask.
@@ -51,12 +56,13 @@ Earlier fixes in this session, recorded before the merge (pre-merge register IR-
 
 ## H57 session irregularities and fixes (2026-10-09; IR-55-034 to IR-55-042)
 
-- **IR-55-034 (Low; fixed). Feature-file name mismatch.** The downloader writes
-  `training_features.tif`, while the SHA checker originally required the descriptive
-  alias `gems-geodawn-numerical-features.tif`. `prepare_data.py` now accepts either
-  filename against the same pinned SHA. The three local payload files passed the
-  pin checks this session. The pins are still not authenticated against the login-
-  gated DrivenData download; see `data/SOURCES.md`.
+- **IR-55-034 (Low; clarified). Canonical feature-file naming.** The active
+  downloader and preparation check use the canonical
+  `gems-geodawn-numerical-features.tif` path from `src/gems55/io55.py`. A legacy
+  `training_features.tif` alias alone is not sufficient for the cached pipeline.
+  The optional mirror downloader is explicitly unofficial, disabled unless opted
+  into, and does not establish organizer provenance. The competition rasters are
+  absent from this checkout; no current payload pin pass is claimed.
 - **IR-55-035 (High; earlier 56-row scan, superseded by IR-55-048). Dense
   lattice registry row.** The prior spacing-5 raster covers 99.87% of the footprint
   within 3 Euclidean pixels; a seeded random-control selection had 0.985 overlap in
@@ -138,8 +144,9 @@ Earlier fixes in this session, recorded before the merge (pre-merge register IR-
   intermediate PASS-UNIQUE result.
 - **IR-55-048 (High; blocking). Expanded strict uniqueness returns DUPLICATE-STOP.**
   The final NaN-outside H57 map was rescanned against all 62 current registry rasters
-  plus four local historical candidates (66/66 compatible comparisons). Surface
-  max |Spearman| is 0.2443 and passes its 0.90 threshold. The maximum one-sided
+  plus four local historical candidates (66/66 compatible comparisons). The expanded
+  final report's max surface |Spearman| is 0.245 (the pre-placement report was 0.2443);
+  both pass the 0.90 threshold. The maximum one-sided
   Euclidean 3-pixel final-dot overlap is **0.76**, exceeding the literal **0.70**
   stop. Two PARALLEL16 NaN/zeros encodings of the same continuous raster each produce
   that overlap and are both retained as rows. Their random-control overlap is 0.765;
@@ -160,6 +167,14 @@ Earlier fixes in this session, recorded before the merge (pre-merge register IR-
   H57 holdout used `emit_dots_budgeted` because all arms had registry budgets, so
   its recorded result is unaffected. Historical exp8/exp9 controls were not rerun;
   they are not used for the current H57 decision, and no holdout rerun is authorized.
+- **IR-55-051 (High; withdrawn). Earlier H33 anchor forensics used an invalid
+  prediction-side kernel sum as `TP_w` and an invalid count-only DTI denominator.
+  The resulting proxy DTI values, hidden-truth-size calculations, ratios, and causal
+  claims are withdrawn; do not use them as scores, estimates, or promotion evidence.
+  The corrected metric identity and receipt boundary are documented in
+  `docs/anchor-0.2778.html`. The public 0.2778 row is not tied by receipt or verified
+  file/account mapping to H33; the separate 0.2747 owner-manifest value is labelled
+  projected/UNSCORED.
 
 ## H57 decision
 

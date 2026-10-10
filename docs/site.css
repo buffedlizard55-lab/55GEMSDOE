@@ -3,7 +3,7 @@
 @media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two-col{grid-template-columns:1fr}.hero{padding:48px 0 32px}.topbar-inner{align-items:flex-start;padding-top:18px;padding-bottom:18px;flex-direction:column}.nav{gap:14px}}@media(max-width:520px){.wrap{padding:0 17px}.grid{grid-template-columns:1fr}.status-banner{padding:16px}.section{padding:35px 0}.nav{font-size:13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
-/* generated status pages (scripts/build_pages55.py) */
+/* shared styles for current status pages and archived disclosure pages */
 .nav a.active{color:#fff;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .callout{border-radius:14px;padding:18px 21px;margin:20px 0;box-shadow:var(--shadow);border:1px solid var(--line)}
 .callout h2{margin:0 0 8px;font-size:20px}

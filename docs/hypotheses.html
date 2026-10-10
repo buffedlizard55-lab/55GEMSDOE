@@ -81,7 +81,7 @@ in `docs/irregularities.md` and the new results will replace stale status claims
 
 These are **proposals only**. None has been implemented or evaluated. AGENTS.md keeps this checkout to the tensor-dimensionality lane, so each one needs lane approval before any work. Gain labels are priors, not measurements, and are not HOLDOUT-DTI.
 
-Break-even bar for any new dot: expected kernel credit above α·DTI/(1+α·DTI). At the random control DTI 0.0757 (HOLDOUT-DTI, 60,988 withheld positives) that is **≈ 0.0149 per dot**. H-A (visible-prior gate) was tested earlier in this session and failed, so it is not repeated here.
+**Metric-shortcut correction:** an earlier draft stated a per-dot break-even threshold `α·DTI/(1+α·DTI)` and a derived value of 0.0149. That shortcut has not been established from the official weighted DTI with both `TP_w` and `FP_w` terms; it is withdrawn and must not guide placement, candidate ranking, or promotion. Use the canonical evaluator on the full prediction instead. H-A (visible-prior gate) was tested earlier and failed, so it is not repeated here.
 
 | Rank | Hypothesis | Layers (band no., `docs/data_dictionary.md`) | Physical reasoning | Expected DTI gain (prior) | Implementation cost | Status |
 |---|---|---|---|---|---|---|
@@ -112,12 +112,14 @@ Evaluator `src/gems55/dti55.py` (exact official DTI). Protocols: Q4 quadrant hid
 
 **Context and evidence boundary.** The user asked for a new unique competition TIF,
 for an analysis of the claimed 0.2778 H33 score, and for a same-evaluator holdout
-before any weekly slot. The local anchor audit shows that the H33 sibling manifest
-has `receipt: null` and marks its `0.2747` value “projected / UNSCORED”; therefore
-0.2778 is not treated here as an organizer-confirmed score. The measured local
-anchor forensics show a contrast between the H33 raster and a sibling raster
-labelled as a 0.2600 anchor, but both leaderboard values remain unreceipted claims.
-See [`anchor-0.2778.html`](anchor-0.2778.html) and `evidence/anchor_*.json`.
+before any weekly slot. The public-page 0.2778 row has no receipt or verified
+file/account mapping to H33. The owner-maintained H33 manifest has `receipt: null`
+and labels a separate `0.2747` value projected/UNSCORED. Earlier local anchor-proxy
+DTI, hidden-truth-size, ratio, and causal conclusions used invalid metric algebra
+and are **withdrawn**, not evidence for any hypothesis. The H57-A flank factor was
+an unvalidated proposal; its matched holdout was negative. See
+[`anchor-0.2778.html`](anchor-0.2778.html) for the corrected metric identity and
+receipt boundary.
 
 ### Ranked candidates before validation
 

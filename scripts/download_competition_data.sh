@@ -9,12 +9,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 need_mirror=0
-for f in data/sample_submission.tif data/labels.tif; do
+for f in data/sample_submission.tif data/labels.tif data/gems-geodawn-numerical-features.tif; do
   [ -f "$f" ] || need_mirror=1
 done
-if [ ! -f data/gems-geodawn-numerical-features.tif ] && [ ! -f data/training_features.tif ]; then
-  need_mirror=1
-fi
 if [ "$need_mirror" = 1 ] && [ "${GEMS_ALLOW_UNOFFICIAL_MIRROR:-0}" != "1" ]; then
   echo "Refusing unofficial mirror download. Retrieve authorized files from DrivenData, or explicitly opt in for local audit only with GEMS_ALLOW_UNOFFICIAL_MIRROR=1." >&2
   exit 2
@@ -37,8 +34,4 @@ if [ ! -f data/gems-geodawn-numerical-features.tif ]; then
   done
   cat data/parts/part-00{0,1,2,3,4} > data/gems-geodawn-numerical-features.tif
 fi
-python_cmd="${PYTHON:-python3}"
-if [ "$python_cmd" = "python3" ] && [ -x .venv/bin/python ]; then
-  python_cmd=".venv/bin/python"
-fi
-"$python_cmd" scripts/prepare_data.py
+python3 scripts/prepare_data.py

@@ -84,22 +84,20 @@ the local sibling manifest does not confirm 0.2778; it does not prove what might
 on a private DrivenData receipt. The values 0.3195, 0.3774, and other sibling scores
 in the user brief are likewise unverified without receipts.
 
-The local anchor forensics compare rasters against the mapped catalogue, not the
-organizer's hidden new-fault labels. The raster labelled as the 0.2778 candidate
-places dots at least 224 m from mapped traces and earns less catalogue-proxy kernel
-credit than a same-size uniform random control. A separate sibling raster labelled
-as a 0.2600 result places dots next to (but not on) mapped traces and earns more
-catalogue-proxy credit. Both leaderboards labels remain unreceipted. Metric algebra
-can state what kernel credit a target DTI would require under assumptions; it cannot
-establish hidden-fault extent, a private score, or a guarantee that a method beats a
-leaderboard entry.
+**Correction to the earlier anchor analysis:** its catalogue-proxy calculation
+incorrectly treated nearest-catalogue kernel weights at prediction pixels as
+`TP_w`, and used an invalid closed-form DTI expression. The official metric sums
+weighted matches over truth pixels, so the old proxy DTI values, hidden-truth-size
+calculations, ratios, and causal claims are withdrawn. Do not use them as score
+estimates or method evidence. The corrected metric identity and the remaining
+receipt boundary are documented in [`docs/anchor-0.2778.html`](docs/anchor-0.2778.html)
+and [`docs/leaderboard-review-20261009.md`](docs/leaderboard-review-20261009.md).
 
 **Answer to “can this score higher than 0.2778?”** This checkout cannot honestly
-claim that. The 0.2778 anchor is unreceipted, and the current H57 audit artifact has
-a negative, low-mass holdout and fails the strict uniqueness gate. No score projection is written as a result. The
-available evidence supports an audit TIF and a negative decision, not a high-scoring
-competition upload. Full local forensic details and the manifest citation are in
-[`docs/anchor-0.2778.html`](docs/anchor-0.2778.html).
+claim that. There is no receipt tying the public-page value to the H33 raster, and
+the current H57 audit artifact has a negative, low-mass holdout and fails the strict
+uniqueness gate. No score projection is written as a result. The available evidence
+supports an audit TIF and a negative decision, not a high-scoring competition upload.
 
 ## What was tested; why this TIF is not cleared
 
@@ -107,8 +105,7 @@ H57-A was preregistered within the assigned tensor lane: combine a near-2-D,
 strike-concordant tensor score with a flank prior derived from visible mapped faults,
 then test whole fault segments withheld from the catalogue. The current strict scan
 covers every available reference: 62 registry rasters plus four local historical
-candidates (66/66, no incompatible rows). The surface passes (max |Spearman| 0.2443
-<0.90), but the final map returns **DUPLICATE-STOP**: 0.76 of the final dots are
+candidates (66/66, no incompatible rows). The surface passes (max |Spearman| 0.2443 in the pre-placement report; 0.245 in the expanded final report, both <0.90), but the final map returns **DUPLICATE-STOP**: 0.76 of the final dots are
 within 3 Euclidean pixels of two PARALLEL16 NaN/zeros variants, above the literal
 0.70 limit. Both rows count; their random-control overlap is diagnostic only and
 cannot waive the rule. No raster is excluded. This H57 map is **not unique** under
